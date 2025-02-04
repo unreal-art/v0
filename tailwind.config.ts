@@ -8,11 +8,58 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      textColor: {
+        primary: {
+          1: "var(--color-text-primary-1)",
+          2: "var(--color-text-primary-2)",
+          3: "var(--color-text-primary-3)",
+          4: "var(--color-text-primary-4)",
+          5: "var(--color-text-primary-5)",
+          6: "var(--color-text-primary-6)",
+          7: "var(--color-text-primary-7)",
+          8: "var(--color-text-primary-8)",
+          9: "var(--color-text-primary-9)",
+          10: "var(--color-text-primary-10)",
+          11: "var(--color-text-primary-11)",
+          12: "var(--color-text-primary-12)",
+          13: "var(--color-text-primary-13)",
+        }
       },
-    },
+      borderColor: {
+        primary: {
+          1: "var(--color-text-primary-1)",
+          2: "var(--color-text-primary-2)",
+          3: "var(--color-text-primary-3)",
+          4: "var(--color-text-primary-4)",
+          5: "var(--color-text-primary-5)",
+          6: "var(--color-text-primary-6)",
+          7: "var(--color-text-primary-7)",
+          8: "var(--color-text-primary-8)",
+          9: "var(--color-text-primary-9)",
+          10: "var(--color-text-primary-10)",
+          11: "var(--color-text-primary-11)",
+          12: "var(--color-text-primary-12)",
+          13: "var(--color-text-primary-13)",
+        }
+      },
+      backgroundColor: {
+        primary: {
+          1: "var(--color-text-primary-1)",
+          2: "var(--color-text-primary-2)",
+          3: "var(--color-text-primary-3)",
+          4: "var(--color-text-primary-4)",
+          5: "var(--color-text-primary-5)",
+          6: "var(--color-text-primary-6)",
+          7: "var(--color-text-primary-7)",
+          8: "var(--color-text-primary-8)",
+          9: "var(--color-text-primary-9)",
+          10: "var(--color-text-primary-10)",
+          11: "var(--color-text-primary-11)",
+          12: "var(--color-text-primary-12)",
+          13: "var(--color-text-primary-13)",
+        }
+      }
+    }
   },
   plugins: [],
 } satisfies Config;
