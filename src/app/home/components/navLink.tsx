@@ -81,7 +81,6 @@ export default function NavLink({ href, text, icon }: NavLinkProps) {
         }
     }, [href]);
 
-
     return (
         <Link 
             className="flex md:p-2 md:m-5 flex-col items-center justify-center" 
