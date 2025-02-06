@@ -23,20 +23,6 @@
 }
 
 
-@font-face {
-  font-family: logirent;
-  src: url("/logirent/otf/logirent-logirent-regular-700.otf") format("opentype");
-}
-
-@font-face {
-  font-family: logirent;
-  font-weight: bold;
-  src: url("/logirent/otf/logirent-logirent-bold-700.otf") format("opentype");
-}
-
-
-
-
 
 
 
@@ -110,4 +96,10 @@
   position: relative;
   z-index: 2;
   background: hsla(0, 0%, 100%, 0.8);
+}
+
+
+
+.picture-gradient {
+  background: linear-gradient(180deg, rgba(102, 102, 102, 0.6) 0%, rgba(0, 0, 0, 0.6) 100%);
 }

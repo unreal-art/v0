@@ -10,7 +10,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className={`flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-screen`}>
+    <main className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-screen w-screen`}>
 
       <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full">
 
@@ -22,7 +22,7 @@ export default function RootLayout({
 
           <div className="flex flex-grow justify-evenly md:flex-col md:justify-start">
             <NavLink href={"/home"} text="Home" icon="dashboard"  />
-            <NavLink href={"/creations"} text="Creations" icon="creations"  />
+            <NavLink href={"/home/creations"} text="Creations" icon="creations"  />
           </div>
 
           <div className="md:hidden">
@@ -30,9 +30,9 @@ export default function RootLayout({
           </div>
 
           <div className="flex flex-grow justify-evenly md:flex-col md:justify-end">
-            <NavLink href={"/notification"} text="Notification" icon="notification"  />
+            <NavLink href={"/home/notification"} text="Notification" icon="notification"  />
             <div className="hidden md:block">
-              <NavLink href={"/profile"} text="Profile" icon="profile"  />
+              <NavLink href={"/home/profile"} text="Profile" icon="profile"  />
             </div>
             <NavLink href="/menu" text="Menu" icon="menu" />
           </div>
@@ -41,7 +41,7 @@ export default function RootLayout({
 
       </div>
 
-      <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full">
+      <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto">
         {children}
       </div>
 
