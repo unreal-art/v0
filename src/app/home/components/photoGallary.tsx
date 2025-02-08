@@ -1,12 +1,11 @@
 "use client"
-
 import { ColumnsPhotoAlbum, RenderImageContext, RenderImageProps } from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import photos from "../photos";
 import Image from "next/image";
+import { MD_BREAKPOINT } from "@/app/libs/constants";
 
-const MD_BREAKPOINT = 768
 
 export default function PhotoGallary() {
     const [columns, setColumns] = useState(window?.innerWidth < MD_BREAKPOINT ? 2 : 4)
@@ -23,15 +22,13 @@ export default function PhotoGallary() {
     }, [])
 
     return (
-        <div className="overflow-y-auto">
-            <ColumnsPhotoAlbum //render={{ image: renderNextImage }} 
+        <ColumnsPhotoAlbum //render={{ image: renderNextImage }} 
             photos={photos} 
             columns={columns}
             onClick={(photo) => {
                 console.log({photo})
             }}
-            />
-        </div>
+        />
     );
 }
 
