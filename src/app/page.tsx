@@ -43,14 +43,14 @@ export default function Home() {
           </AuthBtn>
 
 
-          <AuthBtn
+          {/* <AuthBtn
             icon={
               <div>
 
               </div>
             }> 
             Continue with Wallet
-          </AuthBtn>
+          </AuthBtn> */}
 
 
         </div>
