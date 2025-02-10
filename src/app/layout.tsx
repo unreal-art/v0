@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
-import localFont from 'next/font/local'
+import localFont from "next/font/local";
 import "./globals.css";
+import PathnameProvider from "./components/PathnameProvider";
 
-const nasalization = localFont({ src: './fonts/nasalization/Nasalization Rg.otf' })
+const nasalization = localFont({
+  src: "./fonts/nasalization/Nasalization Rg.otf",
+});
 
 const archivo = localFont({
   src: [
     {
-      path: './fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf',
-      weight: '400',
-      style: 'normal',
+      path: "./fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf",
+      weight: "400",
+      style: "normal",
     },
     {
-      path: './fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf',
-      weight: '400',
-      style: 'italic',
+      path: "./fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf",
+      weight: "400",
+      style: "italic",
     },
     // {
     //   path: './Roboto-Bold.woff2',
@@ -27,10 +30,7 @@ const archivo = localFont({
     //   style: 'italic',
     // },
   ],
-
-})
-
-
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -44,8 +44,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}>
-        {children}
+      <body
+        className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
+      >
+        <PathnameProvider>{children}</PathnameProvider>
       </body>
     </html>
   );
