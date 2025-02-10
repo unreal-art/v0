@@ -1,5 +1,35 @@
 import type { Metadata } from "next";
+import localFont from 'next/font/local'
 import "./globals.css";
+
+const nasalization = localFont({ src: './fonts/nasalization/Nasalization Rg.otf' })
+
+const archivo = localFont({
+  src: [
+    {
+      path: './fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf',
+      weight: '400',
+      style: 'italic',
+    },
+    // {
+    //   path: './Roboto-Bold.woff2',
+    //   weight: '700',
+    //   style: 'normal',
+    // },
+    // {
+    //   path: './Roboto-BoldItalic.woff2',
+    //   weight: '700',
+    //   style: 'italic',
+    // },
+  ],
+
+})
+
 
 
 export const metadata: Metadata = {
@@ -14,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`background-color-primary-1 text-primary-11 `}>
+      <body className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}>
         {children}
       </body>
     </html>

@@ -5,7 +5,7 @@ export default function GenerateInput () {
     const [open, setOpen] = useState(false)
     return (
         <>
-            <h1 className="text-center text-4xl">Create Anything Imaginable</h1>
+            <h1 className="text-center text-4xl text-primary-1 nasalization">Create Anything Imaginable</h1>
 
             <div className="w-4/5 max-w-4xl mt-7">
                 <div className="relative h-12 flex w-full rounded-l-full mb-10">

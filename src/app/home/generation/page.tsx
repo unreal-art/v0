@@ -46,7 +46,7 @@ export default function Generation() {
                                 </div>
                                 <div>
                                     <p className="font-semibold text-lg leading-6 text-primary-2">David Johnson</p>
-                                    <p className="text-primary-7">Creator</p>
+                                    <p className="text-primary-7 nasalization">Creator</p>
                                 </div>
                             </div>
                             <button><OptionMenuIcon color="#C1C1C1" /></button>
