@@ -1,18 +1,16 @@
-"use client"
+"use client";
+
 import GenerateInput from "./components/generateInput";
 import TabBtn from "./components/tabBtn";
-import dynamic from 'next/dynamic'
- 
-const PhotoGallary = dynamic(
-  () => import("./components/photoGallary"),
-  { ssr: false }
-)
+import dynamic from "next/dynamic";
+
+const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
+  ssr: false,
+});
 
 export default function Home() {
-
   return (
     <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
-
       <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
         <GenerateInput />
       </div>
@@ -24,8 +22,10 @@ export default function Home() {
         <TabBtn text="Top" />
       </div>
 
-      <div className="overflow-y-auto"> <PhotoGallary /> </div>
-
+      <div className="overflow-y-auto">
+        {" "}
+        <PhotoGallary />{" "}
+      </div>
     </div>
   );
 }
