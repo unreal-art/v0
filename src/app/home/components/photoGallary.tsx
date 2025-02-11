@@ -8,7 +8,7 @@ import { MD_BREAKPOINT } from "@/app/libs/constants";
 import PhotoOverlay from "./photoOverlay";
 // import { getPosts } from "$/queries/post/getPosts";
 // import { supabase } from "$/supabase/client";
-import { usePostsQuery } from "@/hooks/usePostsQuery";
+// import { usePostsQuery } from "@/hooks/usePostsQuery";
 import { supabase } from "$/supabase/client";
 import { getPosts } from "$/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
