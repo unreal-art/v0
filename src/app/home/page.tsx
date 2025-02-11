@@ -1,4 +1,3 @@
-import { usePostsQuery, usePostsQuerySSR } from "@/hooks/usePostsQuery";
 import GenerateInput from "./components/generateInput";
 import TabBtn from "./components/tabBtn";
 import dynamic from "next/dynamic";
@@ -9,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { getPosts } from "$/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
+import { Post } from "$/types/data.types";
 
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
@@ -17,13 +17,20 @@ const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
 export default async function Home() {
   const supabaseSSR = await createClient();
   const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery({
+  await queryClient.prefetchInfiniteQuery({
     queryKey: ["posts"],
-    queryFn: async () => {
-      const result = await getPosts(supabaseSSR);
-      return result ?? [];
+    queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
+      // console.log("Prefetching page:", pageParam); // Debugging line
+
+      const result = await getPosts(supabaseSSR, pageParam);
+      return {
+        data: result ?? [],
+        nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Handle pagination
+      };
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: { data: Post[]; nextCursor?: number }) =>
+      lastPage?.nextCursor ?? undefined,
   });
 
   return (

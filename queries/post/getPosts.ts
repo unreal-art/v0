@@ -1,5 +1,6 @@
 import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
+import { getRange } from "$/utils";
 
 // export async function getPosts(client: Client): Promise<{ data: Post[] }> {
 //   const { data, error } = await client
@@ -23,16 +24,14 @@ import { Post, UploadResponse } from "$/types/data.types";
 //   return { data: typedData };
 // }
 
-export async function getPosts(
-  client: Client,
-  start = 0,
-  end = 9,
-): Promise<Post[]> {
+export async function getPosts(client: Client, start = 0): Promise<Post[]> {
+  const range = getRange(start, 20);
+
   const { data, error } = await client
     .from("posts")
     .select("*")
     .order("createdAt", { ascending: false })
-    .range(start, end);
+    .range(range[0], range[1]);
 
   if (error) {
     console.error("Supabase error:", error.message);

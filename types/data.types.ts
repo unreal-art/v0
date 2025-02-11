@@ -20,3 +20,9 @@ export type Post = {
   prompt: string | null;
   seed: number | null;
 };
+
+// Define proper types for pages
+export interface Page {
+  data: Post[];
+  nextCursor?: number;
+}
