@@ -9,24 +9,58 @@ import PhotoOverlay from "./photoOverlay";
 // import { getPosts } from "$/queries/post/getPosts";
 // import { supabase } from "$/supabase/client";
 import { usePostsQuery } from "@/hooks/usePostsQuery";
+import { supabase } from "$/supabase/client";
+import { getPosts } from "$/queries/post/getPosts";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import InfiniteScroll from "./InfiniteScroll";
 // import { useQuery } from "@tanstack/react-query";
+//
 
 export default function PhotoGallary() {
   const [columns, setColumns] = useState(
     window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
 
-  const [start, setStart] = useState(0);
-  const [end, setEnd] = useState(0);
-
   // const { data: posts } = useQuery({
   //   queryKey: ["posts"],
   //   queryFn: () => getPosts(supabase),
   // });
+  const {
+    isLoading,
+    isError,
+    error,
+    data,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["posts"],
+    queryFn: async ({ pageParam = 0 }) => {
+      const result = await getPosts(supabase, pageParam);
 
-  const { data: posts, isFetching } = usePostsQuery(start, end);
+      return {
+        data: result ?? [],
+        nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Stop pagination if no data
+      };
+    },
+    initialPageParam: 0,
 
-  console.log("client:", posts, isFetching);
+    getNextPageParam: (lastPage) => {
+      if (!lastPage?.data || !Array.isArray(lastPage.data)) {
+        return undefined;
+      }
+
+      if (lastPage.data.length === 0) {
+        return undefined;
+      }
+
+      return lastPage.nextCursor; // ✅ Correctly use the cursor for pagination
+    },
+  });
+
+  // const { data: posts, isFetching } = usePostsQuery(start, end);
+
+  console.log("client:", data);
 
   useEffect(() => {
     if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
@@ -44,16 +78,22 @@ export default function PhotoGallary() {
   }, []);
 
   return (
-    <ColumnsPhotoAlbum
-      photos={dummyPhotos}
-      columns={columns}
-      spacing={1}
-      render={{
-        extras: () => <PhotoOverlay />,
-      }}
-      onClick={(photo) => {
-        console.log({ photo });
-      }}
-    />
+    <InfiniteScroll
+      isLoadingIntial={isLoading}
+      isLoadingMore={isFetchingNextPage}
+      loadMore={() => hasNextPage && fetchNextPage()}
+    >
+      <ColumnsPhotoAlbum
+        photos={dummyPhotos}
+        columns={columns}
+        spacing={1}
+        render={{
+          extras: () => <PhotoOverlay />,
+        }}
+        onClick={(photo) => {
+          console.log({ photo });
+        }}
+      />
+    </InfiniteScroll>
   );
 }

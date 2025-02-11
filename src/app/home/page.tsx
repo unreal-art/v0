@@ -1,4 +1,3 @@
-import { usePostsQuery, usePostsQuerySSR } from "@/hooks/usePostsQuery";
 import GenerateInput from "./components/generateInput";
 import TabBtn from "./components/tabBtn";
 import dynamic from "next/dynamic";
@@ -18,12 +17,13 @@ export default async function Home() {
   const supabaseSSR = await createClient();
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
+  await queryClient.prefetchInfiniteQuery({
     queryKey: ["posts"],
     queryFn: async () => {
       const result = await getPosts(supabaseSSR);
       return result ?? [];
     },
+    initialPageParam: 0,
   });
 
   return (
