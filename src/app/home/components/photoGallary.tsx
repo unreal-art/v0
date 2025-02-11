@@ -3,7 +3,7 @@ import { ColumnsPhotoAlbum } from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
-import dummyPhotos from "../dummyPhotos";
+// import dummyPhotos from "../dummyPhotos";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay from "./photoOverlay";
 // import { getPosts } from "$/queries/post/getPosts";
@@ -13,6 +13,7 @@ import { supabase } from "$/supabase/client";
 import { getPosts } from "$/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
+import { formattedPhotos } from "../formattedPhotos";
 // import { useQuery } from "@tanstack/react-query";
 //
 
@@ -31,6 +32,7 @@ export default function PhotoGallary() {
     error,
     data,
     isFetchingNextPage,
+    isFetching,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -59,8 +61,8 @@ export default function PhotoGallary() {
   });
 
   // const { data: posts, isFetching } = usePostsQuery(start, end);
-
-  console.log("client:", data);
+  console.log("client:", isLoading, isFetching, data);
+  // console.log(data);
 
   useEffect(() => {
     if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
@@ -77,14 +79,30 @@ export default function PhotoGallary() {
     };
   }, []);
 
+  // if (isLoading || isFetching) {
+  //   return <p>Loading ... </p>;
+  // }
+
+  if (isError) {
+    return (
+      <p className="wrapper">{"message" in error ? error.message : error}</p>
+    );
+  }
+
+  if (!data || data.pages.length === 0) {
+    return (
+      <p>It looks like you haven&apos;t saved any books to this shelf yet.</p>
+    );
+  }
+
   return (
     <InfiniteScroll
-      isLoadingIntial={isLoading}
+      isLoadingIntial={isLoading || isFetching}
       isLoadingMore={isFetchingNextPage}
       loadMore={() => hasNextPage && fetchNextPage()}
     >
       <ColumnsPhotoAlbum
-        photos={dummyPhotos}
+        photos={formattedPhotos(data?.pages ?? [])}
         columns={columns}
         spacing={1}
         render={{

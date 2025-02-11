@@ -18,6 +18,7 @@ function InfiniteScroll(props: Props) {
     function handleIntersection(entries: IntersectionObserverEntry[]) {
       entries.forEach((entry) => {
         if (entry.isIntersecting && (!isLoadingMore || !isLoadingIntial)) {
+          console.log("in view");
           loadMore();
         }
       });
@@ -39,17 +40,17 @@ function InfiniteScroll(props: Props) {
   }, [isLoadingMore, isLoadingIntial, loadMore]);
 
   return (
-    <>
+    <div className="mb-32">
       <>{children}</>
 
       <div ref={observerElement} id="obs">
-        {isLoadingMore && !isLoadingIntial && (
+        {isLoadingMore && (
           <div className="wrapper flex justify-center items-center h-20">
-            Loading...
+            Loading more....
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 

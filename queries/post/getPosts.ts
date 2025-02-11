@@ -25,7 +25,7 @@ import { getRange } from "$/utils";
 // }
 
 export async function getPosts(client: Client, start = 0): Promise<Post[]> {
-  const range = getRange(start, 10);
+  const range = getRange(start, 20);
 
   const { data, error } = await client
     .from("posts")
