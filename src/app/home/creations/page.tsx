@@ -36,7 +36,6 @@ export default async function Creation() {
           <GenerateInput />
 
           <div className="flex gap-x-2 items-center w-full h-6 py-3">
-            <WalletButton />
             <TabBtn text="Search" />
             <TabBtn text="Explore" />
             <TabBtn text="Following" />
