@@ -60,10 +60,6 @@ export default function PhotoGallary() {
     },
   });
 
-  // const { data: posts, isFetching } = usePostsQuery(start, end);
-  console.log("client:", isLoading, isFetching, data);
-  // console.log(data);
-
   useEffect(() => {
     if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
 

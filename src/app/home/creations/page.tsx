@@ -1,5 +1,4 @@
 import GenerateInput from "../components/generateInput";
-import photos from "./photos";
 import TabBtn from "../components/tabBtn";
 import PhotoGrid from "./components/photoGrid";
 import {
@@ -10,6 +9,7 @@ import {
 import { createClient } from "$/supabase/server";
 import { getPostsByUser } from "$/queries/post/getPostsByUser";
 import { Post } from "$/types/data.types";
+import WalletButton from "@/app/components/walletButton";
 
 export default async function Creation() {
   const supabaseSSR = await createClient();
@@ -36,6 +36,7 @@ export default async function Creation() {
           <GenerateInput />
 
           <div className="flex gap-x-2 items-center w-full h-6 py-3">
+            <WalletButton />
             <TabBtn text="Search" />
             <TabBtn text="Explore" />
             <TabBtn text="Following" />
