@@ -2,6 +2,9 @@ import { Page, Post } from "$/types/data.types";
 import { isHighQualityImage } from "$/utils";
 import type { Photo } from "react-photo-album";
 
+export interface ExtendedPhoto extends Photo {
+  prompt?: string;
+}
 const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
 
 // Function to fetch the image
@@ -24,7 +27,7 @@ const getImage = (cid: string, fileName: string) => {
   }
 };
 
-export const formattedPhotos = (pages: Page[]): Photo[] => {
+export const formattedPhotos = (pages: Page[]): ExtendedPhoto[] => {
   return pages
     .flatMap((page) =>
       page.data.map((post: Post) => {
@@ -49,8 +52,9 @@ export const formattedPhotos = (pages: Page[]): Photo[] => {
             width: breakpoint,
             height: Math.round((720 / 1080) * breakpoint), // Maintain aspect ratio
           })),
-        } as Photo;
+          prompt: post.prompt,
+        } as ExtendedPhoto;
       }),
     )
-    .filter(Boolean) as Photo[];
+    .filter(Boolean) as ExtendedPhoto[];
 };
