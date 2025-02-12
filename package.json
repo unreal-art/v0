@@ -27,6 +27,7 @@
     "react-three": "^0.9.7",
     "supabase": "^2.9.6",
     "swiper": "^11.2.2",
+    "thirdweb": "^5.88.2",
     "three": "^0.173.0"
   },
   "devDependencies": {

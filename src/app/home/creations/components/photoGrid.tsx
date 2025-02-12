@@ -15,8 +15,6 @@ const PhotoGrid = () => {
   const [hover, setHover] = useState(false);
   const {
     isLoading,
-    isError,
-    error,
     data,
     isFetchingNextPage,
     isFetching,
