@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import PathnameProvider from "./components/PathnameProvider";
 
 const nasalization = localFont({
   src: "./fonts/nasalization/Nasalization Rg.otf",
@@ -47,7 +46,7 @@ export default function RootLayout({
       <body
         className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
       >
-        <PathnameProvider>{children}</PathnameProvider>
+        {children}
       </body>
     </html>
   );

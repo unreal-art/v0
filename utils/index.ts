@@ -54,3 +54,14 @@ export function isHighQualityImage(filename: string): boolean {
 
   return highQExt.includes(filename.toLowerCase().split(".").pop() || "");
 }
+
+export function truncateText(
+  text: string | undefined,
+  wordLimit: number = 20,
+): string {
+  if (!text) return "";
+  const words = text.split(" ");
+  return words.length > wordLimit
+    ? words.slice(0, wordLimit).join(" ") + "..."
+    : text;
+}
