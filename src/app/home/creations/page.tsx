@@ -1,14 +1,16 @@
 "use client"
 import GenerateInput from "../components/generateInput";
-import photos from "./photos";
 import Image from "next/image";
 import TabBtn from "../components/tabBtn";
 import { OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay from "../components/photoOverlay";
 import { useState } from "react";
+import ImageView from "../components/imageView";
+import dummyPhotos from "../dummyPhotos";
 
 
 export default function Creation() {
+  const [imageIndex, setImageIndex] = useState(-1)
 
 
   return (
@@ -28,33 +30,36 @@ export default function Creation() {
       </div>
 
 
-      <div className="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4">
+      <div className="w-full h-full overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4">
         {
-          photos.map((photo, index) => {
+          dummyPhotos.map((photo, index) => {
             const [hover, setHover] = useState(false)
             return (
-              <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} key={index} className="relative text-primary-1 text-sm">
+              <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} key={index} className="relative h-full w-full text-primary-1 text-sm">
+                <PhotoOverlay hideContent={true} setImageIndex={() => setImageIndex(index)}> </PhotoOverlay>
                 { 
                   hover &&
-                    <div className="picture-gradient absolute top-0 left-0 h-12 w-full flex justify-between items-center px-3"> 
+                    <div className={`${!hover && 'picture-gradient'} absolute top-0 left-0 h-12 w-full flex justify-between items-center px-3 bg-black`}> 
                       <p>36s</p>
                       <button><OptionMenuIcon color="#FFFFFF" /></button>
                     </div>
                 }
-                <Image src={photo.image} width={600} height={600} alt="" />
+                <div className="relative min-h-[400px] min-w-[300px] h-full w-full">
+                  <Image src={photo.src} fill={true} alt=""  />
+                </div>
                 { 
                   hover &&
-                    <div className="picture-gradient absolute bottom-0 left-0 h-16 w-full p-3">
+                    <div className={`${!hover && 'picture-gradient'} absolute bottom-0 left-0 h-16 w-full p-3`}>
                       <p>Pixar Fest at Disneyland sounds amazing! I need to see the new parades! 🎉🎈</p>
                     </div>
                 }
-                <PhotoOverlay />
               </div>
             )
           })
         }
       </div>
 
+      <ImageView photo={imageIndex > -1 && dummyPhotos[imageIndex]} setImageIndex={setImageIndex} />
 
     </div>
   );
