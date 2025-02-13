@@ -43,7 +43,7 @@ export const getUser = async () => {
     followerCount: profileData[0].follower_count,
     followingCount: profileData[0].following_count,
     location: profileData[0].location,
-    likesReceived: profileData[0].likesReceived,
+    likesReceived: profileData[0].likes_received,
     creditBalance: profileData[0].credit_balance,
   };
   return user;
