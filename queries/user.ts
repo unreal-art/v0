@@ -5,10 +5,7 @@ import { generateEthereumWallet } from "$/utils";
 
 export const getUser = async () => {
   const supabase = await createClient();
-  const {
-    data: { userData },
-    error,
-  } = await supabase.auth.getUser();
+  const { data: userData, error } = await supabase.auth.getUser();
   if (error) {
     return null;
   }
@@ -17,7 +14,7 @@ export const getUser = async () => {
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", userData?.id);
+    .eq("id", userData?.user?.id);
 
   if (profileError) {
     return null;
@@ -46,7 +43,7 @@ export const getUser = async () => {
     followerCount: profileData[0].follower_count,
     followingCount: profileData[0].following_count,
     location: profileData[0].location,
-    likesReceived: profileData[0].likesReceived,
+    likesReceived: profileData[0].likes_received,
     creditBalance: profileData[0].credit_balance,
   };
   return user;

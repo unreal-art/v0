@@ -9,7 +9,7 @@ import {
 import { createClient } from "$/supabase/server";
 import { getPostsByUser } from "$/queries/post/getPostsByUser";
 import { Post } from "$/types/data.types";
-import WalletButton from "@/app/components/walletButton";
+//import WalletButton from "@/app/components/walletButton";
 
 export default async function Creation() {
   const supabaseSSR = await createClient();
