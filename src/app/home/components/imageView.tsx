@@ -23,11 +23,11 @@ export default function ImageView ({ photo, setImageIndex } : GenerateTextFieldP
                 
                 <div onClick={() => setImageIndex(-1)} className="absolute flex justify-center items-center top-0 left-0 h-screen w-full"></div>
 
-                <div className="z-10 w-full md:w-8/12 max-w-[685px] h-5/6 md:h-[432px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
+                <div className="z-10 w-full md:w-8/12 max-w-[685px] h-full md:h-[432px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
 
                     <div className="flex flex-col bg-primary-13 h-full w-full rounded-md">
 
-                        <div className="grid grid-cols-2 h-full">
+                        <div className="grid grid-cols-1 md:grid-cols-2 h-full">
 
                             <div className="h-full col-span-1">
                                 <div className="relative w-full h-full">                                
@@ -79,7 +79,9 @@ export default function ImageView ({ photo, setImageIndex } : GenerateTextFieldP
                     </div>
 
                 </div>
+
             </div>
+
         </>
     )
 }
