@@ -164,3 +164,19 @@ const dummyPhotos = [
 );
 
 export default dummyPhotos;
+
+export const dummyPhotos2 = dummyPhotos.map(
+  ({src, alt }, index) =>
+    ({
+      src,
+      key: index.toString(),
+      alt,
+      width: 1000,
+      height: 1000,
+      srcSet: breakpoints.map((breakpoint) => ({
+        src,
+        width: breakpoint,
+        height: Math.round((1) * breakpoint),
+      })),
+    }) as Photo,
+);

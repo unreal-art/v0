@@ -1,5 +1,5 @@
 "use client";
-
+//@deprecated 
 import { useState } from "react";
 import Image from "next/image";
 import { OptionMenuIcon } from "@/app/components/icons";

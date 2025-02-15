@@ -48,9 +48,9 @@ export default async function Home() {
         </div>
 
         <div className="overflow-y-auto">
-          {" "}
-          <PhotoGallary />{" "}
+          <PhotoGallary />
         </div>
+        
       </div>
     </HydrationBoundary>
   );

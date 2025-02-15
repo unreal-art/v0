@@ -79,7 +79,7 @@ export default function NavLink({ href, text, icon }: NavLinkProps) {
         } else {
             setActive(false);
         }
-    }, [href]);
+    }, [href, window.location.pathname]);
 
     return (
         <Link 
