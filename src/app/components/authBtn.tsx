@@ -9,7 +9,7 @@ interface AuthBtnProps {
 }
 
 export default function AuthBtn({ icon, children, provider }: AuthBtnProps) {
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   const handleGoogleSignIn = () => {
     const redirectTo = `${config.domainName}/api/auth/callback`;

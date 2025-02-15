@@ -1,41 +1,50 @@
-"use client"
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { createClient } from "$/supabase/server";
+import { getPostsByUser } from "$/queries/post/getPostsByUser";
+import { Post } from "$/types/data.types";
 import GenerateInput from "../components/generateInput";
-import { useState } from "react";
-import Tabs from "./components/Tabs";
-import TabPage from "./components/TabPage";
-import { dummyPhotos2 } from "../dummyPhotos";
+import CreationView from "./components/CreationView";
 
 
 
-export default function Creation() {
 
-  const [currentIndex, setCurrentIndex] = useState(0)
+export default async function Creation() {
+  const supabaseSSR = await createClient();
+  const queryClient = new QueryClient();
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ["creation_posts"],
+    queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
+      // console.log("Prefetching page:", pageParam); // Debugging line
+
+      const result = await getPostsByUser(supabaseSSR, pageParam);
+      return {
+        data: result ?? [],
+        nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Handle pagination
+      };
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: { data: Post[]; nextCursor?: number }) =>
+      lastPage?.nextCursor ?? undefined,
+  });
 
   return (
-    <div className="flex flex-col items-center background-color-primary-1 px-10 w-full">
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="flex flex-col items-center background-color-primary-1 px-10 w-full">
+  
+        <div className="hidden md:flex flex-col justify-center items-center py-5 w-full">
 
-      <div className="hidden md:flex flex-col justify-center items-center py-5 w-full">
+          <GenerateInput />
 
-        <GenerateInput />
+        </div>
 
-      </div>
-
-      <div className="w-full mb-4"> <Tabs currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} /> </div>
-
-      <div className="w-full">
-
-        { currentIndex === 0 && <TabPage title={"Public"} data={dummyPhotos2} content="You haven’t liked anything yet." subContent="Find something you love and tap that 🤍!"  />  }    
-        
-        { currentIndex === 1 && <TabPage title={"Private"} data={dummyPhotos2} content="You haven’t liked anything yet." subContent="Find something you love and tap that 🤍!"  />  }
-
-        { currentIndex === 2 && <TabPage title={"Liked"} data={[]} content="You haven’t liked anything yet." subContent="Find something you love and tap that 🤍!" />  }        
-
-        { currentIndex === 3 && <TabPage title={"Public"} data={dummyPhotos2} content="You haven’t liked anything yet." subContent="Find something you love and tap that 🤍!" />  }
-
-        { currentIndex === 4 && <TabPage title={"Draft"} data={[]} content="You haven’t saved anything yet." subContent="Create something you love to post later"  />  }
-
-      </div>
+      <CreationView />
 
     </div>
+
+    </HydrationBoundary>
   );
 }

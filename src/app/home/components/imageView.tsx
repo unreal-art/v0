@@ -11,6 +11,8 @@ interface GenerateTextFieldProps {
 
 export default function ImageView ({ photo, setImageIndex } : GenerateTextFieldProps) {
 
+    console.log({photo})
+
     if (!photo) return
 
     const currentImage = photo as IPhoto
