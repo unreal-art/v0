@@ -39,3 +39,9 @@ body {
 .generate-gradient {
   background: linear-gradient(180deg, #2B2B2B 0%, #5E5E5E 41.4%, #919191 100%);
 }
+
+
+.topup-btn-gradient {
+  border: 1px solid;
+  border-image-source: linear-gradient(235.59deg, rgba(0, 0, 0, 0.3) 0%, rgba(193, 193, 193, 0.3) 99.32%);
+}
