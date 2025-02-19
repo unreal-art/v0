@@ -73,8 +73,6 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
     },
   });
 
-  console.log({ data });
-
   useEffect(() => {
     if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
 
