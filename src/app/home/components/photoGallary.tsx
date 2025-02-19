@@ -1,14 +1,14 @@
 "use client";
-import { ColumnsPhotoAlbum, Photo, RenderPhotoContext } from "react-photo-album";
+import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
 // import dummyPhotos from "../dummyPhotos";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
-import PhotoOverlay from "./photoOverlay";
+import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
 // import { getPosts } from "$/queries/post/getPosts";
 // import { supabase } from "$/supabase/client";
-import { usePostsQuery } from "@/hooks/usePostsQuery";
+//import { usePostsQuery } from "@/hooks/usePostsQuery";
 import Image from "next/image";
 import ImageView from "./imageView";
 // import { usePostsQuery } from "@/hooks/usePostsQuery";
@@ -21,7 +21,7 @@ import { formattedPhotos } from "../formattedPhotos";
 //
 
 export default function PhotoGallary({}) {
-  const [imageIndex, setImageIndex] = useState(-1)
+  const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState(
     window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
@@ -80,8 +80,8 @@ export default function PhotoGallary({}) {
   }, []);
 
   const handleImageIndex = (context: RenderPhotoContext) => {
-    setImageIndex(context.index)
-  }
+    setImageIndex(context.index);
+  };
 
   // if (isLoading || isFetching) {
   //   return <p>Loading ... </p>;
@@ -112,19 +112,33 @@ export default function PhotoGallary({}) {
           spacing={4}
           render={{
             extras: (_, context) => (
-            <PhotoOverlay setImageIndex={() => handleImageIndex(context)}> 
-              <div className="absolute flex items-center gap-1 bottom-2 left-2">
-                <div className="rounded-full">
-                  <Image className="rounded-full border-[1px] border-primary-3 drop-shadow-lg" src={"/icons/dummy-profile.png"} width={24} height={24} alt="profile" />
+              <PhotoOverlay
+                setImageIndex={() => handleImageIndex(context)}
+                context={context as ExtendedRenderPhotoContext}
+              >
+                <div className="absolute flex items-center gap-1 bottom-2 left-2">
+                  <div className="rounded-full">
+                    <Image
+                      className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                      src={"/icons/dummy-profile.png"}
+                      width={24}
+                      height={24}
+                      alt="profile"
+                    />
+                  </div>
+                  <p className="font-semibold text-sm drop-shadow-lg">David</p>
                 </div>
-                <p className="font-semibold text-sm drop-shadow-lg">David</p>
-              </div>
-            </PhotoOverlay>
+              </PhotoOverlay>
             ),
           }}
         />
       </InfiniteScroll>
-      <ImageView photo={imageIndex > -1 && formattedPhotos(data?.pages ?? [])[imageIndex]} setImageIndex={setImageIndex} />
+      <ImageView
+        photo={
+          imageIndex > -1 && formattedPhotos(data?.pages ?? [])[imageIndex]
+        }
+        setImageIndex={setImageIndex}
+      />
     </>
   );
 }

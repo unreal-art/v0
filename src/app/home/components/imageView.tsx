@@ -5,8 +5,8 @@ import ImageViewInteractions from "./imageViewInteractions";
 import CommentTextbox from "./commentTextbox";
 
 interface GenerateTextFieldProps {
-    photo: boolean | IPhoto;
-    setImageIndex: (value: number) => void;
+  photo: boolean | IPhoto;
+  setImageIndex: (value: number) => void;
 }
 
 export default function ImageView ({ photo, setImageIndex } : GenerateTextFieldProps) {
@@ -74,16 +74,25 @@ export default function ImageView ({ photo, setImageIndex } : GenerateTextFieldP
                                     <CommentTextbox />
                                 </div>
 
-                            </div>
-                    
-                        </div>
 
-                    </div>
-
+                <div className="px-6">
+                  <hr />
                 </div>
 
-            </div>
+                <div className="flex-grow py-2 px-6 overflow-auto"></div>
 
-        </>
-    )
+                <div className="flex py-2 px-6 border-y-[1px] border-primary-6">
+                  <ImageViewInteractions />
+                </div>
+
+                <div>
+                  <CommentTextbox />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
