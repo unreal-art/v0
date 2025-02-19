@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface NavBtnProps {
@@ -9,7 +11,8 @@ interface NavBtnProps {
 export default function TabBtn({ text }: NavBtnProps) {
   const [active, setActive] = useState(false);
   const [hover, setHover] = useState(false);
-
+  const searchParams = useSearchParams();
+  const s = searchParams.get("s");
   let iconSvg = null;
 
   function getIconColor() {
@@ -92,12 +95,12 @@ export default function TabBtn({ text }: NavBtnProps) {
   }
 
   useEffect(() => {
-    if (window.location.pathname === "home/" + text.toLowerCase()) {
-      setActive(true);
-    } else {
-      setActive(false);
-    }
-  }, [text]);
+    //set active the right tab or default to explore
+    setActive(
+      s?.toUpperCase() === text.toUpperCase() ||
+        (!s && text.toUpperCase() === "EXPLORE"),
+    );
+  }, [text, s]);
 
   if (text === "Search") {
     return (
@@ -112,15 +115,17 @@ export default function TabBtn({ text }: NavBtnProps) {
   }
 
   return (
-    <button
-      className={`flex gap-x-1 items-center p-2 pr-4 rounded-full ${hover || active ? "bg-primary-10" : ""}`}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <div>{iconSvg}</div>
-      <p className={`text-sm ${hover || active ? "text-primary-6" : ""}`}>
-        {text}
-      </p>
-    </button>
+    <Link href={`/home?s=${text}`}>
+      <button
+        className={`flex gap-x-1 items-center p-2 pr-4 rounded-full ${hover || active ? "bg-primary-10" : ""}`}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        <div>{iconSvg}</div>
+        <p className={`text-sm ${hover || active ? "text-primary-6" : ""}`}>
+          {text}
+        </p>
+      </button>
+    </Link>
   );
 }

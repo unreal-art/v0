@@ -84,12 +84,14 @@ export type Database = {
       posts: {
         Row: {
           author: string
+          caption: string | null
           category: string | null
           cpu: number | null
           createdAt: string
           device: string | null
           id: number
           ipfsImages: Json | null
+          isDraft: boolean
           isPinned: boolean | null
           isPrivate: boolean | null
           like_count: number | null
@@ -99,12 +101,14 @@ export type Database = {
         }
         Insert: {
           author?: string
+          caption?: string | null
           category?: string | null
           cpu?: number | null
           createdAt?: string
           device?: string | null
           id?: number
           ipfsImages?: Json | null
+          isDraft?: boolean
           isPinned?: boolean | null
           isPrivate?: boolean | null
           like_count?: number | null
@@ -114,12 +118,14 @@ export type Database = {
         }
         Update: {
           author?: string
+          caption?: string | null
           category?: string | null
           cpu?: number | null
           createdAt?: string
           device?: string | null
           id?: number
           ipfsImages?: Json | null
+          isDraft?: boolean
           isPinned?: boolean | null
           isPrivate?: boolean | null
           like_count?: number | null

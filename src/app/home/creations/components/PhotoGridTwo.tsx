@@ -15,13 +15,21 @@ import Image from "next/image";
 import ImageView from "../../components/imageView";
 import { OptionMenuIcon } from "@/app/components/icons";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getPostsByUser } from "$/queries/post/getPostsByUser";
+import {
+  getIsDraftPostsByUser,
+  getPinnedPostsByUser,
+  getPostsByUser,
+  getPrivatePostsByUser,
+  getUserLikedPosts,
+} from "$/queries/post/getPostsByUser";
 import { formattedPhotos } from "../../formattedPhotos";
 import { supabase } from "$/supabase/client";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import NoItemFound from "./NoItemFound";
 import { TabText } from "./Tabs";
 import { truncateText } from "$/utils";
+import { useSearchParams } from "next/navigation";
+import { Post } from "$/types/data.types";
 // import { useQuery } from "@tanstack/react-query";
 
 interface TabProps {
@@ -36,6 +44,9 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
     window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
 
+  const searchParams = useSearchParams();
+  const s = searchParams.get("s");
+
   // const { data: posts } = useQuery({
   //   queryKey: ["posts"],
   //   queryFn: () => getPosts(supabase),
@@ -49,9 +60,22 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["creation_posts"],
+    queryKey: ["creation_posts", s || "public"],
     queryFn: async ({ pageParam = 0 }) => {
-      const result = await getPostsByUser(supabase, pageParam);
+      let result: Post[] = [];
+      if (s?.toUpperCase() === "PUBLIC") {
+        result = await getPostsByUser(supabase, pageParam);
+      } else if (s?.toUpperCase() === "PRIVATE") {
+        result = await getPrivatePostsByUser(supabase, pageParam);
+      } else if (s?.toUpperCase() === "LIKED") {
+        result = await getUserLikedPosts(supabase, pageParam);
+      } else if (s?.toUpperCase() === "PINNED") {
+        result = await getPinnedPostsByUser(supabase, pageParam);
+      } else if (s?.toUpperCase() === "DRAFT") {
+        result = await getIsDraftPostsByUser(supabase, pageParam);
+      } else {
+        result = await getPostsByUser(supabase, pageParam);
+      }
 
       return {
         data: result ?? [],
