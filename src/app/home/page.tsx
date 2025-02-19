@@ -6,7 +6,11 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getPosts } from "$/queries/post/getPosts";
+import {
+  getFollowingPosts,
+  getPosts,
+  getTopPosts,
+} from "$/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
 
@@ -14,15 +18,28 @@ const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
 });
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
   const supabaseSSR = await createClient();
   const queryClient = new QueryClient();
+  const params = await searchParams;
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", params?.s || "explore"],
     queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
       // console.log("Prefetching page:", pageParam); // Debugging line
-
-      const result = await getPosts(supabaseSSR, pageParam);
+      let result: Post[] = [];
+      if (params.s?.toUpperCase() === "EXPLORE") {
+        result = await getPosts(supabaseSSR, pageParam);
+      } else if (params.s?.toUpperCase() === "FOLLOWING") {
+        result = await getFollowingPosts(supabaseSSR, pageParam);
+      } else if (params.s?.toUpperCase() === "TOP") {
+        result = await getTopPosts(supabaseSSR, pageParam);
+      } else {
+        result = await getPosts(supabaseSSR, pageParam);
+      }
       return {
         data: result ?? [],
         nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Handle pagination
@@ -50,7 +67,6 @@ export default async function Home() {
         <div className="overflow-y-auto">
           <PhotoGallary />
         </div>
-        
       </div>
     </HydrationBoundary>
   );

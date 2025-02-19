@@ -18,7 +18,7 @@ function InfiniteScroll(props: Props) {
     function handleIntersection(entries: IntersectionObserverEntry[]) {
       entries.forEach((entry) => {
         if (entry.isIntersecting && (!isLoadingMore || !isLoadingIntial)) {
-          console.log("in view");
+          // console.log("in view");
           loadMore();
         }
       });

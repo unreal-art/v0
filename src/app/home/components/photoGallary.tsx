@@ -13,10 +13,16 @@ import Image from "next/image";
 import ImageView from "./imageView";
 // import { usePostsQuery } from "@/hooks/usePostsQuery";
 import { supabase } from "$/supabase/client";
-import { getPosts } from "$/queries/post/getPosts";
+import {
+  getFollowingPosts,
+  getPosts,
+  getTopPosts,
+} from "$/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
 import { formattedPhotos } from "../formattedPhotos";
+import { Post } from "$/types/data.types";
+import { useSearchParams } from "next/navigation";
 // import { useQuery } from "@tanstack/react-query";
 //
 
@@ -25,6 +31,8 @@ export default function PhotoGallary({}) {
   const [columns, setColumns] = useState(
     window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
+  const searchParams = useSearchParams();
+  const s = searchParams.get("s");
 
   // const { data: posts } = useQuery({
   //   queryKey: ["posts"],
@@ -40,9 +48,18 @@ export default function PhotoGallary({}) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", s || "explore"],
     queryFn: async ({ pageParam = 0 }) => {
-      const result = await getPosts(supabase, pageParam);
+      let result: Post[] = [];
+      if (s?.toUpperCase() === "EXPLORE") {
+        result = await getPosts(supabase, pageParam);
+      } else if (s?.toUpperCase() === "FOLLOWING") {
+        result = await getFollowingPosts(supabase, pageParam);
+      } else if (s?.toUpperCase() === "TOP") {
+        result = await getTopPosts(supabase, pageParam);
+      } else {
+        result = await getPosts(supabase, pageParam);
+      }
 
       return {
         data: result ?? [],

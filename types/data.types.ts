@@ -26,3 +26,8 @@ export interface Page {
   data: Post[];
   nextCursor?: number;
 }
+
+export interface FollowStats {
+  followerCount: number;
+  followeeCount: number;
+}

@@ -1,10 +1,9 @@
-"use server";
-
 import { createClient } from "$/supabase/server";
-import { generateEthereumWallet } from "$/utils";
+// import { generateEthereumWallet } from "$/utils";
 import { Client } from "$/supabase/client";
 
-export const getUser = async (client?: Client) => {
+//client user getter , no wallet gen
+export const fetchUser = async (client?: Client) => {
   const supabase = await createClient();
 
   const authClient = client ?? supabase;
@@ -24,21 +23,21 @@ export const getUser = async (client?: Client) => {
     return null;
   }
 
-  //check if user has a wallet
-  if (!profileData[0].wallet) {
-    const wallet = generateEthereumWallet();
-    console.log(wallet);
+  // //check if user has a wallet
+  // if (!profileData[0].wallet) {
+  //   const wallet = generateEthereumWallet();
+  //   console.log(wallet);
 
-    const { error: walletError } = await supabase
-      .from("profiles")
-      .update({ wallet }) // Set new wallet
-      .eq("id", profileData[0].id) // Where the user_id matches
-      .single(); // Ensures only one row is returned
+  //   const { error: walletError } = await supabase
+  //     .from("profiles")
+  //     .update({ wallet }) // Set new wallet
+  //     .eq("id", profileData[0].id) // Where the user_id matches
+  //     .single(); // Ensures only one row is returned
 
-    if (walletError) {
-      return null;
-    }
-  }
+  //   if (walletError) {
+  //     return null;
+  //   }
+  // }
 
   const user = {
     ...userData,
