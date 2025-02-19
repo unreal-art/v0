@@ -4,11 +4,12 @@ import TabIcon from "./TabIcon";
 export type TabText = "Public" | "Private" | "Liked" | "Pinned" | "Draft";
 
 interface ITabs {
+    hideDraft?: boolean;
     currentIndex: number;
     setCurrentIndex: (value: number) => void;
 }
 
-export default function Tabs ({ currentIndex,  setCurrentIndex} : ITabs) {
+export default function Tabs ({ hideDraft, currentIndex,  setCurrentIndex} : ITabs) {
 
     return (
         <div className="flex gap-x-8 border-b-[1px] border-primary-11">
@@ -40,13 +41,15 @@ export default function Tabs ({ currentIndex,  setCurrentIndex} : ITabs) {
                 text="Pinned"
                 setCurrentIndex={setCurrentIndex}
                 />
-            
-            <TabBtn 
-                currentIndex={currentIndex}
-                index={4}
-                text="Draft"
-                setCurrentIndex={setCurrentIndex}
-                />
+            {   
+                !hideDraft &&
+                    <TabBtn 
+                        currentIndex={currentIndex}
+                        index={4}
+                        text="Draft"
+                        setCurrentIndex={setCurrentIndex}
+                        />
+            }
 
         </div>
     )

@@ -109,7 +109,7 @@ export default function PhotoGallary({}) {
         <ColumnsPhotoAlbum
           photos={formattedPhotos(data?.pages ?? [])}
           columns={columns}
-          spacing={1}
+          spacing={4}
           render={{
             extras: (_, context) => (
               <PhotoOverlay

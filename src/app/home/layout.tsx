@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import QueryProvider from "../providers/QueryClientProvider";
 import PathnameProvider from "../components/PathnameProvider";
 import { ThirdwebProvider } from "thirdweb/react";
+import Notifications from "../notifications";
 
 const GenerationProgress = dynamic(
   () => import("./components/generationProgress"),
@@ -52,11 +53,13 @@ export default function RootLayout({
                   </div>
 
                   <div className="flex flex-grow justify-evenly md:flex-col md:justify-end">
-                    <NavLink
-                      href={"/home/notification"}
-                      text="Notification"
-                      icon="notification"
-                    />
+                    <Notifications>
+                      <NavLink
+                        href={"#"}
+                        text="Notification"
+                        icon="notification"
+                      />
+                    </Notifications>
                     <div className="hidden md:block">
                       <NavLink
                         href={"/home/profile"}
