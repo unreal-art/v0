@@ -2,15 +2,11 @@ import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
-  useQuery,
 } from "@tanstack/react-query";
 // import { getPosts } from "$/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
-import Image from "next/image";
-import ProfileInfo from "./components/profileInfo";
 import ProfileView from "./components/profileView";
-import { FlashIcon, ShareModernIcon } from "@/app/components/icons";
 import {
   getIsDraftPostsByUser,
   getPinnedPostsByUser,

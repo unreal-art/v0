@@ -3,15 +3,12 @@ import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
-import dummyPhotos, { dummyPhotos2 } from "../../dummyPhotos";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, {
   ExtendedRenderPhotoContext,
 } from "../../components/photoOverlay";
 // import { getPosts } from "$/queries/post/getPosts";
 // import { supabase } from "$/supabase/client";
-import { usePostsQuery } from "@/hooks/usePostsQuery";
-import Image from "next/image";
 import ImageView from "../../components/imageView";
 import { OptionMenuIcon } from "@/app/components/icons";
 import { useInfiniteQuery } from "@tanstack/react-query";
