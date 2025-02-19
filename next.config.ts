@@ -2,7 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["gateway.mesh3.network", "assets.react-photo-album.com"], // ✅ Allow both domains
+    //TODO: add apple link
+    domains: [
+      "gateway.mesh3.network",
+      "assets.react-photo-album.com",
+      "lh3.googleusercontent.com",
+    ], // ✅ Allow both domains
   },
 };
 

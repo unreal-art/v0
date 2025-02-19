@@ -12,9 +12,11 @@ export default function CreationView() {
   const s = searchParams.get("s");
 
   useEffect(() => {
-    setCurrentIndex(indexOf(POST_GROUPS, s?.toUpperCase()));
+    if (!s) setCurrentIndex(0);
+    else setCurrentIndex(indexOf(POST_GROUPS, s?.toUpperCase()));
   }, [s]);
 
+  console.log(currentIndex);
   return (
     <div className="w-full">
       <div className="w-full mb-4">

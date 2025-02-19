@@ -12,7 +12,8 @@ export default function ProfileView() {
   const s = searchParams.get("s");
 
   useEffect(() => {
-    setCurrentIndex(indexOf(POST_GROUPS, s?.toUpperCase()));
+    if (!s) setCurrentIndex(0);
+    else setCurrentIndex(indexOf(POST_GROUPS, s?.toUpperCase()));
   }, [s]);
 
   return (

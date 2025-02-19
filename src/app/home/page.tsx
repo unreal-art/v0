@@ -50,8 +50,6 @@ export default async function Home({
       lastPage?.nextCursor ?? undefined,
   });
 
-  console.log(params.s);
-
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
