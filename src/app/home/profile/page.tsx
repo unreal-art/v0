@@ -13,7 +13,7 @@ import {
   getPostsByUser,
   getPrivatePostsByUser,
   getUserLikedPosts,
-} from "$/queries/post/getPostsByUser";
+} from "@/queries/post/getPostsByUser";
 import { getUser } from "$/queries/user";
 import UserData from "./components/userData";
 

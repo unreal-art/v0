@@ -8,9 +8,13 @@ import {
 } from "@/app/components/icons";
 import { Photo, RenderPhotoContext } from "react-photo-album";
 import { truncateText } from "$/utils";
+import { usePostLikes } from "@/hooks/usePostLikes";
+import { supabase } from "$/supabase/client";
+import { useLikePost } from "@/hooks/useLikePost";
+import { useUser } from "@/hooks/useUser";
 
 export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
-  photo: Photo & { prompt: string }; // Extending `Photo`
+  photo: Photo & { prompt: string; id: string; author: string }; // Extending `Photo`
 }
 
 interface PhotoOverlayProps {
@@ -27,7 +31,11 @@ export default function PhotoOverlay({
   context,
 }: PhotoOverlayProps) {
   const [hover, setHover] = useState(false);
-  const [like, setLike] = useState(false);
+  // const [like, setLike] = useState(false);
+  const { userId } = useUser();
+  const { data: likes } = usePostLikes(Number(context.photo.id), supabase);
+  const { mutate: toggleLike } = useLikePost(Number(context.photo.id), userId);
+  const userHasLiked = likes?.some((like) => like.author === userId);
 
   const handleCommentClick = () => {
     setImageIndex(); // or any specific value you want to pass
@@ -56,15 +64,16 @@ export default function PhotoOverlay({
             <div className="flex justify-center gap-4">
               <button
                 className="flex gap-1 items-center"
-                onClick={() => setLike(!like)}
+                onClick={() => toggleLike()}
               >
-                {like ? (
+                {userHasLiked ? (
                   <HeartFillIcon color="#FFFFFF" />
                 ) : (
                   <HeartIcon color="#FFFFFF" />
                 )}
-                <p>25</p>
+                <p>{likes?.length}</p>
               </button>
+
               <button
                 className="flex gap-1 items-center"
                 onClick={() => handleCommentClick()}

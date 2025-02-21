@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
-import { getLikeStat } from "$/queries/user/getLikeStat";
+import { getLikeStat } from "@/queries/user/getLikeStat";
 
 export const useLikeStat = (userId?: string) => {
   return useQuery<number>({

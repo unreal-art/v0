@@ -17,14 +17,15 @@ import {
   getFollowingPosts,
   getPosts,
   getTopPosts,
-} from "$/queries/post/getPosts";
+} from "@/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
 import { formattedPhotos } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
-// import { useQuery } from "@tanstack/react-query";
-//
+// import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
+import useAuthorUsername from "@/hooks/useAuthorUserName";
+import useAuthorImage from "@/hooks/useAuthorImage";
 
 export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
@@ -129,23 +130,10 @@ export default function PhotoGallary({}) {
           spacing={4}
           render={{
             extras: (_, context) => (
-              <PhotoOverlay
-                setImageIndex={() => handleImageIndex(context)}
+              <PhotoWithAuthor
                 context={context as ExtendedRenderPhotoContext}
-              >
-                <div className="absolute flex items-center gap-1 bottom-2 left-2">
-                  <div className="rounded-full">
-                    <Image
-                      className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
-                      src={"/icons/dummy-profile.png"}
-                      width={24}
-                      height={24}
-                      alt="profile"
-                    />
-                  </div>
-                  <p className="font-semibold text-sm drop-shadow-lg">David</p>
-                </div>
-              </PhotoOverlay>
+                handleImageIndex={handleImageIndex}
+              />
             ),
           }}
         />
@@ -157,5 +145,41 @@ export default function PhotoGallary({}) {
         setImageIndex={setImageIndex}
       />
     </>
+  );
+}
+
+function PhotoWithAuthor({
+  context,
+  handleImageIndex,
+}: {
+  context: ExtendedRenderPhotoContext;
+  handleImageIndex: (context: RenderPhotoContext) => void;
+}) {
+  const authorId = context.photo.author || ""; // Ensure it's always a string
+
+  const { data: userName, isLoading: isLoading } = useAuthorUsername(authorId);
+  const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
+  return (
+    <PhotoOverlay
+      setImageIndex={() => handleImageIndex(context)}
+      context={context}
+    >
+      <div className="absolute flex items-center gap-1 bottom-2 left-2">
+        <div className="rounded-full">
+          {!imageLoading && (
+            <Image
+              className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+              src={image || ""}
+              width={24}
+              height={24}
+              alt="profile"
+            />
+          )}
+        </div>
+        <p className="font-semibold text-sm drop-shadow-lg">
+          {isLoading ? "Loading..." : userName || "Unknown"}
+        </p>
+      </div>
+    </PhotoOverlay>
   );
 }

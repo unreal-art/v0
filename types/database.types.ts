@@ -91,7 +91,7 @@ export type Database = {
           device: string | null
           id: number
           ipfsImages: Json | null
-          isDraft: boolean
+          isDraft: boolean | null
           isPinned: boolean | null
           isPrivate: boolean | null
           like_count: number | null
@@ -108,7 +108,7 @@ export type Database = {
           device?: string | null
           id?: number
           ipfsImages?: Json | null
-          isDraft?: boolean
+          isDraft?: boolean | null
           isPinned?: boolean | null
           isPrivate?: boolean | null
           like_count?: number | null
@@ -125,7 +125,7 @@ export type Database = {
           device?: string | null
           id?: number
           ipfsImages?: Json | null
-          isDraft?: boolean
+          isDraft?: boolean | null
           isPinned?: boolean | null
           isPrivate?: boolean | null
           like_count?: number | null

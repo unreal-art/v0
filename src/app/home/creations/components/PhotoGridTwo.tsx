@@ -18,7 +18,7 @@ import {
   getPostsByUser,
   getPrivatePostsByUser,
   getUserLikedPosts,
-} from "$/queries/post/getPostsByUser";
+} from "@/queries/post/getPostsByUser";
 import { formattedPhotos } from "../../formattedPhotos";
 import { supabase } from "$/supabase/client";
 import InfiniteScroll from "../../components/InfiniteScroll";

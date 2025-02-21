@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
-import { getFollowStats } from "$/queries/user/getFollowerStat";
+import { getFollowStats } from "@/queries/user/getFollowerStat";
 
 export function useFollowStats(userId?: string) {
   return useQuery({
