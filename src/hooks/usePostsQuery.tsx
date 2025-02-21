@@ -1,4 +1,4 @@
-import { getPosts } from "$/queries/post/getPosts";
+import { getPosts } from "@/queries/post/getPosts";
 import { supabase } from "$/supabase/client";
 
 import { Post } from "$/types/data.types";

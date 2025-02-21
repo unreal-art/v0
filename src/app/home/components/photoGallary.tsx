@@ -17,14 +17,14 @@ import {
   getFollowingPosts,
   getPosts,
   getTopPosts,
-} from "$/queries/post/getPosts";
+} from "@/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
 import { formattedPhotos } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
-// import { useQuery } from "@tanstack/react-query";
-//
+// import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
+import useAuthorUsername from "@/hooks/useAuthorUserName";
 
 export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
@@ -123,7 +123,7 @@ export default function PhotoGallary({}) {
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >
-        <ColumnsPhotoAlbum
+        {/* <ColumnsPhotoAlbum
           photos={formattedPhotos(data?.pages ?? [])}
           columns={columns}
           spacing={4}
@@ -143,9 +143,24 @@ export default function PhotoGallary({}) {
                       alt="profile"
                     />
                   </div>
-                  <p className="font-semibold text-sm drop-shadow-lg">David</p>
+                  <p className="font-semibold text-sm drop-shadow-lg">
+                    {getAuthorUserName(context.photo.author, supabase) || ""}
+                  </p>
                 </div>
               </PhotoOverlay>
+            ),
+          }}
+        /> */}
+        <ColumnsPhotoAlbum
+          photos={formattedPhotos(data?.pages ?? [])}
+          columns={columns}
+          spacing={4}
+          render={{
+            extras: (_, context) => (
+              <PhotoWithAuthor
+                context={context as ExtendedRenderPhotoContext}
+                handleImageIndex={handleImageIndex}
+              />
             ),
           }}
         />
@@ -157,5 +172,48 @@ export default function PhotoGallary({}) {
         setImageIndex={setImageIndex}
       />
     </>
+  );
+}
+
+function PhotoWithAuthor({
+  context,
+  handleImageIndex,
+}: {
+  context: ExtendedRenderPhotoContext;
+  handleImageIndex: (context: RenderPhotoContext) => void;
+}) {
+  const { data: userName, isLoading } = useAuthorUsername(context.photo.author);
+
+  // useEffect(() => {
+  //   async function fetchUserName() {
+  //     const name = await getAuthorUserName(context.photo.author, supabase);
+  //     setUserName(name);
+  //   }
+
+  //   if (context.photo.author) {
+  //     fetchUserName();
+  //   }
+  // }, [context.photo.author]);
+
+  return (
+    <PhotoOverlay
+      setImageIndex={() => handleImageIndex(context)}
+      context={context}
+    >
+      <div className="absolute flex items-center gap-1 bottom-2 left-2">
+        <div className="rounded-full">
+          <Image
+            className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+            src={"/icons/dummy-profile.png"}
+            width={24}
+            height={24}
+            alt="profile"
+          />
+        </div>
+        <p className="font-semibold text-sm drop-shadow-lg">
+          {isLoading ? "Loading..." : userName || "Unknown"}
+        </p>
+      </div>
+    </PhotoOverlay>
   );
 }

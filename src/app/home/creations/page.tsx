@@ -10,7 +10,7 @@ import {
   getPostsByUser,
   getPrivatePostsByUser,
   getUserLikedPosts,
-} from "$/queries/post/getPostsByUser";
+} from "@/queries/post/getPostsByUser";
 import { Post } from "$/types/data.types";
 import GenerateInput from "../components/generateInput";
 import CreationView from "./components/CreationView";

@@ -15,6 +15,7 @@ export type Post = {
   ipfsImages: UploadResponse[] | null;
   isPinned: boolean | null;
   isPrivate: boolean | null;
+  isDraft: boolean | null;
   like_count: number | null;
   n: number | null;
   prompt: string | null;
@@ -30,4 +31,11 @@ export interface Page {
 export interface FollowStats {
   followerCount: number;
   followeeCount: number;
+}
+
+export interface Like {
+  id: number;
+  author: string | null;
+  created_at: string;
+  post_id: number | null;
 }

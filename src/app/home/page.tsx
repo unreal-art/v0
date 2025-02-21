@@ -10,7 +10,7 @@ import {
   getFollowingPosts,
   getPosts,
   getTopPosts,
-} from "$/queries/post/getPosts";
+} from "@/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
 
