@@ -7,7 +7,6 @@ export default function useAuthorImage(authorId: string | undefined) {
   return useQuery({
     queryKey: ["authorImage", authorId],
     queryFn: async () => {
-      if (!authorId) return null;
       return getAuthorImage(authorId, supabase);
     },
     enabled: !!authorId, // Ensures query only runs if authorId exists

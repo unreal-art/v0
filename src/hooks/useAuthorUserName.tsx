@@ -7,7 +7,6 @@ export default function useAuthorUsername(authorId: string | undefined) {
   return useQuery({
     queryKey: ["authorUsername", authorId],
     queryFn: async () => {
-      if (!authorId) return null;
       return getAuthorUserName(authorId, supabase);
     },
     enabled: !!authorId, // Ensures query only runs if authorId exists

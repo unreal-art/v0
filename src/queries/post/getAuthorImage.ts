@@ -2,7 +2,7 @@ import { Client } from "$/supabase/client";
 
 // Retrieve a user's profile image by their ID, or return an empty string if not found.
 export const getAuthorImage = async (
-  authorId: string,
+  authorId: string | undefined,
   client: Client,
 ): Promise<string | null> => {
   if (!authorId) {

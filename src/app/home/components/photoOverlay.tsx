@@ -34,10 +34,7 @@ export default function PhotoOverlay({
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
   const { data: likes } = usePostLikes(Number(context.photo.id), supabase);
-  const { mutate: toggleLike, isPending: isPendingOnLike } = useLikePost(
-    Number(context.photo.id),
-    userId,
-  );
+  const { mutate: toggleLike } = useLikePost(Number(context.photo.id), userId);
   const userHasLiked = likes?.some((like) => like.author === userId);
 
   const handleCommentClick = () => {

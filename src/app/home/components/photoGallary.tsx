@@ -124,34 +124,6 @@ export default function PhotoGallary({}) {
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >
-        {/* <ColumnsPhotoAlbum
-          photos={formattedPhotos(data?.pages ?? [])}
-          columns={columns}
-          spacing={4}
-          render={{
-            extras: (_, context) => (
-              <PhotoOverlay
-                setImageIndex={() => handleImageIndex(context)}
-                context={context as ExtendedRenderPhotoContext}
-              >
-                <div className="absolute flex items-center gap-1 bottom-2 left-2">
-                  <div className="rounded-full">
-                    <Image
-                      className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
-                      src={"/icons/dummy-profile.png"}
-                      width={24}
-                      height={24}
-                      alt="profile"
-                    />
-                  </div>
-                  <p className="font-semibold text-sm drop-shadow-lg">
-                    {getAuthorUserName(context.photo.author, supabase) || ""}
-                  </p>
-                </div>
-              </PhotoOverlay>
-            ),
-          }}
-        /> */}
         <ColumnsPhotoAlbum
           photos={formattedPhotos(data?.pages ?? [])}
           columns={columns}
@@ -183,9 +155,10 @@ function PhotoWithAuthor({
   context: ExtendedRenderPhotoContext;
   handleImageIndex: (context: RenderPhotoContext) => void;
 }) {
-  const { data: userName, isLoading } = useAuthorUsername(context.photo.author);
-  const { data: image } = useAuthorImage(context.photo.author);
+  const authorId = context.photo.author || ""; // Ensure it's always a string
 
+  const { data: userName, isLoading: isLoading } = useAuthorUsername(authorId);
+  const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
   return (
     <PhotoOverlay
       setImageIndex={() => handleImageIndex(context)}
@@ -193,13 +166,15 @@ function PhotoWithAuthor({
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
         <div className="rounded-full">
-          <Image
-            className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
-            src={image || ""}
-            width={24}
-            height={24}
-            alt="profile"
-          />
+          {!imageLoading && (
+            <Image
+              className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+              src={image || ""}
+              width={24}
+              height={24}
+              alt="profile"
+            />
+          )}
         </div>
         <p className="font-semibold text-sm drop-shadow-lg">
           {isLoading ? "Loading..." : userName || "Unknown"}
