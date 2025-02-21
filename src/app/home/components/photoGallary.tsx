@@ -25,6 +25,7 @@ import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
 // import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
+import useAuthorImage from "@/hooks/useAuthorImage";
 
 export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
@@ -183,17 +184,7 @@ function PhotoWithAuthor({
   handleImageIndex: (context: RenderPhotoContext) => void;
 }) {
   const { data: userName, isLoading } = useAuthorUsername(context.photo.author);
-
-  // useEffect(() => {
-  //   async function fetchUserName() {
-  //     const name = await getAuthorUserName(context.photo.author, supabase);
-  //     setUserName(name);
-  //   }
-
-  //   if (context.photo.author) {
-  //     fetchUserName();
-  //   }
-  // }, [context.photo.author]);
+  const { data: image } = useAuthorImage(context.photo.author);
 
   return (
     <PhotoOverlay
@@ -204,7 +195,7 @@ function PhotoWithAuthor({
         <div className="rounded-full">
           <Image
             className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
-            src={"/icons/dummy-profile.png"}
+            src={image || ""}
             width={24}
             height={24}
             alt="profile"
