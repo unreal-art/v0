@@ -16,13 +16,11 @@ export default function ImageView({
   photo,
   setImageIndex,
 }: GenerateTextFieldProps) {
-  if (!photo) return;
-
   const currentImage = photo as ExtendedPhoto;
   const authorId = currentImage.author || "";
-
   const { data: userName, isLoading } = useAuthorUsername(authorId);
   const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
+  if (!photo) return;
 
   return (
     <>
