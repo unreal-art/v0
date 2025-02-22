@@ -8,17 +8,17 @@ export default function Home() {
   return (
     <main className="bg-[#050505] h-screen overflow-clip">
 
-      <div className="absolute z-10 md:top-[6%] flex justify-center w-full mb-10">
+      <div className="absolute z-10 top-[12vh] md:top-[6vh] flex justify-center w-full mb-10">
         <Image src={"/logo.png"} alt="logo" width={140} height={36} />
       </div>
 
-      <div className="absolute w-full overflow-clip md:h-[80vh] z-10">
+      <div className="absolute w-full overflow-clip top-[16vh] md:top-[6vh] h-[50vh] md:h-[80vh] z-10">
         <LandingCarousel />
       </div>
 
-      <div className="absolute bottom-[15vh] md:bottom-[20vh] flex justify-center w-full ">
+      <div className="absolute top-[56vh] md:top-[70vh] flex justify-center w-full ">
 
-        <div className="flex z-20 flex-col justify-center items-center border-primary-10/50 border-x-[1px] border-b-[1px] w-[350px] rounded-xl gap-4 py-12">
+        <div className="flex z-20 flex-col justify-center items-center border-primary-10 border-x-[1px] border-b-[1px] w-[350px] rounded-xl gap-4 py-12">
           <AuthBtn icon={<div></div>} provider="google">
             Continue with Google
           </AuthBtn>

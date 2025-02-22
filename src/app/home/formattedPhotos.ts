@@ -4,7 +4,18 @@ import type { Photo } from "react-photo-album";
 
 export interface ExtendedPhoto extends Photo {
   prompt?: string;
+  author?: string;
+  category?: string;
+  cpu?: number;
+  createdAt?: string;
+  device?: string;
+  isDraft?: boolean;
+  isPinned?: boolean;
+  isPrivate?: boolean;
+  likeCount?: number;
+  seed?: number;
 }
+
 const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
 
 // Function to fetch the image
@@ -53,6 +64,15 @@ export const formattedPhotos = (pages: Page[]): ExtendedPhoto[] => {
             height: Math.round((720 / 1080) * breakpoint), // Maintain aspect ratio
           })),
           prompt: post.prompt,
+          author: post.author,
+          category: post.category,
+          cpu: post.cpu,
+          createdAt: post.createdAt,
+          device: post.device,
+          isDraft: post.isDraft,
+          isPinned: post.isPinned,
+          isPrivate: post.isPrivate,
+          seed: post.seed,
         } as ExtendedPhoto;
       }),
     )

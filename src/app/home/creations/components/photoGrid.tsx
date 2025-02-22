@@ -1,11 +1,11 @@
 "use client";
-//@deprecated 
+//@deprecated
 import { useState } from "react";
 import Image from "next/image";
 import { OptionMenuIcon } from "@/app/components/icons";
-import PhotoOverlay from "../../components/photoOverlay";
+// import PhotoOverlay from "../../components/photoOverlay";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getPostsByUser } from "$/queries/post/getPostsByUser";
+import { getPostsByUser } from "@/queries/post/getPostsByUser";
 import { supabase } from "$/supabase/client";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import { formattedPhotos } from "../../formattedPhotos";
@@ -74,7 +74,7 @@ const PhotoGrid = () => {
                   <p>{truncateText(photo.prompt)}</p>
                 </div>
               )}
-              <PhotoOverlay />
+              {/* <PhotoOverlay /> */}
             </div>
           );
         })}

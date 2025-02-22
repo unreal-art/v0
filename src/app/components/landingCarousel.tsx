@@ -35,15 +35,16 @@ export default function LandingCarousel() {
         ease:'expo'
       })
       .add(()=>{
-        if (image.current) {
-          image.current.addEventListener('mouseenter', (e)=>{
-            let current = e.currentTarget;
-            gsap.to('.img', {opacity:(i,t)=>(t==current)? 1:0.5, ease:'power3'})
-          })
-          image.current.addEventListener('mouseleave', (e)=>{
-            gsap.to('.img', {opacity:1, ease:'power2.inOut'})
-          })
-        }
+        gsap.to('.img', { opacity: 0.5, ease:'power3'})
+        // if (image.current) {
+        //   image.current.addEventListener('mouseenter', (e)=>{
+        //     let current = e.currentTarget;
+        //     //gsap.to('.img', {opacity:(i,t)=>(t==current)? 1:0.5, ease:'power3'})
+        //   })
+        //   image.current.addEventListener('mouseleave', (e)=>{
+        //     gsap.to('.img', {opacity:1, ease:'power2.inOut'})
+        //   })
+        // }
       }, '-=0.5')    
     // })
 
@@ -88,7 +89,7 @@ export default function LandingCarousel() {
 
   return (
     <div className="home-carousel overflow-clip overflow-x-hidden">
-      <div ref={container} className="stage md:scale-150 lg:scale-[1.75] 2xl:scale-[2.5] overflow-hidden">
+      <div ref={container} className="stage scale-125 md:scale-150 lg:scale-[1.75] 2xl:scale-[2.5] overflow-hidden">
         <div className="container">
           <div className="ring">
             <div ref={image} className="img"></div>
