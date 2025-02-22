@@ -45,3 +45,36 @@ body {
   border: 1px solid;
   border-image-source: linear-gradient(235.59deg, rgba(0, 0, 0, 0.3) 0%, rgba(193, 193, 193, 0.3) 99.32%);
 }
+
+/* 
+For our carousel, we will need to add some custom CSS to our global styles.
+*/
+
+
+.home-carousel .stage, .ring, .img {
+	width: 100%;
+	height: 100%;
+	transform-style: preserve-3d;
+	user-select:none;
+}
+
+.home-carousel .ring {
+  box-shadow: none;
+}
+
+.home-carousel div {
+  position: absolute;
+}
+  
+.home-carousel .stage {
+	overflow:hidden;
+}
+  
+.home-carousel .container {
+	perspective: 1000px;
+	width: 300px;
+	height: 300px;  
+	left:50%;
+	top:50%;
+	transform:translate(-50%,-50%);
+}
