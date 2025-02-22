@@ -1,5 +1,5 @@
 import { useCreateJob } from "@/hooks/useCreateJob";
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
 import { supabase } from "$/supabase/client";
 import { useState } from "react";
 
@@ -10,9 +10,9 @@ interface GenerateTextFieldProps {
 
 export default function GenerateTextField({
   open,
-  setOpen,
+  // setOpen,
 }: GenerateTextFieldProps) {
-  const { mutate, isLoading } = useCreateJob();
+  const { mutate } = useCreateJob();
   const [prompt, setPrompt] = useState<string | null>(null);
 
   const generate = async () => {
