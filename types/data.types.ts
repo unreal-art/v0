@@ -22,6 +22,12 @@ export type Post = {
   seed: number | null;
 };
 
+export interface JobSpec extends Post {
+  module?: string;
+  version?: string; //version
+  inputs?: Record<string, string | number>;
+}
+
 // Define proper types for pages
 export interface Page {
   data: Post[];
