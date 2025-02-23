@@ -272,21 +272,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_comments_with_users: {
-        Args: {
-          post_uuid: string
-        }
-        Returns: {
-          id: string
-          post_id: string
-          user_id: string
-          content: string
-          parent_id: string
-          created_at: string
-          username: string
-          avatar_url: string
-        }[]
-      }
+      get_comments_with_users:
+        | {
+            Args: {
+              _post_id: number
+            }
+            Returns: {
+              id: string
+              post_id: number
+              user_id: string
+              content: string
+              parent_id: string
+              created_at: string
+              username: string
+              avatar_url: string
+            }[]
+          }
+        | {
+            Args: {
+              post_uuid: string
+            }
+            Returns: {
+              id: string
+              post_id: string
+              user_id: string
+              content: string
+              parent_id: string
+              created_at: string
+              username: string
+              avatar_url: string
+            }[]
+          }
     }
     Enums: {
       [_ in never]: never

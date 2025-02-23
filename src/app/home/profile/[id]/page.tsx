@@ -6,7 +6,7 @@ import {
 // import { getPosts } from "$/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
-import ProfileView from "./components/profileView";
+import ProfileView from "../components/profileView";
 import {
   getIsDraftPostsByUser,
   getPinnedPostsByUser,
@@ -15,34 +15,54 @@ import {
   getUserLikedPosts,
 } from "@/queries/post/getPostsByUser";
 import { getUser } from "$/queries/user";
-import UserData from "./components/userData";
+import UserData from "../components/userData";
 
 export default async function Profile({
   searchParams,
+  params,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
+  params: Promise<{ [key: string]: string | undefined }>;
 }) {
   const supabaseSSR = await createClient();
   const queryClient = new QueryClient();
-  const params = await searchParams;
+  const queryParams = await searchParams;
+  const paramsData = await params;
+
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["creation_posts", params?.s || "public"],
+    queryKey: ["creation_posts", queryParams?.s || "public"],
     queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
       // console.log("Prefetching page:", pageParam); // Debugging line
 
       let result: Post[] = [];
-      if (params.s?.toUpperCase() === "PUBLIC") {
-        result = await getPostsByUser(supabaseSSR, pageParam);
-      } else if (params.s?.toUpperCase() === "PRIVATE") {
-        result = await getPrivatePostsByUser(supabaseSSR, pageParam);
-      } else if (params.s?.toUpperCase() === "LIKED") {
-        result = await getUserLikedPosts(supabaseSSR, pageParam);
-      } else if (params.s?.toUpperCase() === "PINNED") {
-        result = await getPinnedPostsByUser(supabaseSSR, pageParam);
-      } else if (params.s?.toUpperCase() === "DRAFT") {
-        result = await getIsDraftPostsByUser(supabaseSSR, pageParam);
+      if (queryParams.s?.toUpperCase() === "PUBLIC") {
+        result = await getPostsByUser(supabaseSSR, pageParam, paramsData?.id);
+      } else if (queryParams.s?.toUpperCase() === "PRIVATE") {
+        result = await getPrivatePostsByUser(
+          supabaseSSR,
+          pageParam,
+          paramsData?.id,
+        );
+      } else if (queryParams.s?.toUpperCase() === "LIKED") {
+        result = await getUserLikedPosts(
+          supabaseSSR,
+          pageParam,
+          paramsData?.id,
+        );
+      } else if (queryParams.s?.toUpperCase() === "PINNED") {
+        result = await getPinnedPostsByUser(
+          supabaseSSR,
+          pageParam,
+          paramsData?.id,
+        );
+      } else if (queryParams.s?.toUpperCase() === "DRAFT") {
+        result = await getIsDraftPostsByUser(
+          supabaseSSR,
+          pageParam,
+          paramsData?.id,
+        );
       } else {
-        result = await getPostsByUser(supabaseSSR, pageParam);
+        result = await getPostsByUser(supabaseSSR, pageParam, paramsData?.id);
       }
       return {
         data: result ?? [],

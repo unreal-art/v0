@@ -9,6 +9,7 @@ import QueryProvider from "../providers/QueryClientProvider";
 import PathnameProvider from "../components/PathnameProvider";
 import { ThirdwebProvider } from "thirdweb/react";
 import Notifications from "../notifications";
+import { useUser } from "@/hooks/useUser";
 
 const GenerationProgress = dynamic(
   () => import("./components/generationProgress"),
@@ -20,6 +21,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = useUser();
   return (
     <QueryProvider>
       <PathnameProvider>
@@ -62,7 +64,7 @@ export default function RootLayout({
                     </Notifications>
                     <div className="hidden md:block">
                       <NavLink
-                        href={"/home/profile"}
+                        href={"/home/profile/" + userId}
                         text="Profile"
                         icon="profile"
                       />

@@ -14,6 +14,7 @@ export interface ExtendedPhoto extends Photo {
   isPrivate?: boolean;
   likeCount?: number;
   seed?: number;
+  id: string;
 }
 
 const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
