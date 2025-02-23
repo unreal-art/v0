@@ -56,7 +56,7 @@ export function isHighQualityImage(filename: string): boolean {
 }
 
 export function truncateText(
-  text: string | undefined,
+  text: string | undefined | null,
   wordLimit: number = 15,
 ): string {
   if (!text) return "";
@@ -65,3 +65,19 @@ export function truncateText(
     ? words.slice(0, wordLimit).join(" ") + "..."
     : text;
 }
+
+export const getNotificationMessage = (
+  type: string,
+  senderName: string | null | undefined,
+) => {
+  switch (type) {
+    case "like":
+      return `${senderName} liked your post!`;
+    case "comment":
+      return `${senderName} commented on your post!`;
+    case "share":
+      return `${senderName} just shared your post! Your content is reaching more people.`;
+    default:
+      return "You have a new notification!";
+  }
+};

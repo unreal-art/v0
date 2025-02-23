@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       "gateway.mesh3.network",
       "assets.react-photo-album.com",
       "lh3.googleusercontent.com",
+      "cdn.discordapp.com",
     ], // ✅ Allow both domains
   },
 };

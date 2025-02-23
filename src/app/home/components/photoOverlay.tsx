@@ -40,7 +40,11 @@ export default function PhotoOverlay({
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
   const { data: likes } = usePostLikes(Number(context.photo.id), supabase);
-  const { mutate: toggleLike } = useLikePost(Number(context.photo.id), userId);
+  const { mutate: toggleLike } = useLikePost(
+    Number(context.photo.id),
+    userId,
+    context.photo.author,
+  );
   const userHasLiked = likes?.some((like) => like.author === userId);
 
   // console.log(context.photo.createdAt);

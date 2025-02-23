@@ -3,7 +3,7 @@ import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import { useQuery } from "@tanstack/react-query";
 
 /** Custom Hook using React Query */
-export default function useAuthorUsername(authorId: string | undefined) {
+export default function useAuthorUsername(authorId: string | undefined | null) {
   return useQuery({
     queryKey: ["authorUsername", authorId],
     queryFn: async () => {

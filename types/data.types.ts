@@ -45,3 +45,12 @@ export interface Like {
   created_at: string;
   post_id: number | null;
 }
+
+export interface Notification {
+  id: string | null; // UUID
+  user_id: string | null; // UUID of the user receiving the notification
+  sender_id: string | null; // UUID of the sender
+  post_id: number | null; // bigint (assuming it's stored as a number in JavaScript)
+  type: string;
+  created_at: string | null; // ISO timestamp
+}
