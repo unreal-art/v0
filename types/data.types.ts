@@ -69,3 +69,14 @@ export type ExtendedUser = SupabaseUser & {
   bio: string;
   location: string;
 };
+
+export interface CommentWithUser {
+  id: string; // UUID
+  post_id: number; // BIGINT
+  user_id: string; // UUID
+  content: string;
+  parent_id: string | null;
+  created_at: string; // ISO timestamp
+  username: string | null;
+  avatar_url: string;
+}
