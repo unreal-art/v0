@@ -7,7 +7,7 @@ export default function useAuthorUsername(authorId: string | undefined | null) {
   return useQuery({
     queryKey: ["authorUsername", authorId],
     queryFn: async () => {
-      return getAuthorUserName(authorId, supabase);
+      return getAuthorUserName(authorId as string, supabase);
     },
     enabled: !!authorId, // Ensures query only runs if authorId exists
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes

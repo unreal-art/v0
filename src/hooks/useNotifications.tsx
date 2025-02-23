@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
+import { Notification } from "$/types/data.types";
 
 export const useNotifications = (userId: string) => {
   const queryClient = useQueryClient();
@@ -14,7 +15,7 @@ export const useNotifications = (userId: string) => {
         (payload) => {
           queryClient.setQueryData(
             ["notifications", userId],
-            (oldData: any) => {
+            (oldData: Notification[]) => {
               return oldData ? [payload.new, ...oldData] : [payload.new];
             },
           );
@@ -34,7 +35,7 @@ export const useNotifications = (userId: string) => {
         .from("notifications")
         .select("*")
         .eq("user_id", userId)
-        // .neq("sender_id", userId) TODO: uncomment this
+        .neq("sender_id", userId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
