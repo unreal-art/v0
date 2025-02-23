@@ -19,7 +19,7 @@ export interface ExtendedPhoto extends Photo {
 const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
 
 // Function to fetch the image
-const getImage = (cid: string, fileName: string) => {
+export const getImage = (cid: string, fileName: string) => {
   try {
     let imageOptions = "";
     if (isHighQualityImage(fileName)) {
