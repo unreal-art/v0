@@ -12,9 +12,15 @@ import { usePostLikes } from "@/hooks/usePostLikes";
 import { supabase } from "$/supabase/client";
 import { useLikePost } from "@/hooks/useLikePost";
 import { useUser } from "@/hooks/useUser";
+import { timeAgo } from "@/app/libs/timeAgo";
 
 export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
-  photo: Photo & { prompt: string; id: string; author: string }; // Extending `Photo`
+  photo: Photo & {
+    prompt: string;
+    id: string;
+    author: string;
+    createdAt: string;
+  }; // Extending `Photo`
 }
 
 interface PhotoOverlayProps {
@@ -37,6 +43,7 @@ export default function PhotoOverlay({
   const { mutate: toggleLike } = useLikePost(Number(context.photo.id), userId);
   const userHasLiked = likes?.some((like) => like.author === userId);
 
+  // console.log(context.photo.createdAt);
   const handleCommentClick = () => {
     setImageIndex(); // or any specific value you want to pass
   };
@@ -52,7 +59,7 @@ export default function PhotoOverlay({
           <div className="flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
             {!hideContent ? (
               <div className="flex justify-between text-primary-1 text-sm">
-                <p>36s</p>
+                <p>{timeAgo(context.photo.createdAt)}</p>
                 <button>
                   <OptionMenuIcon color="#FFFFFF" />
                 </button>
