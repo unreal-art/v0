@@ -1,3 +1,5 @@
+import { User as SupabaseUser } from "@supabase/supabase-js";
+
 export type UploadResponse = {
   name: string;
   hash: string;
@@ -54,3 +56,16 @@ export interface Notification {
   type: string;
   created_at: string | null; // ISO timestamp
 }
+
+type WalletObject = {
+  address: string;
+  privateKey: string;
+  publicKey: string;
+};
+
+export type ExtendedUser = SupabaseUser & {
+  is_anonymous: boolean;
+  wallet?: WalletObject;
+  bio: string;
+  location: string;
+};

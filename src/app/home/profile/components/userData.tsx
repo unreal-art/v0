@@ -1,27 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
 
 import { FlashIcon, ShareModernIcon } from "@/app/components/icons";
 import ProfileInfo from "./profileInfo";
-import { supabase } from "$/supabase/client";
 import { useFollowStats } from "@/hooks/useFollowStats";
-import { getUser } from "$/queries/user";
 import { useLikeStat } from "@/hooks/useLikeStat";
+import { useParams } from "next/navigation";
+import { useUser } from "@/hooks/useUser";
 // import { getUser } from "$/queries/user/getUser";
 
 export default function UserData() {
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["user"],
-    queryFn: () => getUser(supabase),
-  });
+  // const {
+  //   data: user,
+  //   isLoading,
+  //   error,
+  // } = useQuery({
+  //   queryKey: ["user"],
+  //   queryFn: () => getUser(supabase),
+  // });
+  const { user } = useUser();
 
-  const userId = user?.user?.id;
+  const params = useParams();
+
+  const userId = params.id as string;
 
   //fetch follow stats
   const { data: followStats } = useFollowStats(userId);
@@ -29,8 +31,8 @@ export default function UserData() {
   //fetch like stat
   const { data: likeCount } = useLikeStat(userId);
 
-  if (isLoading) return <p>Loading user data...</p>;
-  if (error) return <p>Error loading user data.</p>;
+  // if (isLoading) return <p>Loading user data...</p>;
+  // if (error) return <p>Error loading user data.</p>;
 
   return (
     <div className="flex flex-col md:flex-row pt-5 w-full mb-12 gap-4">
@@ -38,7 +40,7 @@ export default function UserData() {
         <div className="w-28 h-28 md:w-52 md:h-52">
           <Image
             className="rounded-full"
-            src={user?.user.user_metadata.avatar_url}
+            src={user?.user_metadata.avatar_url || "/profile.jpg"}
             width={200}
             height={200}
             alt="profile"
@@ -47,7 +49,7 @@ export default function UserData() {
 
         <div className="block md:hidden">
           <p className="text-3xl font-medium">
-            {user?.user.user_metadata.full_name}
+            {user?.user_metadata.full_name}
           </p>
 
           <div className="flex my-4 gap-3">
@@ -65,7 +67,7 @@ export default function UserData() {
       <div className="flex-grow text-primary-5">
         <div className="hidden md:block">
           <p className="text-3xl font-medium">
-            {user?.user.user_metadata.full_name}
+            {user?.user_metadata.full_name}
           </p>
 
           <div className="flex my-4 gap-3">
