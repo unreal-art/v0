@@ -10,7 +10,7 @@ export const getLikeStat = async (
     const { data: posts, error } = await client
       .from("likes")
       .select("posts(*),created_at")
-      .eq("author", userId); // Filter posts by the author_id
+      .eq("post_author", userId); // Filter posts by the post_author
 
     if (error) {
       console.error("Error fetching posts with likes:", error);
