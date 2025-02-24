@@ -37,12 +37,13 @@ export default function Notifications({ children }: INotificationProps) {
           <div className="absolute w-full max-w-[528px] h-[90vh] z-50 top-2 md:top-[5vh] left-0 md:left-60 border-primary-8 border-[1px] bg-primary-12 rounded-xl p-4">
             <div className="flex justify-between text-primary-3 px-4">
               <p className="nasalization text-2xl">Notification</p>
-              <button className="flex justify-center items-center w-[120px] h-9 border-[1px] border-primary-11 rounded-[20px] gap-2">
-                <button onClick={scrollTop}>
-                  <ScrollTopIcon width={16} height={16} color="#8F8F8F" />{" "}
-                </button>
+              <div
+                className="flex justify-center items-center w-[120px] h-9 border-[1px] border-primary-11 rounded-[20px] gap-2 cursor-pointer"
+                onClick={scrollTop}
+              >
+                <ScrollTopIcon width={16} height={16} color="#8F8F8F" />
                 <p>To the top</p>
-              </button>
+              </div>
             </div>
 
             <div ref={ref} className="overflow-y-auto h-[82vh] !scroll-smooth">

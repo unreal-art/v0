@@ -59,7 +59,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
                     post.ipfsImages[0].hash as string,
                     post.ipfsImages[0].fileNames[0] as string,
                   )
-                : "/dummy/alien-girl.png"
+                : "/profile.jpg"
             }
             width={70}
             height={70}
