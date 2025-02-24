@@ -1,4 +1,6 @@
+import { HeartFillIcon, HeartIcon } from "@/app/components/icons";
 import Image from "next/image";
+import { useState } from "react";
 
 interface CommentProps {
     comment: string;
@@ -7,6 +9,13 @@ interface CommentProps {
 }
 
 export default function Comment({ comment, user, date }: CommentProps) {
+
+    const [userHasLiked, setUserHasLiked] = useState(false);
+
+    const toggleLike = () => {
+        setUserHasLiked(!userHasLiked);
+    };
+
     return (
         <div className="flex gap-2 py-2">   
             <div className="h-12 w-12">
@@ -18,6 +27,17 @@ export default function Comment({ comment, user, date }: CommentProps) {
                     <p className="text-xs">{date}</p>
                 </div>
                 <p className="text-primary-6 text-sm">{comment}</p>
+                <div>
+                    <button
+                        className="flex gap-1 items-center"
+                        onClick={() => toggleLike()}>
+                            {userHasLiked ? (
+                                <HeartFillIcon color="#FFFFFF" />
+                            ) : (
+                                <HeartIcon color="#FFFFFF" />
+                            )}
+                    </button>
+                </div>
             </div>
         </div>
     )

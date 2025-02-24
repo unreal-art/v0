@@ -73,7 +73,7 @@ For our carousel, we will need to add some custom CSS to our global styles.
 .home-carousel .container {
 	perspective: 1000px;
 	width: 300px;
-	height: 300px;  
+	height: 400px;  
 	left:50%;
 	top:50%;
 	transform:translate(-50%,-50%);

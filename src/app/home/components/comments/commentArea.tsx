@@ -3,6 +3,7 @@ import Image from "next/image";
 import ImageViewInteractions from "../imageViewInteractions";
 import CommentTextbox from "./commentTextbox";
 import Comment from "./comment";
+import { useState } from "react";
 
 
 interface CommentAreaProps {
@@ -15,6 +16,10 @@ interface CommentAreaProps {
 const dummyComments = [1,2,3,4,5,1,2,3,4,5];
 
 export default function CommentArea({ image, imageLoading, userName, isLoading }: CommentAreaProps) { 
+    const [reply, setReply] = useState(true);
+    const handleCloseReply = () => {
+        setReply(false);
+    }
     return (
         <div className="flex flex-col">
             
@@ -53,7 +58,7 @@ export default function CommentArea({ image, imageLoading, userName, isLoading }
 
             <div className="px-6">  <hr />  </div>
 
-            <div className="flex-grow py-2 px-6 overflow-y-auto h-[40vh] md:h-[410px]">
+            <div className={`flex-grow py-2 px-6 overflow-y-auto ${reply ? "h-[calc(40vh_-_64px)] md:h-[346px]" : "h-[40vh] md:h-[400px]"}`}>
                 {
                     dummyComments.map((_, index) => (<Comment key={index} comment="just shared your AI-generated image! Your art is reaching more people." user="Kaylynn" date="10 H" />))
                 }
@@ -61,7 +66,7 @@ export default function CommentArea({ image, imageLoading, userName, isLoading }
 
             <div className="flex py-2 px-6 border-y-[1px] border-primary-6">    <ImageViewInteractions />   </div>
 
-            <div>   <CommentTextbox />  </div>
+            <div>   <CommentTextbox reply={reply} closeReply={handleCloseReply} />  </div>
 
         </div>
     )

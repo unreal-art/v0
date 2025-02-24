@@ -19,10 +19,7 @@ export default function LandingCarousel() {
         rotateY: (i)=> i*-36,
         transformOrigin: '50% 50% 500px',
         z: -500,
-        backgroundImage:(i)=> {
-          console.log({i})
-          return 'url(/images/landing-'+(i + 1)+'.png)'
-        },
+        backgroundImage:(i)=> 'url(/images/landing-'+(i + 1)+'.png)',
         backgroundSize:'cover',
         repeat:-1,
         backfaceVisibility:'hidden'
@@ -35,7 +32,7 @@ export default function LandingCarousel() {
         ease:'expo'
       })
       .add(()=>{
-        gsap.to('.img', { opacity: 0.5, ease:'power3'})
+        //gsap.to('.img', { opacity: 0.5, ease:'power3'})
         // if (image.current) {
         //   image.current.addEventListener('mouseenter', (e)=>{
         //     let current = e.currentTarget;
@@ -50,46 +47,60 @@ export default function LandingCarousel() {
 
     if (container.current) {
 
-      container.current.addEventListener('mousedown touchstart', dragStart);
-      container.current.addEventListener('mouseup touchend', dragEnd);
+      // container.current.addEventListener('mousedown', dragStart);
+      // container.current.addEventListener('touchstart', dragStart);
+      // container.current.addEventListener('mouseup', dragEnd);
+      // container.current.addEventListener('touchend', dragEnd);
 
-      function dragStart(e) { 
-        alert('dragStart')
-        if (e.touches) e.clientX = e.touches[0].clientX; 
-
+      function dragStart(e: any) { 
+        console.log("dragStart")
+        if (e.touches) e.clientX = e.touches[0].clientX;
         xPos = Math.round(e.clientX);
         gsap.set('.ring', {cursor:'grabbing'})
-
-        container.current?.addEventListener('mousemove touchmove', drag);
+        container.current?.addEventListener('mousemove', drag);
+        container.current?.addEventListener('touchmove', drag);
       }
 
 
-      function drag(e){
-        if (e.touches) e.clientX = e.touches[0].clientX;    
-
+      function drag(e: MouseEvent | TouchEvent){
+        if (e instanceof TouchEvent) {
+          const touch = e.touches[0];
+          e = { ...e, clientX: touch.clientX };
+        }
         gsap.to('.ring', {
-          rotationY: '-=' +( (Math.round(e.clientX)-xPos)%360 ),
-          //onUpdate:()=>{ gsap.set('.img', { backgroundPosition:(i)=>getBgPos(i) }) }
+          rotationY: '-=' +( (Math.round((e as MouseEvent).clientX)-xPos)%360 ),
+          onUpdate:()=>{ gsap.set('.img', { backgroundPosition:(i: number)=>getBgPos(i) }) }
         });
-        
-        xPos = Math.round(e.clientX);
+        xPos = Math.round((e as MouseEvent).clientX);
+        console.log({xPos})
       }
 
-      function dragEnd(e){
-        container.current?.removeEventListener('mousemove touchmove', drag);
+      function dragEnd(e: MouseEvent | TouchEvent): void {
+        container.current?.removeEventListener('mousemove', drag);
+        container.current?.removeEventListener('touchmove', drag);
         gsap.set('.ring', {cursor:'grab'});
       }
 
+      interface DragEvent extends MouseEvent {
+        touches?: TouchList;
+        clientX: number;
+      }
+
+      interface GetBgPos {
+        (i: number): string;
+      }
+
+      const getBgPos: GetBgPos = (i) => { //returns the background-position string to create parallax movement in each image
+        return (100 - gsap.utils.wrap(0, 360, gsap.getProperty('.ring', 'rotationY') as number - 180 - i * 36) / 360 * 500) + 'px 0px';
+      };
 
     }
-
     
   }); 
 
-
   return (
-    <div className="home-carousel overflow-clip overflow-x-hidden">
-      <div ref={container} className="stage scale-125 md:scale-150 lg:scale-[1.75] 2xl:scale-[2.5] overflow-hidden">
+    <div className="home-carousel overflow-clip overflow-x-hidden bg-red-600">
+      <div ref={container} className="stage overflow-hidden scale-125 md:scale-150 lg:scale-150 2xl:scale-[2] ">
         <div className="container">
           <div className="ring">
             <div ref={image} className="img"></div>
