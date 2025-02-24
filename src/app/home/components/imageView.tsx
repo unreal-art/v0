@@ -56,5 +56,7 @@ export default function ImageView({
         </div>
       </div>
     </>
+
   );
+  
 }
