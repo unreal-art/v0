@@ -54,7 +54,6 @@ export default function PhotoOverlay({
   };
 
   const { data: comments } = useComments(context.photo.id);
-
   useRealtimeComments(context.photo.id);
 
   return (
@@ -94,7 +93,7 @@ export default function PhotoOverlay({
                 className="flex gap-1 items-center"
                 onClick={() => handleCommentClick()}
               >
-                <ChatIcon color="#FFFFFF" /> <p>{comments.length}</p>
+                <ChatIcon color="#FFFFFF" /> <p>{comments?.length}</p>
               </button>
             </div>
 

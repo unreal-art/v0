@@ -2,19 +2,43 @@ import { createClient } from "$/supabase/server";
 import { NextResponse } from "next/server";
 
 // ✅ Fetch all comments for a post
+// export async function GET(req: Request) {
+//   const supabase = await createClient();
+
+//   const { searchParams } = new URL(req.url);
+//   const postId = searchParams.get("postId");
+
+//   if (!postId)
+//     return NextResponse.json({ error: "Missing postId" }, { status: 400 });
+
+//   const { data, error } = await supabase.rpc("get_comments_with_users", {
+//     _post_id: Number(postId),
+//   });
+//   console.log(error);
+//   if (error)
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+
+//   return NextResponse.json(data);
+// }
+
+// ✅ Fetch comments with like count
 export async function GET(req: Request) {
   const supabase = await createClient();
-
   const { searchParams } = new URL(req.url);
   const postId = searchParams.get("postId");
 
   if (!postId)
     return NextResponse.json({ error: "Missing postId" }, { status: 400 });
 
-  const { data, error } = await supabase.rpc("get_comments_with_users", {
-    _post_id: Number(postId),
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase.rpc("get_comments_with_likes", {
+    post_uuid: Number(postId), // Ensure it's parsed correctly
+    current_user_id: user?.data?.user?.id as string,
   });
-  console.log(error);
+
+  // console.log(error);
+
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 

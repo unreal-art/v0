@@ -9,13 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           content: string
           created_at: string | null
           id: string
           parent_id: string | null
-          post_id: string
+          post_id: number
           user_id: string
         }
         Insert: {
@@ -23,7 +52,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           parent_id?: string | null
-          post_id: string
+          post_id: number
           user_id: string
         }
         Update: {
@@ -31,7 +60,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           parent_id?: string | null
-          post_id?: string
+          post_id?: number
           user_id?: string
         }
         Relationships: [
@@ -272,6 +301,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_comments_with_likes: {
+        Args: {
+          post_uuid: number
+          current_user_id: string
+        }
+        Returns: {
+          id: number
+          post_id: number
+          user_id: string
+          content: string
+          parent_id: number
+          created_at: string
+          username: string
+          avatar_url: string
+          like_count: number
+          user_liked: boolean
+        }[]
+      }
       get_comments_with_users:
         | {
             Args: {

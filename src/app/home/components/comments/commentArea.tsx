@@ -24,7 +24,7 @@ export default function CommentArea({
 }: CommentAreaProps) {
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
-
+  // console.log(comments);
   const [reply, setReply] = useState(false);
   const handleCloseReply = () => {
     setReply(false);

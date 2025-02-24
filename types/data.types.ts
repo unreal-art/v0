@@ -75,8 +75,10 @@ export interface CommentWithUser {
   post_id: number; // BIGINT
   user_id: string; // UUID
   content: string;
-  parent_id: string | null;
+  parent_id: string | null; // UUID or null
   created_at: string; // ISO timestamp
   username: string | null;
   avatar_url: string;
+  like_count: number; // Number of likes
+  user_liked: boolean; // Whether the current user liked the comment
 }
