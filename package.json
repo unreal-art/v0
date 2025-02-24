@@ -26,6 +26,7 @@
     "random": "^5.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-loading-skeleton": "^3.5.0",
     "react-multi-carousel": "^2.8.5",
     "react-photo-album": "^3.0.2",
     "react-three": "^0.9.7",

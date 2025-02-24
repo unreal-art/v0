@@ -3,12 +3,9 @@ import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
-// import dummyPhotos from "../dummyPhotos";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
-// import { getPosts } from "$/queries/post/getPosts";
-// import { supabase } from "$/supabase/client";
-//import { usePostsQuery } from "@/hooks/usePostsQuery";
+
 import Image from "next/image";
 import ImageView from "./imageView";
 // import { usePostsQuery } from "@/hooks/usePostsQuery";
@@ -35,17 +32,13 @@ export default function PhotoGallary({}) {
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
 
-  // const { data: posts } = useQuery({
-  //   queryKey: ["posts"],
-  //   queryFn: () => getPosts(supabase),
-  // });
   const {
     isLoading,
     isError,
     error,
     data,
     isFetchingNextPage,
-    isFetching,
+    // isFetching,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -101,8 +94,18 @@ export default function PhotoGallary({}) {
     setImageIndex(context.index);
   };
 
+  // console.log(isLoading, isFetching, isError);
+
   // if (isLoading || isFetching) {
-  //   return <p>Loading ... </p>;
+  //   return (
+  //     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  //       {Array(8)
+  //         .fill(null)
+  //         .map((_, index) => (
+  //           <Skeleton key={index} height={200} />
+  //         ))}
+  //     </div>
+  //   );
   // }
 
   if (isError) {
@@ -118,9 +121,9 @@ export default function PhotoGallary({}) {
   }
 
   return (
-    <>
+    <div className="w-full">
       <InfiniteScroll
-        isLoadingIntial={isLoading || isFetching}
+        isLoadingInitial={isLoading}
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >
@@ -144,7 +147,7 @@ export default function PhotoGallary({}) {
         }
         setImageIndex={setImageIndex}
       />
-    </>
+    </div>
   );
 }
 

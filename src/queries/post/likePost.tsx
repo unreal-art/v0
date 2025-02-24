@@ -40,6 +40,7 @@ export async function likePost(
         {
           author: userId,
           post_id: postId,
+          post_author: postAuthor,
         },
       ]);
 

@@ -68,6 +68,8 @@ export type ExtendedUser = SupabaseUser & {
   wallet?: WalletObject;
   bio: string;
   location: string;
+  full_name: string;
+  avatar_url: string;
 };
 
 export interface CommentWithUser {

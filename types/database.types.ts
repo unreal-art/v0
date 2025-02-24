@@ -114,18 +114,21 @@ export type Database = {
           author: string | null
           created_at: string
           id: number
+          post_author: string | null
           post_id: number | null
         }
         Insert: {
           author?: string | null
           created_at?: string
           id?: number
+          post_author?: string | null
           post_id?: number | null
         }
         Update: {
           author?: string | null
           created_at?: string
           id?: number
+          post_author?: string | null
           post_id?: number | null
         }
         Relationships: [
@@ -307,11 +310,11 @@ export type Database = {
           current_user_id: string
         }
         Returns: {
-          id: number
+          id: string
           post_id: number
           user_id: string
           content: string
-          parent_id: number
+          parent_id: string
           created_at: string
           username: string
           avatar_url: string
