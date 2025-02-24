@@ -13,6 +13,7 @@ import { supabase } from "$/supabase/client";
 import { useLikePost } from "@/hooks/useLikePost";
 import { useUser } from "@/hooks/useUser";
 import { timeAgo } from "@/app/libs/timeAgo";
+import { useComments, useRealtimeComments } from "@/hooks/useComments";
 
 export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
   photo: Photo & {
@@ -52,6 +53,9 @@ export default function PhotoOverlay({
     setImageIndex(); // or any specific value you want to pass
   };
 
+  const { data: comments } = useComments(context.photo.id);
+  useRealtimeComments(context.photo.id);
+
   return (
     <>
       <div
@@ -89,7 +93,7 @@ export default function PhotoOverlay({
                 className="flex gap-1 items-center"
                 onClick={() => handleCommentClick()}
               >
-                <ChatIcon color="#FFFFFF" /> <p>300</p>
+                <ChatIcon color="#FFFFFF" /> <p>{comments?.length}</p>
               </button>
             </div>
 
