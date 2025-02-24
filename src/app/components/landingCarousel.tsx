@@ -10,7 +10,7 @@ export default function LandingCarousel() {
   const image = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    let xPos = 0;
+    //let xPos = 0;
     gsap
       .timeline()
       .set(".img", {
@@ -45,54 +45,55 @@ export default function LandingCarousel() {
     // })
 
     if (container.current) {
-      container.current.addEventListener("mousedown touchstart", dragStart);
-      container.current.addEventListener("mouseup touchend", dragEnd);
 
       // container.current.addEventListener('mousedown', dragStart);
       // container.current.addEventListener('touchstart', dragStart);
       // container.current.addEventListener('mouseup', dragEnd);
       // container.current.addEventListener('touchend', dragEnd);
 
-      function dragStart(e: any) { 
-        console.log("dragStart")
-        if (e.touches) e.clientX = e.touches[0].clientX;
-        xPos = Math.round(e.clientX);
-        gsap.set('.ring', {cursor:'grabbing'})
-        container.current?.addEventListener('mousemove', drag);
-        container.current?.addEventListener('touchmove', drag);
-      }
+      // function dragStart(e: MouseEvent | TouchEvent): void { 
+      //   console.log("dragStart")
+      //   if (e instanceof TouchEvent) {
+      //     const touch = e.touches[0];
+      //     e = { ...e, clientX: touch.clientX };
+      //   }
+      //   xPos = Math.round((e as MouseEvent).clientX);
+      //   gsap.set('.ring', {cursor:'grabbing'})
+      //   container.current?.addEventListener('mousemove', drag);
+      //   container.current?.addEventListener('touchmove', drag);
+      // }
 
-      function drag(e: MouseEvent | TouchEvent){
-        if (e instanceof TouchEvent) {
-          const touch = e.touches[0];
-          e = { ...e, clientX: touch.clientX };
-        }
-        gsap.to('.ring', {
-          rotationY: '-=' +( (Math.round((e as MouseEvent).clientX)-xPos)%360 ),
-          onUpdate:()=>{ gsap.set('.img', { backgroundPosition:(i: number)=>getBgPos(i) }) }
-        });
-        xPos = Math.round((e as MouseEvent).clientX);
-        console.log({xPos})
-      }
+      // function drag(e: MouseEvent | TouchEvent){
+      //   if (e instanceof TouchEvent) {
+      //     const touch = e.touches[0];
+      //     e = { ...e, clientX: touch.clientX };
+      //   }
+      //   gsap.to('.ring', {
+      //     rotationY: '-=' +( (Math.round((e as MouseEvent).clientX)-xPos)%360 ),
+      //     onUpdate:()=>{ gsap.set('.img', { backgroundPosition:(i: number)=>getBgPos(i) }) }
+      //   });
+      //   xPos = Math.round((e as MouseEvent).clientX);
+      //   console.log({xPos})
+      // }
 
-      function dragEnd(e: MouseEvent | TouchEvent): void {
-        container.current?.removeEventListener('mousemove', drag);
-        container.current?.removeEventListener('touchmove', drag);
-        gsap.set('.ring', {cursor:'grab'});
-      }
+      // function dragEnd(e: MouseEvent | TouchEvent): void {
+      //   container.current?.removeEventListener('mousemove', drag);
+      //   container.current?.removeEventListener('touchmove', drag);
+      //   gsap.set('.ring', {cursor:'grab'});
+      // }
 
-      interface DragEvent extends MouseEvent {
-        touches?: TouchList;
-        clientX: number;
-      }
+      // interface DragEvent extends MouseEvent {
+      //   touches?: TouchList;
+      //   clientX: number;
+      // }
 
-      interface GetBgPos {
-        (i: number): string;
-      }
+      // interface GetBgPos {
+      //   (i: number): string;
+      // }
 
-      const getBgPos: GetBgPos = (i) => { //returns the background-position string to create parallax movement in each image
-        return (100 - gsap.utils.wrap(0, 360, gsap.getProperty('.ring', 'rotationY') as number - 180 - i * 36) / 360 * 500) + 'px 0px';
-      };
+      // const getBgPos: GetBgPos = (i) => { //returns the background-position string to create parallax movement in each image
+      //   return (100 - gsap.utils.wrap(0, 360, gsap.getProperty('.ring', 'rotationY') as number - 180 - i * 36) / 360 * 500) + 'px 0px';
+      // };
 
     }
     
