@@ -1,13 +1,13 @@
 import { supabase } from "$/supabase/client";
-import { getAuthorImage } from "@/queries/post/getAuthorImage";
+import { getUserById } from "@/queries/user/getUserById";
 import { useQuery } from "@tanstack/react-query";
 
 /** Custom Hook using React Query */
-export default function useAuthorImage(authorId: string | undefined | null) {
+export default function useUserData(authorId: string | undefined | null) {
   return useQuery({
-    queryKey: ["authorImage", authorId],
+    queryKey: ["profile_data", authorId],
     queryFn: async () => {
-      return getAuthorImage(authorId as string, supabase);
+      return getUserById(authorId as string, supabase);
     },
     enabled: !!authorId, // Ensures query only runs if authorId exists
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes

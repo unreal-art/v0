@@ -7,23 +7,17 @@ import ProfileInfo from "./profileInfo";
 import { useFollowStats } from "@/hooks/useFollowStats";
 import { useLikeStat } from "@/hooks/useLikeStat";
 import { useParams } from "next/navigation";
-import { useUser } from "@/hooks/useUser";
+// import { useUser } from "@/hooks/useUser";
+import useUserData from "@/hooks/useUserData";
+import ProfileSkeleton from "./profileSkeleton";
 // import { getUser } from "$/queries/user/getUser";
 
 export default function UserData() {
-  // const {
-  //   data: user,
-  //   isLoading,
-  //   error,
-  // } = useQuery({
-  //   queryKey: ["user"],
-  //   queryFn: () => getUser(supabase),
-  // });
-  const { user } = useUser();
-
   const params = useParams();
 
   const userId = params.id as string;
+  //fetch user details
+  const { data: user, isLoading } = useUserData(userId);
 
   //fetch follow stats
   const { data: followStats } = useFollowStats(userId);
@@ -31,7 +25,7 @@ export default function UserData() {
   //fetch like stat
   const { data: likeCount } = useLikeStat(userId);
 
-  // if (isLoading) return <p>Loading user data...</p>;
+  if (isLoading) return <ProfileSkeleton />;
   // if (error) return <p>Error loading user data.</p>;
 
   return (
@@ -40,7 +34,7 @@ export default function UserData() {
         <div className="w-28 h-28 md:w-52 md:h-52">
           <Image
             className="rounded-full"
-            src={user?.user_metadata.avatar_url || "/profile.jpg"}
+            src={user?.avatar_url || "/profile.jpg"}
             width={200}
             height={200}
             alt="profile"
@@ -48,9 +42,7 @@ export default function UserData() {
         </div>
 
         <div className="block md:hidden">
-          <p className="text-3xl font-medium">
-            {user?.user_metadata.full_name}
-          </p>
+          <p className="text-3xl font-medium">{user?.full_name}</p>
 
           <div className="flex my-4 gap-3">
             <button className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
@@ -66,9 +58,7 @@ export default function UserData() {
 
       <div className="flex-grow text-primary-5">
         <div className="hidden md:block">
-          <p className="text-3xl font-medium">
-            {user?.user_metadata.full_name}
-          </p>
+          <p className="text-3xl font-medium">{user?.full_name}</p>
 
           <div className="flex my-4 gap-3">
             <button className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">

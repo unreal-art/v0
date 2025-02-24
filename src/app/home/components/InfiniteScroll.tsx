@@ -40,7 +40,7 @@ function InfiniteScroll(props: Props) {
     return () => observer.disconnect();
   }, [isLoadingMore, isLoadingInitial, loadMore]);
 
-  console.log(isLoadingInitial);
+  // console.log(isLoadingInitial);
   return (
     <div className="mb-32 w-full">
       {isLoadingInitial && (

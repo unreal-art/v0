@@ -34,6 +34,8 @@ export const useUser = () => {
           location: profileData[0].location,
           // likesReceived: profileData[0].likes_received,
           creditBalance: profileData[0].credit_balance,
+          full_name: profileData[0].full_name,
+          avatar_url: profileData[0].avatar_url,
         };
 
         setUserId(data.user?.id || null);
