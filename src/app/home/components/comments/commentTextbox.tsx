@@ -1,12 +1,27 @@
 import { CloseIcon, EmojiIcon } from "@/app/components/icons";
+import { usePostComment } from "@/hooks/useComments";
 import Image from "next/image";
+import { useState } from "react";
 
 interface CommentTextboxProps {
+    postId: string;
     reply: boolean;
     closeReply():  void;
 }
 
-export default function CommentTextbox ({ reply, closeReply }: CommentTextboxProps) {
+export default function CommentTextbox ({ reply, postId, closeReply }: CommentTextboxProps) {
+
+    const postComment = usePostComment();
+
+    const [content, setContent] = useState<string | null>(null);
+  
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!content || !content.trim()) return;
+      postComment.mutate({ post_id: postId, content });
+      setContent(null);
+    };
+
     return (
         <div className="p-1">
             {   
@@ -36,7 +51,7 @@ export default function CommentTextbox ({ reply, closeReply }: CommentTextboxPro
                     </div>
             }
 
-            <div className={`flex h-16 bg-primary-10 px-2 ${reply ? "rounded-b-lg" : "m-1 mt-2 rounded-lg"}  pl-4`}>
+            <form onSubmit={handleSubmit} className={`flex h-16 bg-primary-10 px-2 ${reply ? "rounded-b-lg" : "m-1 mt-2 rounded-lg"}  pl-4`}>
 
                 <button className="w-8">
                     <EmojiIcon color="#C1C1C1" />
@@ -48,7 +63,7 @@ export default function CommentTextbox ({ reply, closeReply }: CommentTextboxPro
 
                 <button className="text-primary-8 text-sm w-12">Post</button>
 
-            </div>
+            </form>
             
         </div>
     )

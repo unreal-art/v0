@@ -1,6 +1,11 @@
 import { supabase } from "$/supabase/client";
+import { addNotification } from "./addNotification";
 
-export async function likePost(postId: number, userId: string) {
+export async function likePost(
+  postId: number,
+  userId: string,
+  postAuthor: string,
+) {
   try {
     // Check if a like already exists
     const { data: existingLike, error: fetchError } = await supabase
@@ -42,6 +47,14 @@ export async function likePost(postId: number, userId: string) {
         console.error("Error adding like:", insertError);
         return false;
       }
+
+      //add notifications
+      await addNotification({
+        userId: postAuthor,
+        senderId: userId,
+        postId,
+        type: "like",
+      });
 
       console.log("Like added");
     }

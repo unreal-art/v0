@@ -27,6 +27,7 @@ import { TabText } from "./Tabs";
 import { truncateText } from "$/utils";
 import { useSearchParams } from "next/navigation";
 import { Post } from "$/types/data.types";
+import { timeAgo } from "@/app/libs/timeAgo";
 // import { useQuery } from "@tanstack/react-query";
 
 interface TabProps {
@@ -134,7 +135,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
               >
                 <>
                   <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
-                    <p>36s</p>
+                    <p>{timeAgo(context.photo.createdAt)}</p>
                     <button>
                       <OptionMenuIcon color="#FFFFFF" />
                     </button>

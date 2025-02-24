@@ -1,3 +1,5 @@
+import { User as SupabaseUser } from "@supabase/supabase-js";
+
 export type UploadResponse = {
   name: string;
   hash: string;
@@ -22,6 +24,12 @@ export type Post = {
   seed: number | null;
 };
 
+export interface JobSpec extends Post {
+  module?: string;
+  version?: string; //version
+  inputs?: Record<string, string | number>;
+}
+
 // Define proper types for pages
 export interface Page {
   data: Post[];
@@ -38,4 +46,37 @@ export interface Like {
   author: string | null;
   created_at: string;
   post_id: number | null;
+}
+
+export interface Notification {
+  id: string | null; // UUID
+  user_id: string | null; // UUID of the user receiving the notification
+  sender_id: string | null; // UUID of the sender
+  post_id: number | null; // bigint (assuming it's stored as a number in JavaScript)
+  type: string;
+  created_at: string | null; // ISO timestamp
+}
+
+type WalletObject = {
+  address: string;
+  privateKey: string;
+  publicKey: string;
+};
+
+export type ExtendedUser = SupabaseUser & {
+  is_anonymous: boolean;
+  wallet?: WalletObject;
+  bio: string;
+  location: string;
+};
+
+export interface CommentWithUser {
+  id: string; // UUID
+  post_id: number; // BIGINT
+  user_id: string; // UUID
+  content: string;
+  parent_id: string | null;
+  created_at: string; // ISO timestamp
+  username: string | null;
+  avatar_url: string;
 }

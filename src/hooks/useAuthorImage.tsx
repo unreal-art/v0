@@ -3,7 +3,7 @@ import { getAuthorImage } from "@/queries/post/getAuthorImage";
 import { useQuery } from "@tanstack/react-query";
 
 /** Custom Hook using React Query */
-export default function useAuthorImage(authorId: string | undefined) {
+export default function useAuthorImage(authorId: string | undefined | null) {
   return useQuery({
     queryKey: ["authorImage", authorId],
     queryFn: async () => {

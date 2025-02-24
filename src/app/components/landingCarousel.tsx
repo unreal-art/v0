@@ -3,33 +3,32 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
 
-
 gsap.registerPlugin(useGSAP);
 
 export default function LandingCarousel() {
-
-
   const container = useRef<HTMLDivElement>(null);
   const image = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     let xPos = 0;
-    gsap.timeline()
-      .set('.img',  { // apply transform rotations to each image
-        rotateY: (i)=> i*-36,
-        transformOrigin: '50% 50% 500px',
+    gsap
+      .timeline()
+      .set(".img", {
+        // apply transform rotations to each image
+        rotateY: (i) => i * -36,
+        transformOrigin: "50% 50% 500px",
         z: -500,
         backgroundImage:(i)=> 'url(/images/landing-'+(i + 1)+'.png)',
         backgroundSize:'cover',
         repeat:-1,
         backfaceVisibility:'hidden'
       })
-      .from('.img', {
-        duration:1.5,
+      .from(".img", {
+        duration: 1.5,
         y: 200,
-        opacity:0,
-        stagger:0.1,
-        ease:'expo'
+        opacity: 0,
+        stagger: 0.1,
+        ease: "expo",
       })
       .add(()=>{
         //gsap.to('.img', { opacity: 0.5, ease:'power3'})
@@ -42,10 +41,12 @@ export default function LandingCarousel() {
         //     gsap.to('.img', {opacity:1, ease:'power2.inOut'})
         //   })
         // }
-      }, '-=0.5')    
+      }, "-=0.5");
     // })
 
     if (container.current) {
+      container.current.addEventListener("mousedown touchstart", dragStart);
+      container.current.addEventListener("mouseup touchend", dragEnd);
 
       // container.current.addEventListener('mousedown', dragStart);
       // container.current.addEventListener('touchstart', dragStart);
@@ -60,7 +61,6 @@ export default function LandingCarousel() {
         container.current?.addEventListener('mousemove', drag);
         container.current?.addEventListener('touchmove', drag);
       }
-
 
       function drag(e: MouseEvent | TouchEvent){
         if (e instanceof TouchEvent) {
@@ -112,11 +112,10 @@ export default function LandingCarousel() {
             <div ref={image} className="img"></div>
             <div ref={image} className="img"></div>
             <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div> 
+            <div ref={image} className="img"></div>
           </div>
         </div>
       </div>
     </div>
-  )
-  
+  );
 }
