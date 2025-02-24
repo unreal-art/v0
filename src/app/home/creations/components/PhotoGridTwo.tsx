@@ -54,7 +54,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
     isLoading,
     data,
     isFetchingNextPage,
-    isFetching,
+    //isFetching,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -119,7 +119,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   return (
     <>
       <InfiniteScroll
-        isLoadingIntial={isLoading || isFetching}
+        isLoadingInitial={isLoading}
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >

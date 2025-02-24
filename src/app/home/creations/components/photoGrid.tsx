@@ -17,7 +17,7 @@ const PhotoGrid = () => {
     isLoading,
     data,
     isFetchingNextPage,
-    isFetching,
+    //isFetching,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -47,7 +47,7 @@ const PhotoGrid = () => {
 
   return (
     <InfiniteScroll
-      isLoadingIntial={isLoading || isFetching}
+      isLoadingInitial={isLoading}
       isLoadingMore={isFetchingNextPage}
       loadMore={() => hasNextPage && fetchNextPage()}
     >

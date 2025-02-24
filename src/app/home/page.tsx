@@ -64,7 +64,7 @@ export default async function Home({
           <TabBtn text="Top" />
         </div>
 
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto w-full">
           <PhotoGallary />
         </div>
       </div>
