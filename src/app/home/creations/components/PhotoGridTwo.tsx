@@ -57,6 +57,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
     //isFetching,
     hasNextPage,
     fetchNextPage,
+    error,
   } = useInfiniteQuery({
     queryKey: ["creation_posts", s || "public"],
     queryFn: async ({ pageParam = 0 }) => {
@@ -119,7 +120,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   return (
     <>
       <InfiniteScroll
-        isLoadingInitial={isLoading}
+        isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >

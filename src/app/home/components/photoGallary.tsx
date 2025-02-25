@@ -96,18 +96,6 @@ export default function PhotoGallary({}) {
 
   // console.log(isLoading, isFetching, isError);
 
-  // if (isLoading || isFetching) {
-  //   return (
-  //     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-  //       {Array(8)
-  //         .fill(null)
-  //         .map((_, index) => (
-  //           <Skeleton key={index} height={200} />
-  //         ))}
-  //     </div>
-  //   );
-  // }
-
   if (isError) {
     return (
       <p className="wrapper">{"message" in error ? error.message : error}</p>
@@ -115,15 +103,15 @@ export default function PhotoGallary({}) {
   }
 
   if (!data || data.pages.length === 0) {
-    return (
-      <p>It looks like you haven&apos;t saved any books to this shelf yet.</p>
-    );
+    return <p>No Data found.</p>;
   }
+
+  console.log(isLoading);
 
   return (
     <div className="w-full">
       <InfiniteScroll
-        isLoadingInitial={isLoading}
+        isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >

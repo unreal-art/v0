@@ -14,6 +14,7 @@ import {
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
 import Search from "./components/search";
+//import { SearchResults } from "./components/sampleSearch";
 
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
@@ -64,6 +65,7 @@ export default async function Home({
           <TabBtn text="Following" />
           <TabBtn text="Top" />
         </div>
+        {/* <SearchResults /> */}
 
         <div className="overflow-y-auto w-full">
           <PhotoGallary />
