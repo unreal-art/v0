@@ -103,15 +103,15 @@ export default function PhotoGallary({}) {
   }
 
   if (!data || data.pages.length === 0) {
-    return (
-      <p>It looks like you haven&apos;t saved any books to this shelf yet.</p>
-    );
+    return <p>No Data found.</p>;
   }
+
+  console.log(isLoading);
 
   return (
     <div className="w-full">
       <InfiniteScroll
-        isLoadingInitial={isLoading}
+        isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
       >
