@@ -146,6 +146,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_rank"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notifications: {
@@ -179,6 +186,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_rank"
             referencedColumns: ["id"]
           },
         ]
@@ -301,7 +315,71 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      posts_with_rank: {
+        Row: {
+          author: string | null
+          caption: string | null
+          category: string | null
+          cpu: number | null
+          createdAt: string | null
+          device: string | null
+          id: number | null
+          ipfsImages: Json | null
+          isDraft: boolean | null
+          isPinned: boolean | null
+          isPrivate: boolean | null
+          like_count: number | null
+          n: number | null
+          prompt: string | null
+          rank: number | null
+          seed: number | null
+        }
+        Insert: {
+          author?: string | null
+          caption?: string | null
+          category?: string | null
+          cpu?: number | null
+          createdAt?: string | null
+          device?: string | null
+          id?: number | null
+          ipfsImages?: Json | null
+          isDraft?: boolean | null
+          isPinned?: boolean | null
+          isPrivate?: boolean | null
+          like_count?: number | null
+          n?: number | null
+          prompt?: string | null
+          rank?: never
+          seed?: number | null
+        }
+        Update: {
+          author?: string | null
+          caption?: string | null
+          category?: string | null
+          cpu?: number | null
+          createdAt?: string | null
+          device?: string | null
+          id?: number | null
+          ipfsImages?: Json | null
+          isDraft?: boolean | null
+          isPinned?: boolean | null
+          isPrivate?: boolean | null
+          like_count?: number | null
+          n?: number | null
+          prompt?: string | null
+          rank?: never
+          seed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Posts_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_comments_with_likes: {
@@ -353,6 +431,22 @@ export type Database = {
               avatar_url: string
             }[]
           }
+      search_posts: {
+        Args: {
+          keyword: string
+          limit_num: number
+          offset_num: number
+        }
+        Returns: {
+          rank: number
+          id: string
+          prompt: string
+          ipfsimages: Json
+          created_at: string
+          author_id: string
+          other_columns: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
