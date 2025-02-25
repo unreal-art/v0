@@ -33,7 +33,8 @@
     "supabase": "^2.9.6",
     "swiper": "9.0.2",
     "thirdweb": "^5.88.2",
-    "three": "^0.173.0"
+    "three": "^0.173.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
