@@ -18,8 +18,6 @@ export default function GenerateTextField({
   const generate = async () => {
     if (!prompt) return;
     mutate({ prompt, client: supabase });
-    // setOpen(false);
-    // router.push("/home/generation");
   };
   if (!open) return;
   return (
