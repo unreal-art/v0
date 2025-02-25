@@ -78,3 +78,20 @@ For our carousel, we will need to add some custom CSS to our global styles.
 	top:50%;
 	transform:translate(-50%,-50%);
 }
+
+@media screen and (max-width: 746px) {
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Adjust as needed */
+    background-color: white;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhones */
+    z-index: 1000;
+  }
+}

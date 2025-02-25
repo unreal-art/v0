@@ -28,7 +28,7 @@ export default function RootLayout({
         <ThirdwebProvider>
           <>
             <main
-              className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-screen w-screen`}
+              className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}
             >
               <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full">
                 <Link href={"/"} className="hidden md:block m-6">
@@ -40,7 +40,7 @@ export default function RootLayout({
                   />
                 </Link>
 
-                <div className="flex md:flex-col flex-grow justify-between gap-3">
+                <div className="flex md:flex-col flex-grow justify-between gap-3 bottom-nav">
                   <div className="flex flex-grow justify-evenly md:flex-col md:justify-start">
                     <NavLink href={"/home"} text="Home" icon="dashboard" />
                     <NavLink

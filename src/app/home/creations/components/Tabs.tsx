@@ -3,9 +3,9 @@ import TabIcon from "./TabIcon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type TabText = "Public" | "Private" | "Liked" | "Pinned" | "Draft";
+export type TabText = "Public" | "Private" | "Liked" | "Pinned" | "Draft" | "User" | "Image";
 
-interface ITabs {
+export interface ITabs {
   hideDraft?: boolean;
   currentIndex: number;
   setCurrentIndex: (value: number) => void;
@@ -57,14 +57,14 @@ export default function Tabs({
   );
 }
 
-interface ITabBtn {
+export interface ITabBtn {
   currentIndex: number;
   index: number;
   text: TabText;
   setCurrentIndex: (value: number) => void;
 }
 
-function TabBtn({ index, currentIndex, text, setCurrentIndex }: ITabBtn) {
+export function TabBtn({ index, currentIndex, text, setCurrentIndex }: ITabBtn) {
   const [color, setColor] = useState<`#${string}`>("#5D5D5D");
   const pathname = usePathname();
 

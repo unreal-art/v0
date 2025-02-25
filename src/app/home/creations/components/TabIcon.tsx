@@ -1,4 +1,4 @@
-import { CrossedEyeIcon, DraftIcon, GlobeIcon, HeartIcon, PinIcon } from "@/app/components/icons"
+import { CrossedEyeIcon, DraftIcon, GlobeIcon, HeartIcon, PhotoGridIcon, PinIcon, UserIcon } from "@/app/components/icons"
 import { TabText } from "./Tabs"
 
 interface TabIconProps {
@@ -21,8 +21,12 @@ export default function TabIcon({ text, color, height, width } : TabIconProps) {
             return (<PinIcon height={height} width={width} color={color} />)
         case "Draft":
             return (<DraftIcon height={height} width={width} color={color} />)
+        case "User":
+            return (<UserIcon height={height} width={width} color={color} />)
+        case "Image":
+            return (<PhotoGridIcon height={height} width={width} color={color} />)
         default:
-            throw Error("Invalid Table")
+           // throw Error("Invalid Table")
     }
 
 }
