@@ -10,7 +10,7 @@ interface GenerateTextFieldProps {
 
 export default function GenerateTextField({
   open,
-  // setOpen,
+  setOpen,
 }: GenerateTextFieldProps) {
   const { mutate } = useCreateJob();
   const [prompt, setPrompt] = useState<string | null>(null);
@@ -18,6 +18,7 @@ export default function GenerateTextField({
   const generate = async () => {
     if (!prompt) return;
     mutate({ prompt, client: supabase });
+    setOpen(!open);
   };
   if (!open) return;
   return (
