@@ -11,6 +11,7 @@ export const searchPostsPaginated = async (
   const start = Math.max(0, (page - 1) * limit);
   const end = start + limit - 1;
 
+  // console.log(`Fetching posts from index ${start} to ${end}`);
   const { data, error } = await supabase
     .from("posts_with_rank") // ✅ Query the view, not "posts"
     .select("*")
@@ -19,6 +20,8 @@ export const searchPostsPaginated = async (
       config: "english",
     })
     .order("rank", { ascending: false }) // ✅ Order by rank
+    .order("id", { ascending: false }) // ✅ Ensures stable pagination
+
     .range(start, end);
 
   if (error) {
