@@ -96,18 +96,6 @@ export default function PhotoGallary({}) {
 
   // console.log(isLoading, isFetching, isError);
 
-  // if (isLoading || isFetching) {
-  //   return (
-  //     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-  //       {Array(8)
-  //         .fill(null)
-  //         .map((_, index) => (
-  //           <Skeleton key={index} height={200} />
-  //         ))}
-  //     </div>
-  //   );
-  // }
-
   if (isError) {
     return (
       <p className="wrapper">{"message" in error ? error.message : error}</p>
