@@ -2,6 +2,8 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
+import Image from "next/image";
+import AuthBtn from "./authBtn";
 
 gsap.registerPlugin(useGSAP);
 
@@ -100,10 +102,13 @@ export default function LandingCarousel() {
   }); 
 
   return (
-    <div className="home-carousel overflow-clip overflow-x-hidden bg-red-600">
-      <div ref={container} className="stage overflow-hidden scale-125 md:scale-150 lg:scale-150 2xl:scale-[2] ">
+    <div className="home-carousel overflow-clip overflow-x-hidden">
+      <div ref={container} className="stage overflow-hidden  md:scale-150 lg:scale-150 2xl:scale-[2] ">
         <div className="container">
-          <div className="ring">
+          <div className="absolute top-0 z-10 flex justify-center w-full mb-10 scale-50">
+            <Image src={"/logo.png"} alt="logo" width={140} height={36} />
+          </div>
+          <div className="ring z-20">
             <div ref={image} className="img"></div>
             <div ref={image} className="img"></div>
             <div ref={image} className="img"></div>
@@ -114,6 +119,18 @@ export default function LandingCarousel() {
             <div ref={image} className="img"></div>
             <div ref={image} className="img"></div>
             <div ref={image} className="img"></div>
+          </div>
+
+          <div className={`absolute flex justify-center w-full bottom-20 scale-50 z-10`}>
+            <div className="flex z-20 flex-col justify-center items-center border-primary-10 border-x-[1px] border-b-[1px] w-[350px] rounded-xl gap-4 py-12">
+              <AuthBtn icon={<div></div>} provider="google">
+                Continue with Google
+              </AuthBtn>
+
+              <AuthBtn icon={<div></div>} provider="apple">
+                Continue with Apple
+              </AuthBtn>
+            </div> 
           </div>
         </div>
       </div>

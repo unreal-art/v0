@@ -13,7 +13,8 @@ import {
 } from "@/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
-import { SearchResults } from "./components/sampleSearch";
+import Search from "./components/search";
+//import { SearchResults } from "./components/sampleSearch";
 
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
@@ -59,7 +60,7 @@ export default async function Home({
         </div>
 
         <div className="flex gap-x-2 items-center w-full h-10 mt-8 md:mt-0 mb-2">
-          <TabBtn text="Search" />
+          <Search />
           <TabBtn text="Explore" />
           <TabBtn text="Following" />
           <TabBtn text="Top" />

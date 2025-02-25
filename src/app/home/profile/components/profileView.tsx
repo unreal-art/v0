@@ -19,12 +19,11 @@ export default function ProfileView() {
   return (
     <div className="w-full">
       <div className="w-full mb-4">
-        {" "}
         <Tabs
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
           hideDraft={true}
-        />{" "}
+        />
       </div>
 
       <div className="w-full">

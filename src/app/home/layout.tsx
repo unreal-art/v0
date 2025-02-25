@@ -30,7 +30,7 @@ export default function RootLayout({
           <GenerationStoreProvider>
             <>
               <main
-                className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-screen w-screen`}
+                className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}
               >
                 <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full">
                   <Link href={"/"} className="hidden md:block m-6">
