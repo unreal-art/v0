@@ -2,7 +2,7 @@ import { supabase } from "$/supabase/client";
 
 // Toggle follow/unfollow status
 const toggleFollow = async (followerId: string, followeeId: string) => {
-  if (!followerId || !followeeId) return;
+  if (!followerId || !followeeId || followerId === followeeId) return;
 
   // Check current follow status
   const { data, error } = await supabase

@@ -81,16 +81,18 @@ export function User({
             {data.full_name}
           </p>
 
-          <button
-            disabled={toggleFollowMutation.isPending}
-            onClick={handleFollowToggle}
-            className={`flex items-center justify-center gap-1 rounded-full h-8 w-24 px-2 py-1 border-[1px] border-primary-8 
+          {userId !== data.id && (
+            <button
+              disabled={toggleFollowMutation.isPending}
+              onClick={handleFollowToggle}
+              className={`flex items-center justify-center gap-1 rounded-full h-8 w-24 px-2 py-1 border-[1px] border-primary-8 
     ${isFollowing ? "bg-transparent" : "bg-primary-10"}`}
-          >
-            <p className="text-primary-5 text-sm">
-              {isLoading ? "Loading..." : isFollowing ? "Unfollow" : "Follow"}
-            </p>
-          </button>
+            >
+              <p className="text-primary-5 text-sm">
+                {isLoading ? "Loading..." : isFollowing ? "Unfollow" : "Follow"}
+              </p>
+            </button>
+          )}
         </div>
 
         <div className="flex gap-x-4 my-4">
