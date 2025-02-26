@@ -4,17 +4,21 @@ import { Post, UploadResponse } from "$/types/data.types";
 export const searchPostsPaginated = async (
   keyword: string,
   page: number,
-  limit = 10,
+  limit = 10
 ): Promise<Post[]> => {
   if (!keyword?.trim()) return []; // ✅ Prevent empty or whitespace-only searches
 
+  // Calculate pagination bounds, ensuring start is never negative
   const start = Math.max(0, (page - 1) * limit);
-  const end = start + limit - 1;
+  // Calculate end index (inclusive) for the current page
+  const end = start + (limit - 1);
 
   // console.log(`Fetching posts from index ${start} to ${end}`);
   const { data, error } = await supabase
     .from("posts_with_rank") // ✅ Query the view, not "posts"
     .select("*")
+    .eq("isPrivate", false) // Filter where isPrivate is false
+    .eq("isDraft", false) // Filter where isDraft is false
     .textSearch("prompt", keyword, {
       type: "websearch",
       config: "english",
