@@ -32,10 +32,9 @@ export default function AuthBtn({ icon, children, provider }: AuthBtnProps) {
   return (
     <button
       onClick={login}
-      className="border-primary-9 text-primary-6 rounded-full flex justify-center items-center h-10 w-[276px] border-[1px]"
-    >
-      <div className="mx-3">{icon}</div>
-      <p>{children}</p>
+      className="border-primary-9 text-primary-6 rounded-full flex justify-center items-center h-10 w-[276px] border-[1px]">
+      {icon}
+      <p className="block w-40">{children}</p>
     </button>
   );
 }
