@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 export function useCreateJob() {
   const router = useRouter();
   const { startGeneration, stopGeneration } = useGenerationStore(
-    (state) => state,
+    (state) => state
   );
 
   return useMutation({
@@ -28,7 +28,7 @@ export function useCreateJob() {
       //TODO: the post id should be among the data returned
       console.log("Job created successfully:", data);
       stopGeneration();
-      router.push(`/home/generation?id=${data.id}`); // Navigate after success
+      router.push(`/home/generation?id=${data.data[0].id}`); // Navigate after success
     },
     onError: (error) => {
       stopGeneration();
