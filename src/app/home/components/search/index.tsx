@@ -76,7 +76,9 @@ export default function Search() {
             </div>
 
             <div className="overflow-y-auto h-[70vh]">
-              {currentIndex === 0 && <UserSearch />}
+              {currentIndex === 0 && (
+                <UserSearch searchTerm={debouncedSearch} />
+              )}
 
               {currentIndex === 1 && (
                 <SearchPhotoGallary searchTerm={debouncedSearch} />
