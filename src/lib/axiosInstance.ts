@@ -1,9 +1,12 @@
 import axios from "axios";
+import https from "https";
 
-// Create an Axios instance
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  headers: { "Content-Type": "application/json" },
+  baseURL: "https://darts.decenterai.com:8080", // Base URL
+  headers: {
+    "Content-Type": "application/json",
+  },
+  httpsAgent: new https.Agent({ rejectUnauthorized: false }), // Allow self-signed SSL
 });
 
 export const axiosInstanceLocal = axios.create({
