@@ -1,17 +1,17 @@
 "use client"
 import { useRouter } from "next/navigation";
-import GenerateInput from "../components/generateInput";
+import GenerateInput from "../../components/generateInput";
 import dynamic from 'next/dynamic'
 import Image from "next/image";
-import Prompt from "./components/prompt";
-import Feature from "./components/feature";
-import CaptionInput from "./components/captionInput";
-import Interactions from "./components/interactions";
-import PostingActions from "./components/postingActions";
+import Prompt from "../components/prompt";
+import Feature from "../components/feature";
+import CaptionInput from "../components/captionInput";
+import Interactions from "../components/interactions";
+import PostingActions from "../components/postingActions";
 import { BackIcon, OptionMenuIcon } from "@/app/components/icons";
  
 const PhotoGallary = dynamic(
-  () => import("../components/photoGallary"),
+  () => import("../../components/photoGallary"),
   { ssr: false }
 )
 
