@@ -117,6 +117,13 @@ Content-Type: application/json
     "Seed": "{{$randomInt 1 10000000}}"
   }
 }
+
+HTTP/1.1 200  - OK
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+content-type: application/json
+date: Thu, 27 Feb 2025 01:45:31 GMT
+connection: close
+transfer-encoding: chunked
 ###
 
 POST {{u}}/darts
