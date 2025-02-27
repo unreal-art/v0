@@ -11,6 +11,7 @@ import { ThirdwebProvider } from "thirdweb/react";
 import Notifications from "../notifications";
 import { useUser } from "@/hooks/useUser";
 import { GenerationStoreProvider } from "../providers/GenerationStoreProvider";
+import Menu from "../menu";
 
 const GenerationProgress = dynamic(
   () => import("./components/generationProgress"),
@@ -71,7 +72,9 @@ export default function RootLayout({
                           icon="profile"
                         />
                       </div>
-                      <NavLink href="/menu" text="Menu" icon="menu" />
+                      <Menu>
+                        <NavLink href="#" text="Menu" icon="menu" />
+                      </Menu>
                     </div>
                   </div>
                 </div>

@@ -79,6 +79,16 @@ For our carousel, we will need to add some custom CSS to our global styles.
 	transform:translate(-50%,-50%);
 }
 
+.shadow-bg {
+  background-color: #0000008C;
+}
+
+.hide-arrow[type="number"]::-webkit-inner-spin-button,
+.hide-arrow[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 @media screen and (max-width: 746px) {
   .bottom-nav {
     position: fixed;
