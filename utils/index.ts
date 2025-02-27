@@ -57,7 +57,7 @@ export function isHighQualityImage(filename: string): boolean {
 
 export function truncateText(
   text: string | undefined | null,
-  wordLimit: number = 15,
+  wordLimit: number = 15
 ): string {
   if (!text) return "";
   const words = text.split(" ");
@@ -68,7 +68,7 @@ export function truncateText(
 
 export const getNotificationMessage = (
   type: string,
-  senderName: string | null | undefined,
+  senderName: string | null | undefined
 ) => {
   switch (type) {
     case "like":
@@ -81,3 +81,40 @@ export const getNotificationMessage = (
       return "You have a new notification!";
   }
 };
+
+export function formatDate(dateString: string) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function getImageResolution(imageUrl: string) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => {
+      resolve(`${img.width} × ${img.height} `);
+    };
+    img.onerror = (err) => reject(err);
+  });
+}
+
+export function downloadImage(imageUrl: string, fileName: string) {
+  fetch(imageUrl)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName || "downloaded-image.jpg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => console.error("Error downloading image:", error));
+}

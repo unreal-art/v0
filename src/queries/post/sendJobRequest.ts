@@ -28,8 +28,6 @@ export const sendJobRequest = async ({
         Format: "webp",
       },
       author,
-      isPrivate: false,
-      isPinned: false,
       category: "GENERATION",
     };
 
