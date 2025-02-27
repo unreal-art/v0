@@ -197,6 +197,42 @@ export type Database = {
           },
         ]
       }
+      post_pins: {
+        Row: {
+          id: number
+          pinned_at: string | null
+          post_id: number | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: never
+          pinned_at?: string | null
+          post_id?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: never
+          pinned_at?: string | null
+          post_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_pins_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_pins_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_rank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author: string

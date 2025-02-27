@@ -28,7 +28,7 @@ export function useCreateJob() {
       //TODO: the post id should be among the data returned
       console.log("Job created successfully:", data);
       stopGeneration();
-      router.push(`/home/generation?id=${data.data[0].id}`); // Navigate after success
+      router.push(`/home/photo/${data.data[0].id}?a=${data.data[0].author}`); // Navigate after success
     },
     onError: (error) => {
       stopGeneration();

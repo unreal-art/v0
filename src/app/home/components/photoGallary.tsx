@@ -106,7 +106,7 @@ export default function PhotoGallary({}) {
     return <p>No Data found.</p>;
   }
 
-  console.log(isLoading);
+  // console.log(isLoading);
 
   return (
     <div className="w-full">
