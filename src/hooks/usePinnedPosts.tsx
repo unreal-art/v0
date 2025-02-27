@@ -27,6 +27,8 @@ export function useIsPostPinned(postId: number, userId: string) {
   const query = useQuery({
     queryKey: ["post_pinned", postId, userId],
     queryFn: async () => {
+      if (!postId || !userId) return false;
+
       const { data, error } = await supabase
         .from("post_pins")
         .select("id")
@@ -41,6 +43,7 @@ export function useIsPostPinned(postId: number, userId: string) {
 
       return !!data;
     },
+    enabled: !!postId && !!userId, // Only run if both values exist
   });
 
   // Realtime subscription
@@ -72,7 +75,7 @@ export function useIsPostPinned(postId: number, userId: string) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      channel.unsubscribe();
     };
   }, [postId, userId, queryClient]);
 

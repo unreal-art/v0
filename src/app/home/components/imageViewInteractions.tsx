@@ -7,7 +7,7 @@ import {
   ShareIcon,
 } from "@/app/components/icons";
 import { useLikePost } from "@/hooks/useLikePost";
-import usePost from "@/hooks/usePost";
+import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
 import React from "react";
@@ -26,7 +26,7 @@ export default function ImageViewInteractions({
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string,
+    post?.author as string
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
 

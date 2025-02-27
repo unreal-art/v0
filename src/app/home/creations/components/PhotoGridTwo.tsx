@@ -39,7 +39,7 @@ interface TabProps {
 export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
+    window?.innerWidth < MD_BREAKPOINT ? 2 : 4
   );
 
   const searchParams = useSearchParams();
@@ -114,6 +114,10 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   const handleImageIndex = (context: RenderPhotoContext) => {
     setImageIndex(context.index);
   };
+
+  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
+    return <p className="text-center">No Data found.</p>;
+  }
 
   const photos = formattedPhotos(data?.pages ?? []);
 

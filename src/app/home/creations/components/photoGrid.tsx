@@ -45,6 +45,10 @@ const PhotoGrid = () => {
     },
   });
 
+  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
+    return <p className="text-center">No Data found.</p>;
+  }
+
   return (
     <InfiniteScroll
       isLoadingInitial={isLoading}

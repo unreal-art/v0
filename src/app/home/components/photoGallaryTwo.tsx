@@ -10,27 +10,36 @@ import Image from "next/image";
 import ImageView from "./imageView";
 // import { usePostsQuery } from "@/hooks/usePostsQuery";
 import { supabase } from "$/supabase/client";
-import {
-  getFollowingPosts,
-  getPosts,
-  getTopPosts,
-} from "@/queries/post/getPosts";
+
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
 import { formattedPhotos } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 // import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
+import { useUser } from "@/hooks/useUser";
+import {
+  getOtherIsDraftPostsByUser,
+  getOtherPostsByUser,
+  getPostsByUser,
+} from "@/queries/post/getPostsByUser";
 
-export default function PhotoGallary({}) {
+export default function PhotoGallaryTwo({}) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState(
     window?.innerWidth < MD_BREAKPOINT ? 2 : 4
   );
+  const { userId } = useUser();
   const searchParams = useSearchParams();
-  const s = searchParams.get("s");
+  const a = searchParams.get("a");
+  const { id: postId } = useParams();
+
+  // Ensure loading state is handled before rendering and a can be any text
+  // if (!a && loading) {
+  //   return null; // or a loading spinner if needed
+  // }
 
   const {
     isLoading,
@@ -42,17 +51,26 @@ export default function PhotoGallary({}) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", s || "explore"],
+    queryKey: ["posts", a || "other_posts"],
     queryFn: async ({ pageParam = 0 }) => {
       let result: Post[] = [];
-      if (s?.toUpperCase() === "EXPLORE") {
-        result = await getPosts(supabase, pageParam);
-      } else if (s?.toUpperCase() === "FOLLOWING") {
-        result = await getFollowingPosts(supabase, pageParam);
-      } else if (s?.toUpperCase() === "TOP") {
-        result = await getTopPosts(supabase, pageParam);
+
+      if (a) {
+        // completing image generation
+        result = await getOtherIsDraftPostsByUser(
+          supabase,
+          pageParam,
+          Number(postId),
+          userId as string
+        );
       } else {
-        result = await getPosts(supabase, pageParam);
+        // viewing other user's posts
+        result = await getOtherPostsByUser(
+          supabase,
+          pageParam,
+          Number(postId),
+          userId as string
+        );
       }
 
       return {
@@ -105,6 +123,8 @@ export default function PhotoGallary({}) {
   if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
     return <p className="text-center">No Data found.</p>;
   }
+
+  console.log(data);
 
   // console.log(isLoading);
 
