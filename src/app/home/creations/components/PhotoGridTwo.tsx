@@ -147,7 +147,9 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
                   </div>
 
                   <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
-                    {truncateText(context.photo.prompt)}
+                    {truncateText(
+                      context.photo.caption || context.photo.prompt
+                    )}
                   </p>
                 </>
               </PhotoOverlay>

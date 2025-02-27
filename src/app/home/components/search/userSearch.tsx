@@ -147,7 +147,7 @@ export function UserImage({ post }: { post: Post }) {
       />
 
       <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
-        {truncateText(post.prompt as string, 3)}
+        {truncateText(post.caption || (post.prompt as string), 3)}
       </p>
     </div>
     // </PhotoOverlay>

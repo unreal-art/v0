@@ -57,7 +57,7 @@ export function isHighQualityImage(filename: string): boolean {
 
 export function truncateText(
   text: string | undefined | null,
-  wordLimit: number = 15
+  wordLimit: number = 10
 ): string {
   if (!text) return "";
   const words = text.split(" ");
