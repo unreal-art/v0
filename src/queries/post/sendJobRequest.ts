@@ -33,7 +33,7 @@ export const sendJobRequest = async ({
       category: "GENERATION",
     };
 
-    const response = await axiosInstanceLocal.post("api/darts", dto);
+    const response = await axiosInstanceLocal.post("/api/darts", dto);
     return response.data;
   } catch (error: unknown) {
     console.error("Error sending job request:", error);
