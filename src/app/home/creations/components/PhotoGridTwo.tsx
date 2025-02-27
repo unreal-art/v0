@@ -78,7 +78,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
 
       return {
         data: result ?? [],
-        nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Stop pagination if no data
+        nextCursor: result.length === 10 ? pageParam + 1 : undefined, // ✅ Ensure cursor is only set if limit is reached
       };
     },
     initialPageParam: 0,
@@ -88,8 +88,8 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
         return undefined;
       }
 
-      if (lastPage.data.length === 0) {
-        return undefined;
+      if (lastPage.data.length < 10) {
+        return undefined; // ✅ No more pages if the last page has less than `limit`
       }
 
       return lastPage.nextCursor; // ✅ Correctly use the cursor for pagination
@@ -120,6 +120,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   }
 
   const photos = formattedPhotos(data?.pages ?? []);
+  console.log(hasNextPage);
 
   return (
     <>
@@ -127,6 +128,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
         isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
+        hasNextPage={hasNextPage}
       >
         <ColumnsPhotoAlbum
           photos={photos}

@@ -8,11 +8,13 @@ type Props = {
   isLoadingMore: boolean;
   children: React.ReactNode;
   loadMore: () => void;
+  hasNextPage: boolean;
 };
 
 function InfiniteScroll(props: Props) {
   const observerElement = useRef<HTMLDivElement | null>(null);
-  const { isLoadingInitial, isLoadingMore, children, loadMore } = props;
+  const { isLoadingInitial, isLoadingMore, children, loadMore, hasNextPage } =
+    props;
 
   useEffect(() => {
     // is element in view?
@@ -61,7 +63,7 @@ function InfiniteScroll(props: Props) {
       {!isLoadingInitial && <>{children}</>}
 
       <div ref={observerElement} id="obs">
-        {isLoadingMore && (
+        {isLoadingMore && hasNextPage && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full p-2 ">
             {Array(4)
               .fill(null)

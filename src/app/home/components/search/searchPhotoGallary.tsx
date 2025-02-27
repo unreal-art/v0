@@ -127,6 +127,7 @@ export default function SearchPhotoGallary({
         isLoadingInitial={isLoading}
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
+        hasNextPage={hasNextPage}
       >
         <ColumnsPhotoAlbum
           photos={formattedPhotos(data?.pages ?? [])}
