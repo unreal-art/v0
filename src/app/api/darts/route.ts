@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server";
 import { axiosInstance } from "@/lib/axiosInstance";
 import axios from "axios";

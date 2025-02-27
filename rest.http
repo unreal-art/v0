@@ -81,6 +81,16 @@ Content-Type: application/json
   },
   "author": "e260b0ab-9867-4507-97be-976779c20c9f"
 }
+
+HTTP/1.1 404  - Not Found
+cache-control: no-store, must-revalidate
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding
+x-powered-by: Next.js
+content-type: text/html; charset=utf-8
+content-encoding: gzip
+date: Thu, 27 Feb 2025 02:05:32 GMT
+connection: close
+transfer-encoding: chunked
 ###
 
 POST {{u}}/darts
@@ -121,12 +131,12 @@ Content-Type: application/json
 HTTP/1.1 200  - OK
 vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
 content-type: application/json
-date: Thu, 27 Feb 2025 01:45:31 GMT
+date: Thu, 27 Feb 2025 02:08:56 GMT
 connection: close
 transfer-encoding: chunked
 ###
 
-POST {{u}}/darts
+POST {{u}}/api/darts
 Content-Type: application/json
 
 {
@@ -138,8 +148,8 @@ Content-Type: application/json
 }
 
 HTTP/1.1 500  - Internal Server Error
-access-control-allow-origin: *
-content-length: 604
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
 content-type: application/json
-date: Thu, 02 Jan 2025 00:42:16 GMT
+date: Thu, 27 Feb 2025 02:07:10 GMT
 connection: close
+transfer-encoding: chunked
