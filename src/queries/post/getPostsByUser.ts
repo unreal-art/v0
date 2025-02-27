@@ -142,7 +142,6 @@ export async function getPrivatePostsByUser(
       : null, // ❌ Set to null if neither
   }));
 }
-
 export async function getPinnedPostsByUser(
   client: Client,
   start = 0,
@@ -164,13 +163,19 @@ export async function getPinnedPostsByUser(
   }
 
   const { data, error } = await client
-    .from("posts")
-    .select("*")
-    // .eq("author", id) // Filter posts by the author_id
-    .eq("isPinned", true)
-    .neq("isPrivate", true)
-    .neq("isDraft", true)
-    .order("createdAt", { ascending: false }) // Order posts by creation date, descending
+    .from("post_pins")
+    .select(
+      `
+    posts:posts (
+      *,
+      createdAt
+    )
+  `
+    ) // ✅ Aliases `posts` for better structure
+    .eq("user_id", id)
+    .filter("posts.isPrivate", "neq", true)
+    .filter("posts.isDraft", "neq", true)
+    .order("createdAt", { ascending: false }) // ✅ Sort correctly
     .range(range[0], range[1]);
 
   if (error) {
@@ -178,16 +183,23 @@ export async function getPinnedPostsByUser(
     throw new Error(error.message);
   }
 
-  // console.log("Supabase raw data:", data);
+  if (!Array.isArray(data)) {
+    console.error("Unexpected response from Supabase:", data);
+    throw new Error("Invalid data format received from Supabase.");
+  }
 
-  return data.map((post) => ({
-    ...post,
-    ipfsImages: Array.isArray(post.ipfsImages)
-      ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
-      : typeof post.ipfsImages === "string"
-      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-      : null, // ❌ Set to null if neither
-  }));
+  return (
+    data?.map(({ posts }) => ({
+      ...(posts as Post), // ✅ Explicitly cast `posts` as `Post`
+      author: posts?.author ?? "", // Ensure `author` is always a string
+      category: posts?.category ?? null, // Ensure `category` is `string | null`
+      ipfsImages: Array.isArray(posts?.ipfsImages)
+        ? (posts.ipfsImages as UploadResponse[]) // ✅ Already an array
+        : typeof posts?.ipfsImages === "string"
+        ? (JSON.parse(posts.ipfsImages) as UploadResponse[]) // ✅ Parse string
+        : null, // ❌ Set to null if neither
+    })) ?? []
+  );
 }
 
 export async function getIsDraftPostsByUser(

@@ -1,4 +1,5 @@
 import { supabase } from "$/supabase/client";
+import { getPinnedPostsByUser } from "@/queries/post/getPostsByUser";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -8,16 +9,10 @@ export function usePinnedPosts(userId: string) {
     queryKey: ["pinned-posts", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
-        .from("post_pins")
-        .select("posts(*)") // Fetch full post details
-        .eq("user_id", userId);
-
-      if (error) throw new Error(error.message);
-      return data;
+      return await getPinnedPostsByUser(supabase, 0, userId);
     },
     enabled: !!userId, // Only fetch if userId is available
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 1, // Cache for 1 minutes
   });
 }
 
