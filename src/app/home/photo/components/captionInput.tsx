@@ -4,9 +4,11 @@ import { useState } from "react";
 export default function CaptionInput({
   caption,
   setCaption,
+  readOnly,
 }: {
   caption: string;
   setCaption: (caption: string) => void;
+  readOnly: boolean;
 }) {
   return (
     <div className="relative border-dashed border-[1px] border-primary-5 rounded">
@@ -15,6 +17,7 @@ export default function CaptionInput({
         placeholder="Add caption"
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
+        readOnly={readOnly}
       />
       <button className="absolute top-4 right-4">
         <TickIcon width={20} height={20} color="#5D5D5D" />

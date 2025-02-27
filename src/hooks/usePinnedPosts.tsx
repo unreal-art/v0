@@ -1,4 +1,5 @@
 import { supabase } from "$/supabase/client";
+import { getPinnedPostsByUser } from "@/queries/post/getPostsByUser";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -8,16 +9,10 @@ export function usePinnedPosts(userId: string) {
     queryKey: ["pinned-posts", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
-        .from("post_pins")
-        .select("posts(*)") // Fetch full post details
-        .eq("user_id", userId);
-
-      if (error) throw new Error(error.message);
-      return data;
+      return await getPinnedPostsByUser(supabase, 0, userId);
     },
     enabled: !!userId, // Only fetch if userId is available
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 1, // Cache for 1 minutes
   });
 }
 
@@ -27,6 +22,8 @@ export function useIsPostPinned(postId: number, userId: string) {
   const query = useQuery({
     queryKey: ["post_pinned", postId, userId],
     queryFn: async () => {
+      if (!postId || !userId) return false;
+
       const { data, error } = await supabase
         .from("post_pins")
         .select("id")
@@ -41,6 +38,7 @@ export function useIsPostPinned(postId: number, userId: string) {
 
       return !!data;
     },
+    enabled: !!postId && !!userId, // Only run if both values exist
   });
 
   // Realtime subscription
@@ -72,7 +70,7 @@ export function useIsPostPinned(postId: number, userId: string) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      channel.unsubscribe();
     };
   }, [postId, userId, queryClient]);
 

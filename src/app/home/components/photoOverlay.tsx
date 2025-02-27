@@ -21,6 +21,7 @@ export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
     id: string;
     author: string;
     createdAt: string;
+    caption?: string;
   }; // Extending `Photo`
 }
 
@@ -44,7 +45,7 @@ export default function PhotoOverlay({
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author,
+    context.photo.author
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
 
@@ -99,7 +100,7 @@ export default function PhotoOverlay({
 
             {!hideContent ? (
               <p className="text-left text-primary-1 text-sm">
-                {truncateText(context.photo.prompt)}
+                {truncateText(context.photo.caption || context.photo.prompt)}
               </p>
             ) : (
               <p></p>

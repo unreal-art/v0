@@ -22,6 +22,7 @@ export type Post = {
   n: number | null;
   prompt: string | null;
   seed: number | null;
+  caption: string | null;
 };
 
 export interface JobSpec extends Post {

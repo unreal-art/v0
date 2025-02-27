@@ -16,7 +16,7 @@ import {
   usePinPost,
   useUnpinPost,
 } from "@/hooks/usePinnedPosts";
-import usePost from "@/hooks/usePost";
+import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
 import { getImage } from "../../formattedPhotos";

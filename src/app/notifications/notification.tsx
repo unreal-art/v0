@@ -3,7 +3,7 @@ import Image from "next/image";
 import { timeAgo } from "../libs/timeAgo";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
-import usePost from "@/hooks/usePost";
+import { usePost } from "@/hooks/usePost";
 import { getNotificationMessage } from "$/utils";
 import { getImage } from "../home/formattedPhotos";
 
@@ -57,7 +57,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
               post.ipfsImages[0].fileNames.length > 0
                 ? getImage(
                     post.ipfsImages[0].hash as string,
-                    post.ipfsImages[0].fileNames[0] as string,
+                    post.ipfsImages[0].fileNames[0] as string
                   )
                 : "/profile.jpg"
             }

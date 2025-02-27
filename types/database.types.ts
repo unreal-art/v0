@@ -199,18 +199,21 @@ export type Database = {
       }
       post_pins: {
         Row: {
+          createdAt: string | null
           id: number
           pinned_at: string | null
           post_id: number | null
           user_id: string | null
         }
         Insert: {
+          createdAt?: string | null
           id?: never
           pinned_at?: string | null
           post_id?: number | null
           user_id?: string | null
         }
         Update: {
+          createdAt?: string | null
           id?: never
           pinned_at?: string | null
           post_id?: number | null

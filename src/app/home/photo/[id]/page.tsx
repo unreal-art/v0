@@ -9,7 +9,7 @@ import CaptionInput from "../components/captionInput";
 import Interactions from "../components/interactions";
 import PostingActions from "../components/postingActions";
 import { BackIcon, OptionMenuIcon } from "@/app/components/icons";
-import usePost from "@/hooks/usePost";
+import { usePost, useUpdatePost } from "@/hooks/usePost";
 import { useUser } from "@/hooks/useUser";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
@@ -19,9 +19,12 @@ import { formatDate, getImageResolution, truncateText } from "$/utils";
 import { useEffect } from "react";
 import { useState } from "react";
 
-const PhotoGallary = dynamic(() => import("../../components/photoGallary"), {
-  ssr: false,
-});
+const PhotoGallaryTwo = dynamic(
+  () => import("../../components/photoGallaryTwo"),
+  {
+    ssr: false,
+  }
+);
 
 export default function Generation() {
   const router = useRouter();
@@ -31,30 +34,70 @@ export default function Generation() {
   const { data: post, error: postError } = usePost(
     id ? parseInt(id as string) : null
   );
-  const { userId, loading } = useUser();
+  const {
+    updatePost,
+    loading: updatingPost,
+    error: updateError,
+  } = useUpdatePost();
+  const { userId, loading: loadingUser } = useUser();
   const { data: authorImage } = useAuthorImage(post?.author);
   const { data: authorUsername } = useAuthorUsername(post?.author);
-  const [caption, setCaption] = useState(post?.caption);
+  const [caption, setCaption] = useState(post?.caption || "");
   const [privatePost, setPrivatePost] = useState(post?.isPrivate);
 
   // Ensure loading state is handled before rendering and a can be any text
-  if (!a && loading) {
+  if (!a && loadingUser) {
     return null; // or a loading spinner if needed
   }
 
-  // If `a` exists, it means we are editing, otherwise, we are viewing
+  // If `a` exists, it means we are completing image generation, otherwise, we are viewing
   if ((a && userId && post?.author !== userId) || postError) {
     router.push("/home");
-    // console.log("not the same user");
     return null;
   }
+
+  //save post as draft
+  const saveAsDraft = async () => {
+    const data = {
+      caption,
+      isPrivate: privatePost, // still depends on the user's choice
+      isDraft: true, //marked  to hide the post
+    };
+
+    console.log(data);
+    const success = await updatePost(post?.id as number, data);
+    if (success) {
+      console.log("Post saved to drafts successfully!");
+    }
+  };
+
+  //post image to db
+  const postImage = async () => {
+    console.log("post image");
+    if (!caption) {
+      return;
+    }
+
+    const data = {
+      caption,
+      isPrivate: privatePost, // still depends on the user's choice
+      isDraft: false, //marked  to expose the post
+    };
+
+    console.log(data);
+    const success = await updatePost(post?.id as number, data);
+    if (success) {
+      console.log("Post published successfully!");
+    }
+  };
 
   //http://localhost:3000/home/photo/7451?a=2cacb756-9569-43d9-9143-6f12e7293c42
 
   // Sync state with post.isPrivate whenever post changes
   useEffect(() => {
     setPrivatePost(post?.isPrivate);
-  }, [post?.isPrivate]);
+    setCaption(post?.caption || "");
+  }, [post?.isPrivate, post?.caption]);
 
   return (
     <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
@@ -114,12 +157,15 @@ export default function Generation() {
               <CaptionInput
                 caption={caption as string}
                 setCaption={setCaption}
+                readOnly={userId !== post?.author}
               />
               {post && <Interactions postId={post?.id as number} />}
-              {post && (
+              {post && userId == post?.author && (
                 <PostingActions
                   privatePost={privatePost as boolean}
                   setPrivatePost={setPrivatePost}
+                  saveAsDraft={saveAsDraft}
+                  postImage={postImage}
                 />
               )}
             </div>
@@ -144,11 +190,11 @@ export default function Generation() {
 
             <hr className="border-[1px] border-primary-10 my-2" />
 
-            <Prompt title="Prompt">
+            <Prompt title="Prompt" fullText={post?.prompt || ""}>
               {truncateText(post?.prompt || "", 100)}
             </Prompt>
 
-            <Prompt title="Magic Prompt">
+            <Prompt title="Magic Prompt" fullText={post?.prompt || ""}>
               {truncateText(post?.prompt || "", 100)}
             </Prompt>
 
@@ -182,7 +228,7 @@ export default function Generation() {
         </p>
 
         <div>
-          <PhotoGallary />
+          <PhotoGallaryTwo />
         </div>
       </div>
     </div>
