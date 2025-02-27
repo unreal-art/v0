@@ -1,10 +1,9 @@
 import axios from "axios";
 import https from "https";
 
-
 const agent = new https.Agent({
-	rejectUnauthorized: false, // Disable SSL verification
-	ca: `-----BEGIN CERTIFICATE-----
+  rejectUnauthorized: false, // Disable SSL verification
+  ca: `-----BEGIN CERTIFICATE-----
 MIIDtTCCAp2gAwIBAgIUOtTgT7SuASjWkIn/ujXWltfZL0UwDQYJKoZIhvcNAQEL
 BQAwajELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxEzARBgNVBAoM
 CkRlY2VudGVyQUkxDTALBgNVBAMMBEhpcm8xIjAgBgkqhkiG9w0BCQEWE2hpcm9A
@@ -25,11 +24,11 @@ sxjLWnvGxGMzCPdb1utcVjmDyL+3o4h0UEgYDhWMGMl0iILmKGBQ7qnfMy3nsgDy
 Y7n1LfRMuwwZcNzTrq4OjpKBjAKPZMy1NZR9cuMEw+fVQOiM4afdsJSt/DOl+aY2
 XmIP1S6gHygY805JVAjoGlEv4SYgsJt97/61xZgWZQh8N3PSFn1zR3lbZ3JpDLN2
 lQ7Ghuq6/cFOhwmhdh2zUf8x/N8lzzeZqPdy3DYVGPmPyKOAPRsq69s=
------END CERTIFICATE-----`.trim()
+-----END CERTIFICATE-----`.trim(),
 });
 
 export const axiosInstance = axios.create({
-  // baseURL: "https://darts.decenterai.com:8080", // Base URL
+  baseURL: "https://darts.decenterai.com:8080", // Base URL
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,5 +38,5 @@ export const axiosInstance = axios.create({
 export const axiosInstanceLocal = axios.create({
   baseURL: "/",
   headers: { "Content-Type": "application/json" },
-    // httpsAgent: agent, // Allow self-signed SSL
+  // httpsAgent: agent, // Allow self-signed SSL
 });
