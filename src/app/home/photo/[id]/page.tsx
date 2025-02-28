@@ -31,9 +31,12 @@ export default function Generation() {
   const searchParams = useSearchParams();
   const a = searchParams.get("a");
   const { id } = useParams();
-  const { data: post, error: postError } = usePost(
-    id ? parseInt(id as string) : null
-  );
+
+  // Ensure id is valid before making API call
+  const postId = id ? parseInt(id as string) : null;
+
+  const { data: post, error: postError } = usePost(postId);
+
   const {
     updatePost,
     loading: updatingPost,
@@ -44,6 +47,12 @@ export default function Generation() {
   const { data: authorUsername } = useAuthorUsername(post?.author);
   const [caption, setCaption] = useState(post?.caption || "");
   const [privatePost, setPrivatePost] = useState(post?.isPrivate);
+
+  // Sync state with post.isPrivate whenever post changes
+  useEffect(() => {
+    setPrivatePost(post?.isPrivate);
+    setCaption(post?.caption || "");
+  }, [post]);
 
   // Ensure loading state is handled before rendering and a can be any text
   if (!a && loadingUser) {
@@ -92,12 +101,6 @@ export default function Generation() {
   };
 
   //http://localhost:3000/home/photo/7451?a=2cacb756-9569-43d9-9143-6f12e7293c42
-
-  // Sync state with post.isPrivate whenever post changes
-  useEffect(() => {
-    setPrivatePost(post?.isPrivate);
-    setCaption(post?.caption || "");
-  }, [post?.isPrivate, post?.caption]);
 
   return (
     <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">

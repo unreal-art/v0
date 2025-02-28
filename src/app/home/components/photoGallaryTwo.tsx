@@ -25,6 +25,7 @@ import {
   getOtherPostsByUser,
   getPostsByUser,
 } from "@/queries/post/getPostsByUser";
+import { usePost } from "@/hooks/usePost";
 
 export default function PhotoGallaryTwo({}) {
   const [imageIndex, setImageIndex] = useState(-1);
@@ -34,7 +35,12 @@ export default function PhotoGallaryTwo({}) {
   const { userId } = useUser();
   const searchParams = useSearchParams();
   const a = searchParams.get("a");
-  const { id: postId } = useParams();
+  const { id } = useParams();
+
+  // Ensure id is valid before making API call
+  const postId = id ? parseInt(id as string) : null;
+
+  const { data: post } = usePost(postId);
 
   // Ensure loading state is handled before rendering and a can be any text
   // if (!a && loading) {
@@ -51,7 +57,10 @@ export default function PhotoGallaryTwo({}) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", a || "other_posts"],
+    queryKey: [
+      "other_posts_by_user",
+      `${post?.author} "_" ${a} || "other_posts"`,
+    ],
     queryFn: async ({ pageParam = 0 }) => {
       let result: Post[] = [];
 
@@ -61,7 +70,7 @@ export default function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          userId as string
+          post?.author
         );
       } else {
         // viewing other user's posts
@@ -69,7 +78,7 @@ export default function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          userId as string
+          post?.author
         );
       }
 

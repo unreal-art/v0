@@ -1,21 +1,27 @@
-"use server";
-
 import { NextRequest, NextResponse } from "next/server";
-import { axiosInstance } from "@/lib/axiosInstance";
+// import { axiosInstance } from "@/lib/axiosInstance";
 import axios from "axios";
+
+export const runtime = "edge"; // Use Edge Functions
+export const maxDuration = 300; // 5-minute max execution time
 
 export async function POST(req: NextRequest) {
   try {
     // Parse request body
     const requestData = await req.json();
     console.log(requestData);
-    // Forward the request to the /darts endpoint
-    const response = await axiosInstance.post("/darts", requestData, {
-      timeout: 300000, // 5 minutes
+    const response = await fetch("https://darts.decenterai.com:8080/darts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
     });
 
-    // Return the response data
-    return NextResponse.json(response.data, { status: response.status });
+    if (!response.ok) {
+      throw new Error(`Request failed with status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    return NextResponse.json(responseData, { status: response.status });
   } catch (error: unknown) {
     console.error("Error forwarding request to /darts:", error);
 
