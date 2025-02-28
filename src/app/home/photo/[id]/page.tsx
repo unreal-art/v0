@@ -16,8 +16,10 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
 import { formatDate, getImageResolution, truncateText } from "$/utils";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import ViewSkeleton from "../components/viewSkeleton";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -31,24 +33,39 @@ export default function Generation() {
   const searchParams = useSearchParams();
   const a = searchParams.get("a");
   const { id } = useParams();
-  const { data: post, error: postError } = usePost(
-    id ? parseInt(id as string) : null
-  );
+
+  // Ensure id is valid before making API call
+  const postId = id ? parseInt(id as string) : null;
+
+  const {
+    data: post,
+    isLoading: loadingPost,
+    error: postError,
+  } = usePost(postId);
+
   const {
     updatePost,
-    loading: updatingPost,
-    error: updateError,
+    // loading: updatingPost,
+    // error: updateError,
   } = useUpdatePost();
   const { userId, loading: loadingUser } = useUser();
   const { data: authorImage } = useAuthorImage(post?.author);
   const { data: authorUsername } = useAuthorUsername(post?.author);
   const [caption, setCaption] = useState(post?.caption || "");
   const [privatePost, setPrivatePost] = useState(post?.isPrivate);
+  const [isFetching, setIsFetching] = useState(true);
 
-  // Ensure loading state is handled before rendering and a can be any text
-  if (!a && loadingUser) {
-    return null; // or a loading spinner if needed
-  }
+  useEffect(() => {
+    if (!loadingUser && !loadingPost && post) {
+      setIsFetching(false); // Only set false when loading completes
+    }
+  }, [loadingUser, loadingPost, post]);
+
+  // Sync state with post.isPrivate whenever post changes
+  useEffect(() => {
+    setPrivatePost(post?.isPrivate);
+    setCaption(post?.caption || "");
+  }, [post]);
 
   // If `a` exists, it means we are completing image generation, otherwise, we are viewing
   if ((a && userId && post?.author !== userId) || postError) {
@@ -93,14 +110,12 @@ export default function Generation() {
 
   //http://localhost:3000/home/photo/7451?a=2cacb756-9569-43d9-9143-6f12e7293c42
 
-  // Sync state with post.isPrivate whenever post changes
-  useEffect(() => {
-    setPrivatePost(post?.isPrivate);
-    setCaption(post?.caption || "");
-  }, [post?.isPrivate, post?.caption]);
+  if (isFetching) {
+    return <ViewSkeleton />;
+  }
 
   return (
-    <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
+    <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full ">
       <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
         <GenerateInput />
       </div>
@@ -115,7 +130,7 @@ export default function Generation() {
         </button>
       </div>
 
-      <div className="overflow-y-auto">
+      <div className="overflow-y-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-12 w-full md:h-[calc(100vh_-_220px)]">
           <div className="flex flex-col justify-between items-center col-span-9">
             <div className="flex justify-between h-24 p-6 gap-5 w-full">

@@ -23,7 +23,7 @@ export default {
           11: "var(--color-text-primary-11)",
           12: "var(--color-text-primary-12)",
           13: "var(--color-text-primary-13)",
-        }
+        },
       },
       borderColor: {
         primary: {
@@ -40,7 +40,7 @@ export default {
           11: "var(--color-text-primary-11)",
           12: "var(--color-text-primary-12)",
           13: "var(--color-text-primary-13)",
-        }
+        },
       },
       backgroundColor: {
         primary: {
@@ -57,9 +57,9 @@ export default {
           11: "var(--color-text-primary-11)",
           12: "var(--color-text-primary-12)",
           13: "var(--color-text-primary-13)",
-        }
-      }
-    }
+        },
+      },
+    },
   },
   plugins: [],
 } satisfies Config;
