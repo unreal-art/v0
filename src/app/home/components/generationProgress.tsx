@@ -44,6 +44,12 @@ export default function GenerationProgress() {
     return () => clearInterval(timer);
   }, [isActive]);
 
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? `0${secs}` : secs}`;
+  };
+
   if (!isActive) return null; // Don't auto-hide, but remove when inactive
 
   return (
@@ -52,7 +58,7 @@ export default function GenerationProgress() {
         <p>
           {isFinishing
             ? "Finishing up..."
-            : `Generating image(s) ${timeLeft}s left...`}
+            : `Generating image(s) ${formatTime(timeLeft)} left...`}
         </p>
 
         <div className="flex gap-x-2">

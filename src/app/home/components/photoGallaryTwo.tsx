@@ -124,8 +124,6 @@ export default function PhotoGallaryTwo({}) {
     return <p className="text-center">No Data found.</p>;
   }
 
-  console.log(data);
-
   // console.log(isLoading);
 
   return (

@@ -120,7 +120,6 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   }
 
   const photos = formattedPhotos(data?.pages ?? []);
-  console.log(hasNextPage);
 
   return (
     <>

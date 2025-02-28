@@ -57,7 +57,7 @@ export default function PhotoOverlay({
   const handleCommentClick = () => {
     setImageIndex(); // or any specific value you want to pass
   };
-  console.log(userHasLiked);
+
   const { data: comments, isLoading: loadingComments } = useComments(
     context.photo.id
   );
