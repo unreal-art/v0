@@ -10,7 +10,9 @@ export async function POST(req: NextRequest) {
     const requestData = await req.json();
     console.log(requestData);
     // Forward the request to the /darts endpoint
-    const response = await axiosInstance.post("/darts", requestData);
+    const response = await axiosInstance.post("/darts", requestData, {
+      timeout: 300000, // 5 minutes
+    });
 
     // Return the response data
     return NextResponse.json(response.data, { status: response.status });

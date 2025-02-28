@@ -57,7 +57,7 @@ export default function PhotoGallary({}) {
 
       return {
         data: result ?? [],
-        nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Stop pagination if no data
+        nextCursor: result.length === 10 ? pageParam + 1 : undefined, // ✅ Ensure cursor is only set if limit is reached
       };
     },
     initialPageParam: 0,
@@ -67,8 +67,8 @@ export default function PhotoGallary({}) {
         return undefined;
       }
 
-      if (lastPage.data.length === 0) {
-        return undefined;
+      if (lastPage.data.length < 10) {
+        return undefined; // ✅ No more pages if the last page has less than `limit`
       }
 
       return lastPage.nextCursor; // ✅ Correctly use the cursor for pagination
@@ -114,6 +114,7 @@ export default function PhotoGallary({}) {
         isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
+        hasNextPage={hasNextPage}
       >
         <ColumnsPhotoAlbum
           photos={formattedPhotos(data?.pages ?? [])}
@@ -156,20 +157,24 @@ function PhotoWithAuthor({
       context={context}
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
-        <div className="rounded-full">
-          {!imageLoading && (
-            <Image
-              className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
-              src={image || ""}
-              width={24}
-              height={24}
-              alt="profile"
-            />
-          )}
-        </div>
-        <p className="font-semibold text-sm drop-shadow-lg">
-          {isLoading ? "Loading..." : userName || "Unknown"}
-        </p>
+        {!isLoading && !imageLoading && userName && (
+          <>
+            <div className="rounded-full">
+              {image ? (
+                <Image
+                  className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                  src={image}
+                  width={24}
+                  height={24}
+                  alt="profile"
+                />
+              ) : (
+                <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
+              )}
+            </div>
+            <p className="font-semibold text-sm drop-shadow-lg">{userName}</p>
+          </>
+        )}
       </div>
     </PhotoOverlay>
   );

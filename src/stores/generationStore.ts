@@ -22,7 +22,7 @@ export const defaultInitState: GenerationState = {
 };
 
 export const createGenerationStore = (
-  initState: GenerationState = defaultInitState,
+  initState: GenerationState = defaultInitState
 ) => {
   return createStore<GenerationStore>()((set) => ({
     ...initState,

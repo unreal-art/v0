@@ -54,6 +54,7 @@ const PhotoGrid = () => {
       isLoadingInitial={isLoading}
       isLoadingMore={isFetchingNextPage}
       loadMore={() => hasNextPage && fetchNextPage()}
+      hasNextPage={hasNextPage}
     >
       <div className="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4">
         {formattedPhotos(data?.pages ?? []).map((photo, index) => {
