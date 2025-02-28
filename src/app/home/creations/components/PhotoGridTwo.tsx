@@ -19,7 +19,7 @@ import {
   getPrivatePostsByUser,
   getUserLikedPosts,
 } from "@/queries/post/getPostsByUser";
-import { formattedPhotos } from "../../formattedPhotos";
+import { formattedPhotos, formattedPhotosForGrid } from "../../formattedPhotos";
 import { supabase } from "$/supabase/client";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import NoItemFound from "./NoItemFound";
@@ -28,6 +28,7 @@ import { truncateText } from "$/utils";
 import { useSearchParams } from "next/navigation";
 import { Post } from "$/types/data.types";
 import { timeAgo } from "@/app/libs/timeAgo";
+import Image from "next/image";
 // import { useQuery } from "@tanstack/react-query";
 
 interface TabProps {
@@ -36,11 +37,12 @@ interface TabProps {
   subContent: string;
 }
 
+const TWO_XL_BREAK_POINT = 1536
+const LG_BREAKPOINT = 1024
+
 export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   const [imageIndex, setImageIndex] = useState(-1);
-  const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4
-  );
+  const [size, setSize] = useState({width: 350, height: 350});
 
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
@@ -97,19 +99,31 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
   });
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
+    if (typeof window === "undefined") return;
 
-    const handleResize = () => {
-      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
-    };
+    handleResize()
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // ✅ Call initially to set correct columns
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const handleResize = () => {
+    const width = window.innerWidth
+    //const height = window.innerHeight
+    if (width >= TWO_XL_BREAK_POINT) {
+      setSize({width: 380, height: 380})
+    } else if (width >= LG_BREAKPOINT) {
+      setSize({width: 320, height: 320})
+    } else if (width <= MD_BREAKPOINT) {
+      setSize({width: 320, height: 320})
+    } else if (width < MD_BREAKPOINT) {
+      setSize({width: 300, height: 300})
+    }
+
+  }
 
   const handleImageIndex = (context: RenderPhotoContext) => {
     setImageIndex(context.index);
@@ -119,7 +133,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
     return <p className="text-center">No Data found.</p>;
   }
 
-  const photos = formattedPhotos(data?.pages ?? []);
+  const photos = formattedPhotosForGrid(data?.pages ?? []);
 
   return (
     <>
@@ -129,34 +143,40 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
         loadMore={() => hasNextPage && fetchNextPage()}
         hasNextPage={hasNextPage}
       >
-        <ColumnsPhotoAlbum
-          photos={photos}
-          columns={columns}
-          spacing={2}
-          render={{
-            extras: (_, context) => (
-              <PhotoOverlay
-                setImageIndex={() => handleImageIndex(context)}
-                context={context as ExtendedRenderPhotoContext}
-              >
-                <>
-                  <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
-                    <p>{timeAgo(context.photo.createdAt)}</p>
-                    <button>
-                      <OptionMenuIcon color="#FFFFFF" />
-                    </button>
-                  </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
+          {
+            photos.map((photo, index) => {
 
-                  <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
-                    {truncateText(
-                      context.photo.caption || context.photo.prompt
-                    )}
-                  </p>
-                </>
-              </PhotoOverlay>
-            ),
-          }}
-        />
+              const context = { index, photo, width: photo.width, height: photo.height }
+
+              return (
+                <div key={index} style={{width: size.width, height: size.height}} className="relative grid-cols-1">
+                  <PhotoOverlay
+                    setImageIndex={() => handleImageIndex(context)}
+                    context={context as ExtendedRenderPhotoContext}
+                    photo={<Image src={photo.src} width={500} height={500} alt={String(photo.alt)} />}>
+                    <>
+                      <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
+                        <p>{timeAgo(context.photo.createdAt)}</p>
+                        <button>
+                          <OptionMenuIcon color="#FFFFFF" />
+                        </button>
+                      </div>
+
+                      <Image src={photo.src} width={500} height={500} alt={String(photo.alt)} />
+      
+                      <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
+                        {truncateText(
+                          context.photo.caption || context.photo.prompt
+                        )}
+                      </p>
+                    </>
+                  </PhotoOverlay>
+                </div>
+              )
+            })
+          }
+        </div>
       </InfiniteScroll>
 
       {photos.length < 1 && (

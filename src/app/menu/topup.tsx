@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CloseIcon, FlashIcon } from "../components/icons";
+import Payment from "../home/components/payment";
 
 interface TopupProps {
   open: boolean;
@@ -12,6 +13,7 @@ export default function Topup({open, setOpen }: TopupProps) {
   const [credit, setCredit] = useState<number | string>()
   const [amount, setAmount] = useState<number>(0)
   const [cost, setCost] = useState<number>(0)
+  const [openPayment, setOpenPayment] = useState(false)
 
   useEffect(() => {
     const price = Number(credit) || 0
@@ -22,6 +24,10 @@ export default function Topup({open, setOpen }: TopupProps) {
 
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
   }
 
   if (!open) return;
@@ -41,7 +47,7 @@ export default function Topup({open, setOpen }: TopupProps) {
             <button onClick={handleClose}><CloseIcon width={24} height={24} color="#F5F5F5" /></button>
           </div>
 
-          <form method="post" className="">
+          <form onSubmit={handleSubmit} method="post" className="">
 
             <div className="text-primary-2 my-10">
               <label>Number of credits</label>
@@ -72,7 +78,7 @@ export default function Topup({open, setOpen }: TopupProps) {
               <button onClick={handleClose} className="border-primary-10 w-40 border-[1px] rounded-full">
                 Cancel
               </button>
-              <button className="bg-primary-11 w-40 rounded-full hover:bg-primary-10">
+              <button onClick={() => setOpenPayment(true)} className="bg-primary-11 w-40 rounded-full hover:bg-primary-10">
                 Proceed
               </button>
             </div>
@@ -82,6 +88,8 @@ export default function Topup({open, setOpen }: TopupProps) {
         </div>
 
       </div>
+
+      <Payment amount={amount} open={openPayment} close={handleClose} setOpen={setOpenPayment} />
 
     </>
   );

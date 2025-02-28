@@ -10,8 +10,6 @@ interface ImageOptionMenuProps {
   image: IPhoto;
 }
 
-// const dummy = [1, 2, 3, 4, 5, 6, 8, 1, 2, 3, 4, 5, 6, 8];
-
 export default function ImageOptionMenu({ children, image }: ImageOptionMenuProps) {
 
     const { userId } = useUser();
@@ -24,6 +22,11 @@ export default function ImageOptionMenu({ children, image }: ImageOptionMenuProp
 
     const handlePrompt = () => {
         router.push("/home/photo/" + image.id)
+        handleClose()
+    }
+
+    const handleCreator = () => {
+        router.push("/home/profile/" + image.author)
         handleClose()
     }
 
@@ -53,7 +56,7 @@ export default function ImageOptionMenu({ children, image }: ImageOptionMenuProp
 
                         <MenuItem onClick={handleClose} icon={<ShareIcon width={16} height={16} color="#8F8F8F" />} text="Share" />
 
-                        <MenuItem onClick={handleClose} icon={<UserIcon width={16} height={16} color="#8F8F8F" />} text="Go to creator profile" />
+                        <MenuItem onClick={handleCreator} icon={<UserIcon width={16} height={16} color="#8F8F8F" />} text="Go to creator profile" />
 
                         <MenuItem onClick={handleClose} icon={<FlagIcon width={16} height={16} color="#FDA29B" />} text="Report post" color={"#FDA29B"} />
 

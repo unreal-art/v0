@@ -8,7 +8,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPostsByUser } from "@/queries/post/getPostsByUser";
 import { supabase } from "$/supabase/client";
 import InfiniteScroll from "../../components/InfiniteScroll";
-import { formattedPhotos } from "../../formattedPhotos";
+import { formattedPhotos, formattedPhotosForGrid } from "../../formattedPhotos";
 import { truncateText } from "$/utils";
 
 const PhotoGrid = () => {
@@ -45,6 +45,8 @@ const PhotoGrid = () => {
     },
   });
 
+  const photos = formattedPhotosForGrid(data?.pages ?? []);
+
   if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
     return <p className="text-center">No Data found.</p>;
   }
@@ -57,7 +59,7 @@ const PhotoGrid = () => {
       hasNextPage={hasNextPage}
     >
       <div className="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4">
-        {formattedPhotos(data?.pages ?? []).map((photo, index) => {
+        {photos.map((photo, index) => {
           return (
             <div
               key={index}

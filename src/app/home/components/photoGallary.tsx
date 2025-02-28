@@ -17,7 +17,7 @@ import {
 } from "@/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
-import { formattedPhotos } from "../formattedPhotos";
+import { formattedPhotos, formattedPhotosForGallary } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
 // import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
@@ -108,6 +108,8 @@ export default function PhotoGallary({}) {
 
   // console.log(isLoading);
 
+  const photos = formattedPhotosForGallary(data?.pages ?? [])
+
   return (
     <div className="w-full">
       <InfiniteScroll
@@ -117,7 +119,7 @@ export default function PhotoGallary({}) {
         hasNextPage={hasNextPage}
       >
         <ColumnsPhotoAlbum
-          photos={formattedPhotos(data?.pages ?? [])}
+          photos={photos}
           columns={columns}
           spacing={4}
           render={{
@@ -132,7 +134,7 @@ export default function PhotoGallary({}) {
       </InfiniteScroll>
       <ImageView
         photo={
-          imageIndex > -1 && formattedPhotos(data?.pages ?? [])[imageIndex]
+          imageIndex > -1 && photos[imageIndex]
         }
         setImageIndex={setImageIndex}
       />
