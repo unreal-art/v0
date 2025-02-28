@@ -177,20 +177,24 @@ function PhotoWithAuthor({
       context={context}
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
-        <div className="rounded-full">
-          {!imageLoading && (
-            <Image
-              className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
-              src={image || ""}
-              width={24}
-              height={24}
-              alt="profile"
-            />
-          )}
-        </div>
-        <p className="font-semibold text-sm drop-shadow-lg">
-          {isLoading ? "Loading..." : userName || "Unknown"}
-        </p>
+        {!isLoading && !imageLoading && userName && (
+          <>
+            <div className="rounded-full">
+              {image ? (
+                <Image
+                  className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                  src={image}
+                  width={24}
+                  height={24}
+                  alt="profile"
+                />
+              ) : (
+                <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
+              )}
+            </div>
+            <p className="font-semibold text-sm drop-shadow-lg">{userName}</p>
+          </>
+        )}
       </div>
     </PhotoOverlay>
   );

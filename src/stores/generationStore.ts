@@ -14,11 +14,11 @@ export type GenerationStore = GenerationState & GenerationActions;
 
 //initialize
 export const initGenerationStore = (): GenerationState => {
-  return { isActive: true };
+  return { isActive: false };
 };
 
 export const defaultInitState: GenerationState = {
-  isActive: true,
+  isActive: false,
 };
 
 export const createGenerationStore = (
