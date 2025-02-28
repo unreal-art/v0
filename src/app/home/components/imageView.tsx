@@ -49,6 +49,7 @@ export default function ImageView({
                   userName={userName as string}
                   isLoading={isLoading}
                   postId={currentImage.id}
+                  imageDetails={currentImage}
                 />
               </div>
             </div>

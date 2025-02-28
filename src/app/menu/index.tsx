@@ -1,9 +1,7 @@
 "use client";
-import { ReactNode, useRef, useState } from "react";
-import Notification from "./topup";
-import { FlashIcon, ScrollTopIcon } from "../components/icons";
+import { ReactNode, useState } from "react";
+import { FlashIcon, LogoutIcon, MoonIcon } from "../components/icons";
 import { useUser } from "@/hooks/useUser";
-import { useNotifications } from "@/hooks/useNotifications";
 import Image from "next/image";
 import Topup from "./topup";
 
@@ -42,7 +40,7 @@ export default function Menu({ children }: INotificationProps) {
             className="fixed z-50  top-0 left-0 h-screen w-full"
           ></div>
 
-          <div className="absolute w-full max-w-[240px] h-[308px] z-50 bottom-2 md:bottom-[5vh] left-0 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
+          <div className="absolute w-full max-w-[240px] h-[308px] z-50 bottom-20 md:bottom-[5vh] right-4 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
             
             <div className="flex items-center gap-2 text-primary-6 h-16 p-3 border-primary-8 border-b-[1px]">
               <div>
@@ -67,15 +65,15 @@ export default function Menu({ children }: INotificationProps) {
               } />
 
     
-            <MenuItem onClick={handleClose} icon={<FlashIcon width={16} height={16} color="#C1C1C1" />} text="LinkedIn" underlineOff={true} />
+            <MenuItem onClick={handleClose} icon={<Image src={"/icons/linkedin.png"} width={16} height={16} alt="telegram" />} text="LinkedIn" underlineOff={true} />
 
             <MenuItem onClick={handleClose} icon={<Image src={"/icons/telegram.png"} width={16} height={16} alt="telegram" />} text="Telegram" underlineOff={true} />
 
-            <MenuItem onClick={handleClose} icon={<FlashIcon width={16} height={16} color="#C1C1C1" />} text="x  (formerly Twitter)" />
+            <MenuItem onClick={handleClose} icon={<Image src={"/icons/x.png"} width={16} height={16} alt="x" />} text="x  (formerly Twitter)" />
 
-            <MenuItem onClick={handleClose} icon={<FlashIcon width={16} height={16} color="#C1C1C1" />} text="Dark Theme" />
+            <MenuItem icon={<MoonIcon width={16} height={16} color="#C1C1C1" />} text="Dark Theme" />
 
-            <MenuItem onClick={handleClose} icon={<FlashIcon width={16} height={16} color="#C1C1C1" />} text="Logout" underlineOff={true} />
+            <MenuItem onClick={handleClose} icon={<LogoutIcon width={16} height={16} color="#C1C1C1" />} text="Logout" underlineOff={true} />
 
 
           </div>
@@ -90,7 +88,7 @@ export default function Menu({ children }: INotificationProps) {
 }
 
 
-export function MenuItem({ icon, text, underlineOff, action, onClick } : { icon: ReactNode, text: string, onClick: () => void,  underlineOff?: boolean, action?: ReactNode }) {
+export function MenuItem({ icon, text, underlineOff, action, onClick } : { icon: ReactNode, text: string, onClick?: () => void,  underlineOff?: boolean, action?: ReactNode }) {
 
   return (
     <div onClick={onClick} className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 ${!underlineOff ? "border-b-[1px]" : ""}`}>
