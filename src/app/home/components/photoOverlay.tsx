@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import {
   ChatIcon,
   HeartFillIcon,
@@ -32,6 +32,7 @@ interface PhotoOverlayProps {
   children: ReactNode;
   setImageIndex: () => void;
   context: ExtendedRenderPhotoContext;
+  photo?: ReactNode; 
 }
 
 export default function PhotoOverlay({
@@ -39,6 +40,7 @@ export default function PhotoOverlay({
   children,
   setImageIndex,
   context,
+  photo
 }: PhotoOverlayProps) {
 
   const router = useRouter()
@@ -68,6 +70,10 @@ export default function PhotoOverlay({
   );
   useRealtimeComments(context.photo.id);
 
+  const handleView = () => {
+    router.push("/home/photo/" + context.photo.id)
+  }
+
   return (
     <>
       <div
@@ -77,7 +83,10 @@ export default function PhotoOverlay({
       >
         {hover && (
           <div className="relative flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
-            <div onClick={() => router.push("/home/photo/" + context.photo.id)} className="absolute top-0 left-0 w-full h-full cursor-pointer"></div>
+            
+            <div onClick={handleView} className="absolute top-0 left-0 w-full h-full"> {photo} </div>
+
+            <div onClick={handleView} className="absolute top-0 left-0 w-full h-full cursor-pointer"></div>
             {!hideContent ? (
               <div className="flex justify-between text-primary-1 text-sm z-20">
                 <p>{timeAgo(context.photo.createdAt)}</p>

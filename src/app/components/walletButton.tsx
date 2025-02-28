@@ -5,7 +5,7 @@ import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { createThirdwebClient } from "thirdweb";
 import { ConnectButton } from "thirdweb/react";
 
-const client = createThirdwebClient({
+export const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID as string,
 });
 

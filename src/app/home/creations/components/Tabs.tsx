@@ -17,7 +17,7 @@ export default function Tabs({
   setCurrentIndex,
 }: ITabs) {
   return (
-    <div className="flex gap-x-8 border-b-[1px] border-primary-11">
+    <div className="flex gap-x-8 border-b-[1px] border-primary-11 overflow-x-hidden">
       <TabBtn
         currentIndex={currentIndex}
         index={0}
