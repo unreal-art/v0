@@ -14,6 +14,8 @@ import { useLikePost } from "@/hooks/useLikePost";
 import { useUser } from "@/hooks/useUser";
 import { timeAgo } from "@/app/libs/timeAgo";
 import { useComments, useRealtimeComments } from "@/hooks/useComments";
+import ImageOptionMenu from "./imageOptionMenu";
+import { useRouter } from "next/navigation";
 
 export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
   photo: Photo & {
@@ -38,6 +40,9 @@ export default function PhotoOverlay({
   setImageIndex,
   context,
 }: PhotoOverlayProps) {
+
+  const router = useRouter()
+
   const [hover, setHover] = useState(false);
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
@@ -71,20 +76,21 @@ export default function PhotoOverlay({
         className="absolute top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm hover:bg-gray-900/50"
       >
         {hover && (
-          <div className="flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
+          <div className="relative flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
+            <div onClick={() => router.push("/home/photo/" + context.photo.id)} className="absolute top-0 left-0 w-full h-full cursor-pointer"></div>
             {!hideContent ? (
-              <div className="flex justify-between text-primary-1 text-sm">
+              <div className="flex justify-between text-primary-1 text-sm z-20">
                 <p>{timeAgo(context.photo.createdAt)}</p>
-                <button>
+                <ImageOptionMenu image={context.photo}>
                   <OptionMenuIcon color="#FFFFFF" />
-                </button>
+                </ImageOptionMenu>
               </div>
             ) : (
               <div> </div>
             )}
 
             {!loadingLikes && !loadingComments && (
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-4 z-10">
                 <button
                   className="flex gap-1 items-center"
                   onClick={() => toggleLike()}
@@ -107,7 +113,7 @@ export default function PhotoOverlay({
             )}
 
             {!hideContent ? (
-              <p className="text-left text-primary-1 text-sm">
+              <p className="text-left text-primary-1 text-sm z-10">
                 {truncateText(context.photo.caption || context.photo.prompt)}
               </p>
             ) : (

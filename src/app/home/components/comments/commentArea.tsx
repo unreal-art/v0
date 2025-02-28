@@ -6,6 +6,9 @@ import Comment from "./comment";
 import { useState } from "react";
 import { useComments, useRealtimeComments } from "@/hooks/useComments";
 import { CommentWithUser } from "$/types/data.types";
+import ImageOptionMenu from "../imageOptionMenu";
+import { ExtendedRenderPhotoContext } from "../photoOverlay";
+import { IPhoto } from "@/app/libs/interfaces";
 
 interface CommentAreaProps {
   image: string;
@@ -13,6 +16,7 @@ interface CommentAreaProps {
   userName: string;
   isLoading: boolean;
   postId: string;
+  imageDetails: IPhoto;
 }
 
 export default function CommentArea({
@@ -21,6 +25,7 @@ export default function CommentArea({
   userName,
   isLoading,
   postId,
+  imageDetails
 }: CommentAreaProps) {
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
@@ -54,9 +59,11 @@ export default function CommentArea({
               <p className="text-primary-7 nasalization">Creator</p>
             </div>
           </div>
-          <button className="h-8">
-            <OptionMenuIcon color="#C1C1C1" />
-          </button>
+          <ImageOptionMenu image={imageDetails}>
+            <div className="h-8">
+                <OptionMenuIcon color="#C1C1C1" />
+            </div>
+           </ImageOptionMenu>
         </div>
       </div>
 
