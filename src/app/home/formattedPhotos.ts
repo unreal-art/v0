@@ -15,6 +15,7 @@ export interface ExtendedPhoto extends Photo {
   likeCount?: number;
   seed?: number;
   id: string;
+  caption?: string;
 }
 
 const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
@@ -73,9 +74,10 @@ export const formattedPhotos = (pages: Page[]): ExtendedPhoto[] => {
           isDraft: post.isDraft,
           isPinned: post.isPinned,
           isPrivate: post.isPrivate,
+          caption: post.caption,
           seed: post.seed,
         } as ExtendedPhoto;
-      }),
+      })
     )
     .filter(Boolean) as ExtendedPhoto[];
 };

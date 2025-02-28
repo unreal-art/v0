@@ -45,11 +45,16 @@ const PhotoGrid = () => {
     },
   });
 
+  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
+    return <p className="text-center">No Data found.</p>;
+  }
+
   return (
     <InfiniteScroll
       isLoadingInitial={isLoading}
       isLoadingMore={isFetchingNextPage}
       loadMore={() => hasNextPage && fetchNextPage()}
+      hasNextPage={hasNextPage}
     >
       <div className="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4">
         {formattedPhotos(data?.pages ?? []).map((photo, index) => {

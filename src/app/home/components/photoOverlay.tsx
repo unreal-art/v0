@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   ChatIcon,
   HeartFillIcon,
@@ -23,6 +23,7 @@ export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
     id: string;
     author: string;
     createdAt: string;
+    caption?: string;
   }; // Extending `Photo`
 }
 
@@ -45,12 +46,16 @@ export default function PhotoOverlay({
   const [hover, setHover] = useState(false);
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
-  const { data: likes } = usePostLikes(Number(context.photo.id), supabase);
+  const { data: likes, isLoading: loadingLikes } = usePostLikes(
+    Number(context.photo.id),
+    supabase
+  );
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author,
+    context.photo.author
   );
+
   const userHasLiked = likes?.some((like) => like.author === userId);
 
   // console.log(context.photo.createdAt);
@@ -58,7 +63,9 @@ export default function PhotoOverlay({
     setImageIndex(); // or any specific value you want to pass
   };
 
-  const { data: comments } = useComments(context.photo.id);
+  const { data: comments, isLoading: loadingComments } = useComments(
+    context.photo.id
+  );
   useRealtimeComments(context.photo.id);
 
   return (
@@ -82,30 +89,32 @@ export default function PhotoOverlay({
               <div> </div>
             )}
 
-            <div className="flex justify-center gap-4 z-10">
-              <button
-                className="flex gap-1 items-center"
-                onClick={() => toggleLike()}
-              >
-                {userHasLiked ? (
-                  <HeartFillIcon color="#FFFFFF" />
-                ) : (
-                  <HeartIcon color="#FFFFFF" />
-                )}
-                <p>{likes?.length}</p>
-              </button>
+            {!loadingLikes && !loadingComments && (
+              <div className="flex justify-center gap-4 z-10">
+                <button
+                  className="flex gap-1 items-center"
+                  onClick={() => toggleLike()}
+                >
+                  {userHasLiked ? (
+                    <HeartFillIcon color="#FFFFFF" />
+                  ) : (
+                    <HeartIcon color="#FFFFFF" />
+                  )}
+                  <p>{likes?.length}</p>
+                </button>
 
-              <button
-                className="flex gap-1 items-center"
-                onClick={() => handleCommentClick()}
-              >
-                <ChatIcon color="#FFFFFF" /> <p>{comments?.length}</p>
-              </button>
-            </div>
+                <button
+                  className="flex gap-1 items-center"
+                  onClick={() => handleCommentClick()}
+                >
+                  <ChatIcon color="#FFFFFF" /> <p>{comments?.length}</p>
+                </button>
+              </div>
+            )}
 
             {!hideContent ? (
               <p className="text-left text-primary-1 text-sm z-10">
-                {truncateText(context.photo.prompt)}
+                {truncateText(context.photo.caption || context.photo.prompt)}
               </p>
             ) : (
               <p></p>

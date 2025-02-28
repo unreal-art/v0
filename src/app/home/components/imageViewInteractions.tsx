@@ -1,4 +1,5 @@
 import { supabase } from "$/supabase/client";
+import { downloadImage } from "$/utils";
 import {
   DownloadIcon,
   HeartFillIcon,
@@ -7,10 +8,12 @@ import {
   ShareIcon,
 } from "@/app/components/icons";
 import { useLikePost } from "@/hooks/useLikePost";
-import usePost from "@/hooks/usePost";
+import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
 import React from "react";
+import { getImage } from "../formattedPhotos";
+import { UploadResponse } from "$/types/data.types";
 
 interface IInteractions {
   commentCount: number;
@@ -26,7 +29,7 @@ export default function ImageViewInteractions({
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string,
+    post?.author as string
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
 
@@ -54,7 +57,17 @@ export default function ImageViewInteractions({
         <p className="text-xs text-primary-3">0</p>
       </button>
 
-      <button>
+      <button
+        onClick={() =>
+          downloadImage(
+            getImage(
+              (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
+              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+            ),
+            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+          )
+        }
+      >
         <DownloadIcon color="#F0F0F0" />
       </button>
     </div>

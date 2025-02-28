@@ -9,28 +9,56 @@ export default function GenerationProgress() {
 
   const [expand, setExpand] = useState(false);
   const [size, setSize] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 16 : 24,
+    typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT ? 16 : 24
   );
+  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes countdown
+  const [isFinishing, setIsFinishing] = useState(false);
 
   useEffect(() => {
-    window.addEventListener("resize", () => {
-      if (window.innerWidth < MD_BREAKPOINT) {
-        setSize(16);
-      } else {
-        setSize(24);
-      }
-    });
-    return () =>
-      window.removeEventListener("resize", () => console.log("removed"));
+    const handleResize = () => {
+      setSize(window.innerWidth < MD_BREAKPOINT ? 16 : 24);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!isActive) return;
+  useEffect(() => {
+    if (!isActive) {
+      setTimeLeft(120); // Reset countdown
+      setIsFinishing(false);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setIsFinishing(true);
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isActive]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? `0${secs}` : secs}`;
+  };
+
+  if (!isActive) return null; // Don't auto-hide, but remove when inactive
 
   return (
     <div className="fixed bottom-20 md:bottom-4 right-4 md:right-16 rounded-xl max-w-[496px] w-4/5 bg-primary-13">
       <div className="flex items-center justify-between h-12 md:h-[84px] px-5 text-sm md:text-2xl text-primary-6">
         <p>
-          Generating image(s) <strong>4s</strong> left...
+          {isFinishing
+            ? "Finishing up..."
+            : `Generating image(s) ${formatTime(timeLeft)} left...`}
         </p>
 
         <div className="flex gap-x-2">

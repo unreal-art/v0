@@ -28,12 +28,12 @@ export const sendJobRequest = async ({
         Format: "webp",
       },
       author,
-      isPrivate: false,
-      isPinned: false,
       category: "GENERATION",
     };
 
-    const response = await axiosInstanceLocal.post("api/darts", dto);
+    const response = await axiosInstanceLocal.post("/api/darts", dto, {
+      timeout: 300000,
+    });
     return response.data;
   } catch (error: unknown) {
     console.error("Error sending job request:", error);
