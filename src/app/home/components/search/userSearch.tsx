@@ -27,8 +27,6 @@ export default function UserSearch({ searchTerm }: { searchTerm: string }) {
     isFetchingNextPage,
   } = useSearchUsersInfinite(searchTerm, 10);
 
-  console.log(data);
-
   return (
     <div>
       {data?.pages?.flatMap((page) =>
