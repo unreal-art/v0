@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import ServiceWorker from "./components/serviceWorker";
 
 const nasalization = localFont({
   src: "./fonts/nasalization/Nasalization Rg.otf",
@@ -47,6 +48,7 @@ export default function RootLayout({
         className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
       >
         {children}
+        <ServiceWorker />
       </body>
     </html>
   );

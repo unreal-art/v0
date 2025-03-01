@@ -15,7 +15,7 @@ import Menu from "../menu";
 
 const GenerationProgress = dynamic(
   () => import("./components/generationProgress"),
-  { ssr: false },
+  { ssr: false }
 );
 
 export default function RootLayout({
@@ -24,6 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { userId } = useUser();
+
   return (
     <QueryProvider>
       <PathnameProvider>
