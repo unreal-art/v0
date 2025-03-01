@@ -14,7 +14,7 @@ export const torusTestnet = defineChain({
   blockExplorers: {
     default: { name: "Torus Explorer", url: "https://testnet.toruscan.com/" },
   },
-  testnet: false,
+  testnet: true,
 });
 
 export const torusMainnet = defineChain({
