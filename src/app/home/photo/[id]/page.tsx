@@ -68,10 +68,11 @@ export default function Generation() {
   }, [post]);
 
   // If `a` exists, it means we are completing image generation, otherwise, we are viewing
-  if ((a && userId && post?.author !== userId) || postError) {
-    router.push("/home");
-    return null;
-  }
+  useEffect(() => {
+    if ((a && userId && post?.author !== userId) || postError) {
+      router.push("/home");
+    }
+  }, [a, userId, post, postError, router]);
 
   //save post as draft
   const saveAsDraft = async () => {

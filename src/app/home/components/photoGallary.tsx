@@ -2,7 +2,7 @@
 import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
-import { MD_BREAKPOINT } from "@/app/libs/constants";
+import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
 
@@ -57,7 +57,7 @@ export default function PhotoGallary({}) {
 
       return {
         data: result ?? [],
-        nextCursor: result.length === 10 ? pageParam + 1 : undefined, // ✅ Ensure cursor is only set if limit is reached
+        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined, // ✅ Ensure cursor is only set if limit is reached
       };
     },
     initialPageParam: 0,
@@ -108,7 +108,7 @@ export default function PhotoGallary({}) {
 
   // console.log(isLoading);
 
-  const photos = formattedPhotosForGallary(data?.pages ?? [])
+  const photos = formattedPhotosForGallary(data?.pages ?? []);
 
   return (
     <div className="w-full">
@@ -133,9 +133,7 @@ export default function PhotoGallary({}) {
         />
       </InfiniteScroll>
       <ImageView
-        photo={
-          imageIndex > -1 && photos[imageIndex]
-        }
+        photo={imageIndex > -1 && photos[imageIndex]}
         setImageIndex={setImageIndex}
       />
     </div>
