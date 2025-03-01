@@ -1,6 +1,6 @@
 "use client";
 
-import { inAppWallet } from "thirdweb/wallets";
+import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { createThirdwebClient } from "thirdweb";
 import { ConnectButton } from "thirdweb/react";
@@ -19,9 +19,13 @@ const metadata = {
 const wallets = [
   inAppWallet({
     auth: {
-      options: ["google", "apple", "email", "passkey", "wallet"],
+      options: ["google", "apple", "email", "passkey"],
     },
   }),
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("com.binance"),
+  createWallet("me.rainbow"),
 ];
 
 const WalletButton: React.FC = () => {
