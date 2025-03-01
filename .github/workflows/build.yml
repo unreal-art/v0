@@ -47,7 +47,7 @@ jobs:
           cp .env.example .env
           # source .env.example
           # bun i
-          yarn i
+          yarn install
 
       - name: Write environment
         run: |
