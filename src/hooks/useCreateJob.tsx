@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 export function useCreateJob() {
   const router = useRouter();
   const { startGeneration, stopGeneration } = useGenerationStore(
-    (state) => state
+    (state) => state,
   );
 
   return useMutation({

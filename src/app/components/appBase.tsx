@@ -7,7 +7,8 @@ import Menu from "../menu";
 import { useUser } from "@/hooks/useUser";
 
 export default function AppBase({ children }: { children: React.ReactNode }) {
-  const { userId } = useUser();
+  const { userId, user } = useUser();
+
   return (
     <main
       className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}

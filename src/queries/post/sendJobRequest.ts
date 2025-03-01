@@ -15,6 +15,7 @@ export const sendJobRequest = async ({
   try {
     console.log(prompt);
     const author = (await client.auth.getUser()).data.user?.id;
+
     const dto: Partial<JobSpec> = {
       module: "isdxl",
       version: "v1.6.0",
