@@ -1,9 +1,10 @@
 import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
 import { getRange } from "$/utils";
+import { LIST_LIMIT } from "@/app/libs/constants";
 
 export async function getPosts(client: Client, start = 0): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   const { data, error } = await client
     .from("posts")
@@ -25,8 +26,8 @@ export async function getPosts(client: Client, start = 0): Promise<Post[]> {
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 
@@ -54,15 +55,15 @@ export async function getTopPosts(client: Client, start = 0): Promise<Post[]> {
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 
 export async function getFollowingPosts(
   client: Client,
   start = 0,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, 20);
 
@@ -116,7 +117,7 @@ export async function getFollowingPosts(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }

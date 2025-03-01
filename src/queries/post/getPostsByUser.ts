@@ -1,13 +1,14 @@
 import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
 import { getRange } from "$/utils";
+import { LIST_LIMIT } from "@/app/libs/constants";
 
 export async function getPostsByUser(
   client: Client,
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
@@ -55,7 +56,7 @@ export async function getOtherPostsByUser(
   postId: number,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
@@ -102,7 +103,7 @@ export async function getPrivatePostsByUser(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
@@ -147,7 +148,7 @@ export async function getPinnedPostsByUser(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
@@ -207,7 +208,7 @@ export async function getIsDraftPostsByUser(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
@@ -252,7 +253,7 @@ export async function getOtherIsDraftPostsByUser(
   postId: number,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
@@ -298,7 +299,7 @@ export async function getUserLikedPosts(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
