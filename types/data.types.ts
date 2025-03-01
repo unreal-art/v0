@@ -71,6 +71,7 @@ export type ExtendedUser = SupabaseUser & {
   location: string;
   full_name: string;
   avatar_url: string;
+  creditBalance: number;
 };
 
 export interface CommentWithUser {
