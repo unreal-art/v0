@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+    tags:
+      - "*"
+  pull_request:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  envfile: ${{secrets.ENV}}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun Runtime
+        uses: antongolub/action-setup-bun@v1
+        with:
+          bun-version: ">=1"
+          bun-repo: "oven-sh/bun"
+          cache: true
+          # cache-bin: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          check-latest: false
+          # cache-dependency-path: "bun.lockb"
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: |
+          cp .env.example .env
+          # source .env.example
+          # bun i
+          yarn i
+
+      - name: Write environment
+        run: |
+          echo "\n$envfile" >> .env
+          # sed -i 's/ /\n/g' .env
+          # source .env
+
+      - name: Build
+        run: |
+          bun run build
