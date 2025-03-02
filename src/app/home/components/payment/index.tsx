@@ -20,7 +20,7 @@ export default function Payment({open, amount, setOpen, close }: TopupProps) {
     return (
         <>
 
-            <div onClick={handleClose} className="fixed z-30 top-0 left-0 h-screen w-full shadow-bg"></div>
+            <div onClick={handleClose} className={"fixed z-30 top-0 left-0 h-screen w-full shadow-bg"}></div>
 
             <div className="absolute flex justify-center items-center z-30 top-0 left-0 h-screen w-full">
 

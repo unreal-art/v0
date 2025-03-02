@@ -11,8 +11,6 @@ interface INotificationProps {
   children: ReactNode;
 }
 
-// const dummy = [1, 2, 3, 4, 5, 6, 8, 1, 2, 3, 4, 5, 6, 8];
-
 export default function Menu({ children }: INotificationProps) {
   const { userId, user } = useUser();
 
