@@ -74,11 +74,11 @@ export default async function Profile({
       lastPage?.nextCursor ?? undefined,
   });
 
-  //from server
-  await queryClient.prefetchQuery({
-    queryKey: ["user"],
-    queryFn: async () => await getUser(),
-  });
+  // //from server
+  // await queryClient.prefetchQuery({
+  //   queryKey: ["user"],
+  //   queryFn: async () => await getUser(),
+  // });
 
   // const userData = queryClient.getQueryData(["user"]);
   // console.log(userData);

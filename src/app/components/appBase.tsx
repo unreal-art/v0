@@ -8,7 +8,7 @@ import { useUser } from "@/hooks/useUser";
 import { Toaster } from "sonner";
 
 export default function AppBase({ children }: { children: React.ReactNode }) {
-  const { userId, user } = useUser();
+  const { userId } = useUser();
 
   return (
     <main

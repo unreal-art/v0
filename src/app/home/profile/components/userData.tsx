@@ -41,7 +41,7 @@ export default function UserData() {
   //fetch like stat
   const { data: likeCount } = useLikeStat(userId);
 
-  if (isLoading || authUserLoading) return <ProfileSkeleton />;
+  if (isLoading || authUserLoading || !authUser) return <ProfileSkeleton />;
   // if (error) return <p>Error loading user data.</p>;
 
   const showEditAccount = () => {
