@@ -44,6 +44,7 @@ export default function Topup({ open, setOpen }: TopupProps) {
 
   const handleClose = () => {
     setOpen(false);
+    setOpenPayment(false)
   };
 
   const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,14 +63,13 @@ export default function Topup({ open, setOpen }: TopupProps) {
     <>
       <div
         onClick={handleClose}
-        className="fixed z-30 top-0 left-0 h-screen w-full shadow-bg"
-      ></div>
+        className={`fixed z-30 top-0 left-0 h-screen w-full ${!openPayment ? "shadow-bg" : ""}`}></div>
 
       <div className="absolute flex justify-center items-center z-30 top-0 left-0 h-screen w-full">
+
         <div
           onClick={handleClose}
-          className="absolute z-30 top-0 left-0 h-screen w-full shadow-bg"
-        ></div>
+          className={"absolute z-30 top-0 left-0 h-screen w-full"}></div>
 
         <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 h-[394px] w-[520px] flex flex-col">
           <div className="flex justify-between">
