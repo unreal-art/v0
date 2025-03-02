@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation"; // Remove useSearchParams
 import NProgress from "nprogress";
-// import "nprogress/nprogress.css";
 
-// Customize NProgress
 NProgress.configure({ showSpinner: false, speed: 500 });
 
 const ProgressBar = () => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // Removed useSearchParams()
 
   useEffect(() => {
     NProgress.start();
@@ -20,9 +18,9 @@ const ProgressBar = () => {
       clearTimeout(timer);
       NProgress.done();
     };
-  }, [pathname, searchParams]);
+  }, [pathname]); // Only depend on pathname
 
-  return null; // This component only handles loading logic
+  return null;
 };
 
 export default ProgressBar;
