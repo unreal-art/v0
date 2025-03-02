@@ -2,7 +2,7 @@ import { supabase } from "$/supabase/client";
 import { getUserById } from "@/queries/user/getUserById";
 import { useQuery } from "@tanstack/react-query";
 
-/** Custom Hook using React Query */
+/** Custom Hook using React Query  for fetching random user data*/
 export default function useUserData(authorId: string | undefined | null) {
   return useQuery({
     queryKey: ["profile_data", authorId],

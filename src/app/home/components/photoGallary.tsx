@@ -23,11 +23,12 @@ import { useSearchParams } from "next/navigation";
 // import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
+import Link from "next/link";
 
 export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4
+    window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
@@ -158,7 +159,10 @@ function PhotoWithAuthor({
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
         {!isLoading && !imageLoading && userName && (
-          <>
+          <Link
+            href={`/home/profile/${authorId}`}
+            className="flex items-center gap-2"
+          >
             <div className="rounded-full">
               {image ? (
                 <Image
@@ -173,7 +177,7 @@ function PhotoWithAuthor({
               )}
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">{userName}</p>
-          </>
+          </Link>
         )}
       </div>
     </PhotoOverlay>

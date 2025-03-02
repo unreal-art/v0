@@ -6,7 +6,7 @@ import { Client } from "$/supabase/client";
 import { ExtendedUser } from "$/types/data.types";
 
 export const getUser = async (
-  client?: Client,
+  client?: Client
 ): Promise<Partial<ExtendedUser> | null> => {
   const supabase = await createClient();
 
@@ -50,6 +50,7 @@ export const getUser = async (
     location: profileData[0].location as string,
     creditBalance: profileData[0].credit_balance as number,
     full_name: profileData[0].full_name as string,
+    username: profileData[0].display_name || profileData[0].full_name,
     avatar_url: profileData[0].avatar_url as string,
   };
   return user;

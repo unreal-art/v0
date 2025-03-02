@@ -15,20 +15,25 @@ import ModalWrapper from "../../components/modalWrapper";
 import EditModal from "./modals/editModal";
 import DeleteModal from "./modals/deleteModal";
 import EditProfileModal from "./modals/editProfileModal";
+import { useUser } from "@/hooks/useUser";
 // import { getUser } from "$/queries/user/getUser";
 
-type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | ""
+type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 export default function UserData() {
-
-  const [open, setOpen] = useState(false)
-  const [title, setTitle] = useState<TitleType>("")
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState<TitleType>("");
 
   const params = useParams();
 
   const userId = params.id as string;
   //fetch user details
   const { data: user, isLoading } = useUserData(userId);
+  const {
+    userId: authUserId,
+    user: authUser,
+    loading: authUserLoading,
+  } = useUser();
 
   //fetch follow stats
   const { data: followStats } = useFollowStats(userId);
@@ -36,18 +41,18 @@ export default function UserData() {
   //fetch like stat
   const { data: likeCount } = useLikeStat(userId);
 
-  if (isLoading) return <ProfileSkeleton />;
+  if (isLoading || authUserLoading || !authUser) return <ProfileSkeleton />;
   // if (error) return <p>Error loading user data.</p>;
 
   const showEditAccount = () => {
-    setOpen(true)
-    setTitle("Edit Account")
-  }
+    setOpen(true);
+    setTitle("Edit Account");
+  };
 
   const handleClose = () => {
-    setOpen(false)
-    setTitle("")
-  }
+    setOpen(false);
+    setTitle("");
+  };
 
   return (
     <>
@@ -67,9 +72,14 @@ export default function UserData() {
             <p className="text-3xl font-medium">{user?.full_name}</p>
 
             <div className="flex my-4 gap-3">
-              <button onClick={showEditAccount} className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
-                <p className="text-sm">Edit Account</p>
-              </button>
+              {authUserId === userId && (
+                <button
+                  onClick={showEditAccount}
+                  className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11"
+                >
+                  <p className="text-sm">Edit Account</p>
+                </button>
+              )}
 
               <button className="flex justify-center items-center h-9 w-12 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
                 <ShareModernIcon width={16} height={16} color="#DADADA" />
@@ -83,9 +93,14 @@ export default function UserData() {
             <p className="text-3xl font-medium">{user?.full_name}</p>
 
             <div className="flex my-4 gap-3">
-              <button onClick={showEditAccount} className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
-                <p className="text-sm">Edit Account</p>
-              </button>
+              {authUserId === userId && (
+                <button
+                  onClick={showEditAccount}
+                  className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11"
+                >
+                  <p className="text-sm">Edit Account</p>
+                </button>
+              )}
 
               <button className="flex justify-center items-center h-9 w-12 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
                 <ShareModernIcon width={16} height={16} color="#DADADA" />
@@ -96,11 +111,15 @@ export default function UserData() {
           <div className="flex gap-x-4 my-4">
             <ProfileInfo
               value={followStats?.followeeCount?.toString() || "0"}
-              title={followStats?.followeeCount === 1 ? "Follower" : "Followers"} // Adjusts title dynamically
+              title={
+                followStats?.followeeCount === 1 ? "Follower" : "Followers"
+              } // Adjusts title dynamically
             />
             <ProfileInfo
               value={followStats?.followerCount?.toString() || "0"}
-              title={followStats?.followerCount === 1 ? "Following" : "Following"} // Stays the same
+              title={
+                followStats?.followerCount === 1 ? "Following" : "Following"
+              } // Stays the same
               leftBorder={true}
             />
             <ProfileInfo
@@ -115,19 +134,33 @@ export default function UserData() {
         </div>
 
         <div className="hidden md:block">
-          <button className="flex gap-2 text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11">
-            <div>
-              <FlashIcon width={16} height={16} color="#DADADA" />
-            </div>
-            <p>10 Credits</p>
-          </button>
+          {authUserId === userId && (
+            <button className="flex gap-2 text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11">
+              <div>
+                <FlashIcon width={16} height={16} color="#DADADA" />
+              </div>
+              <p>10 Credits</p>
+            </button>
+          )}
         </div>
       </div>
-      <ModalWrapper title={title} open={open} setOpen={setOpen} titleColor={title === "Delete Account" ? "#FF5252" : undefined}>
-        { title === "Edit Account" && <EditModal openProfile={() => setTitle("Edit Profile")} deleteProfile={() => setTitle('Delete Account')} /> }
-        { title === "Delete Account" && <DeleteModal close={handleClose} /> }
-        { title === "Edit Profile" && user && <EditProfileModal user={user} close={handleClose} /> }
-      </ModalWrapper> 
+      <ModalWrapper
+        title={title}
+        open={open}
+        setOpen={setOpen}
+        titleColor={title === "Delete Account" ? "#FF5252" : undefined}
+      >
+        {title === "Edit Account" && (
+          <EditModal
+            openProfile={() => setTitle("Edit Profile")}
+            deleteProfile={() => setTitle("Delete Account")}
+          />
+        )}
+        {title === "Delete Account" && <DeleteModal close={handleClose} />}
+        {title === "Edit Profile" && user && (
+          <EditProfileModal user={authUser} close={handleClose} />
+        )}
+      </ModalWrapper>
     </>
   );
 }

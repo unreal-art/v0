@@ -70,6 +70,7 @@ export type ExtendedUser = SupabaseUser & {
   bio: string;
   location: string;
   full_name: string;
+  username: string | null;
   avatar_url: string;
   creditBalance: number;
 };

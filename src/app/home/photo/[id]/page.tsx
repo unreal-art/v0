@@ -20,12 +20,13 @@ import { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import ViewSkeleton from "../components/viewSkeleton";
+import Link from "next/link";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
   {
     ssr: false,
-  }
+  },
 );
 
 export default function Generation() {
@@ -135,7 +136,10 @@ export default function Generation() {
         <div className="grid grid-cols-1 md:grid-cols-12 w-full md:h-[calc(100vh_-_220px)]">
           <div className="flex flex-col justify-between items-center col-span-9">
             <div className="flex justify-between h-24 p-6 gap-5 w-full">
-              <div className="flex gap-1">
+              <Link
+                href={`/home/profile/${post?.author}`}
+                className="flex gap-1"
+              >
                 <div>
                   <Image
                     src={authorImage || "/profile.jpg"}
@@ -151,7 +155,7 @@ export default function Generation() {
                   </p>
                   <p className="text-primary-7 nasalization">Creator</p>
                 </div>
-              </div>
+              </Link>
               <button>
                 <OptionMenuIcon color="#C1C1C1" />
               </button>
@@ -161,7 +165,7 @@ export default function Generation() {
               <Image
                 src={getImage(
                   (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
                 )}
                 width={306}
                 height={408}
@@ -195,7 +199,7 @@ export default function Generation() {
                 <Image
                   src={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
                   )}
                   width={98}
                   height={128}
@@ -222,7 +226,7 @@ export default function Generation() {
               <ImageResolutionFeature
                 imageUrl={getImage(
                   (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
                 )}
               />
 
@@ -240,7 +244,9 @@ export default function Generation() {
 
         <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10">
           {a ? "Drafts" : "Other posts"} by{"  "}
-          <strong className="text-primary-5 pl-1">{authorUsername}</strong>
+          <Link href={`/home/profile/${post?.author}`}>
+            <strong className="text-primary-5 pl-1">{authorUsername}</strong>
+          </Link>
         </p>
 
         <div>
