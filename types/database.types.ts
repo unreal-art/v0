@@ -159,6 +159,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          is_read: boolean
           post_id: number | null
           sender_id: string
           type: string
@@ -167,6 +168,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          is_read?: boolean
           post_id?: number | null
           sender_id: string
           type: string
@@ -175,6 +177,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          is_read?: boolean
           post_id?: number | null
           sender_id?: string
           type?: string
@@ -312,6 +315,7 @@ export type Database = {
           id: string
           likes_received: number
           location: string | null
+          search_vector: unknown | null
           updated_at: string | null
           wallet: Json | null
           website: string | null
@@ -329,6 +333,7 @@ export type Database = {
           id: string
           likes_received?: number
           location?: string | null
+          search_vector?: unknown | null
           updated_at?: string | null
           wallet?: Json | null
           website?: string | null
@@ -346,6 +351,7 @@ export type Database = {
           id?: string
           likes_received?: number
           location?: string | null
+          search_vector?: unknown | null
           updated_at?: string | null
           wallet?: Json | null
           website?: string | null

@@ -7,7 +7,7 @@ const fetchUser = async (): Promise<{
   user: ExtendedUser | null;
 }> => {
   const { data, error } = await supabase.auth.getUser();
-  console.log(data, error);
+  // console.log(data, error);
 
   if (error) throw new Error("Error fetching user");
 

@@ -16,7 +16,7 @@ export default function CreationView() {
     else setCurrentIndex(indexOf(POST_GROUPS, s?.toUpperCase()));
   }, [s]);
 
-  console.log(currentIndex);
+
   return (
     <div className="w-full">
       <div className="w-full mb-4">

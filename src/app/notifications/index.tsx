@@ -3,7 +3,11 @@ import { ReactNode, useRef, useState } from "react";
 import Notification from "./notification";
 import { ScrollTopIcon } from "../components/icons";
 import { useUser } from "@/hooks/useUser";
-import { useNotifications } from "@/hooks/useNotifications";
+import {
+  useNotifications,
+  useUnreadNotificationsCount,
+} from "@/hooks/useNotifications";
+import NotificationSkeleton from "./components/notificationSkeleton";
 
 interface INotificationProps {
   children: ReactNode;
@@ -13,10 +17,14 @@ interface INotificationProps {
 
 export default function Notifications({ children }: INotificationProps) {
   const { userId } = useUser();
-  const { data: notifications } = useNotifications(userId || "");
 
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const { data: notifications } = useNotifications(userId);
+
+  const unreadCount = useUnreadNotificationsCount(userId);
+  // console.log(unreadCount);
 
   function scrollTop() {
     if (ref.current) {
@@ -26,7 +34,14 @@ export default function Notifications({ children }: INotificationProps) {
 
   return (
     <>
-      <button onClick={() => setOpen(true)}>{children}</button>
+      <button onClick={() => setOpen(true)} className="relative">
+        {children}
+        {unreadCount > 0 && (
+          <span className="absolute -top-2 right-1 md:top-4 md:right-12 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            {unreadCount}
+          </span>
+        )}
+      </button>
 
       {open && (
         <>
@@ -47,7 +62,10 @@ export default function Notifications({ children }: INotificationProps) {
             </div>
 
             <div ref={ref} className="overflow-y-auto h-[82vh] !scroll-smooth">
+              {!notifications && <NotificationSkeleton />}
               {notifications?.map((notification, index) => {
+                console.log(notification);
+                // return null;
                 return <Notification key={index} notification={notification} />;
               })}
             </div>
