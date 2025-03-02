@@ -6,10 +6,12 @@ import Notifications from "../notifications";
 import Menu from "../menu";
 import { useUser } from "@/hooks/useUser";
 import { Toaster } from "sonner";
+import { useUnreadNotificationsCount } from "@/hooks/useNotifications";
 
 export default function AppBase({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
-
+  // const unreadCount = useUnreadNotificationsCount(userId);
+  // console.log(unreadCount);
   return (
     <main
       className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}
