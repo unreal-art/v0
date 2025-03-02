@@ -16,6 +16,7 @@ export const useNotifications = (userId: string | null) => {
         .select("*")
         .eq("user_id", userId)
         .neq("sender_id", userId)
+        .eq("is_read", false) // Only unread notifications
         .order("created_at", { ascending: false });
 
       if (error) throw error;
