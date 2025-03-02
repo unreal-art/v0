@@ -13,6 +13,7 @@ import { useLikeStat } from "@/hooks/useLikeStat";
 import { useDoesUserFollow } from "@/hooks/useDoesUserFollow";
 import { useUser } from "@/hooks/useUser";
 import { useToggleFollow } from "@/hooks/useToggleFollow";
+import Link from "next/link";
 
 const dummydata = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -32,7 +33,7 @@ export default function UserSearch({ searchTerm }: { searchTerm: string }) {
       {data?.pages?.flatMap((page) =>
         page.data.map((details: ProfileWithPosts) => (
           <User key={details.id} data={details} posts={details.posts} />
-        ))
+        )),
       )}
     </div>
   );
@@ -50,7 +51,7 @@ export function User({
   const { userId } = useUser();
   const { data: isFollowing, isLoading } = useDoesUserFollow(
     userId as string,
-    data.id
+    data.id,
   );
   const toggleFollowMutation = useToggleFollow();
 
@@ -65,7 +66,10 @@ export function User({
     <div className="bg-primary-11 rounded-t-3xl my-3">
       <div className="flex justify-between items-center h-16 py-4 px-4">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-primary-9 rounded-full">
+          <Link
+            href={`/home/profile/${data.id}`}
+            className="w-10 h-10 bg-primary-9 rounded-full"
+          >
             <Image
               src={data.avatar_url || "/profile.jpg"}
               width={40}
@@ -73,17 +77,20 @@ export function User({
               alt="profile"
               className="rounded-full"
             />
-          </div>
+          </Link>
 
-          <p className="text-primary-1 text-lg w-36 font-normal">
+          <Link
+            href={`/home/profile/${data.id}`}
+            className="text-primary-1 text-lg w-36 font-normal"
+          >
             {data.username}
-          </p>
+          </Link>
 
           {userId !== data.id && (
             <button
               disabled={toggleFollowMutation.isPending}
               onClick={handleFollowToggle}
-              className={`flex items-center justify-center gap-1 rounded-full h-8 w-24 px-2 py-1 border-[1px] border-primary-8 
+              className={`flex items-center justify-center gap-1 rounded-full h-8 w-24 px-2 py-1 border-[1px] border-primary-8
     ${isFollowing ? "bg-transparent" : "bg-primary-10"}`}
             >
               <p className="text-primary-5 text-sm">
@@ -126,7 +133,10 @@ export function UserImage({ post }: { post: Post }) {
     //     //setImageIndex={() => handleImageIndex(context)}
     //     //context={context as ExtendedRenderPhotoContext}
     //     >
-    <div className="relative inline-block w-[306px]">
+    <Link
+      href={`home/photo/${post.id}`}
+      className="relative inline-block w-[306px] cursor-pointer"
+    >
       <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
         <p>{timeAgo(post.createdAt)}</p>
         <button>
@@ -137,7 +147,7 @@ export function UserImage({ post }: { post: Post }) {
       <Image
         src={getImage(
           post.ipfsImages?.[0].hash as string,
-          post.ipfsImages?.[0].fileNames?.[0] as string
+          post.ipfsImages?.[0].fileNames?.[0] as string,
         )}
         width={306}
         height={408}
@@ -147,7 +157,7 @@ export function UserImage({ post }: { post: Post }) {
       <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
         {truncateText(post.caption || (post.prompt as string), 3)}
       </p>
-    </div>
+    </Link>
     // </PhotoOverlay>
   );
 }

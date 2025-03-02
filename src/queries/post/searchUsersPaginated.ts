@@ -13,21 +13,31 @@ export type ProfileWithPosts = {
 export const searchUsersPaginated = async (
   keyword: string,
   page: number,
-  limit = 10
+  limit = 10,
 ): Promise<ProfileWithPosts[]> => {
   if (!keyword?.trim()) return []; // Prevent empty searches
 
   const start = Math.max(0, (page - 1) * limit);
   const end = start + (limit - 1);
 
+  // const { data, error } = await supabase
+  //   .from("profiles")
+  //   .select(`*, posts:posts(*)`) // Select everything from profiles and its posts
+  //   .textSearch("full_name", keyword, {
+  //     type: "websearch",
+  //     config: "english",
+  //   })
+  //   .order("createdAt", { ascending: false }) // Ensure correct sorting
+  //   .range(start, end);
+  //
   const { data, error } = await supabase
     .from("profiles")
-    .select(`*, posts:posts(*)`) // Select everything from profiles and its posts
-    .textSearch("display_name", keyword, {
+    .select(`*, posts:posts(*)`)
+    .textSearch("search_vector", keyword, {
       type: "websearch",
       config: "english",
     })
-    .order("createdAt", { ascending: false }) // Ensure correct sorting
+    .order("createdAt", { ascending: false })
     .range(start, end);
 
   if (error) {
