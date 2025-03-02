@@ -304,6 +304,7 @@ export type Database = {
           bio: string | null
           createdAt: string
           credit_balance: number
+          display_name: string | null
           email: string | null
           follower_count: number
           following_count: number
@@ -312,7 +313,6 @@ export type Database = {
           likes_received: number
           location: string | null
           updated_at: string | null
-          username: string | null
           wallet: Json | null
           website: string | null
         }
@@ -321,6 +321,7 @@ export type Database = {
           bio?: string | null
           createdAt?: string
           credit_balance?: number
+          display_name?: string | null
           email?: string | null
           follower_count?: number
           following_count?: number
@@ -329,7 +330,6 @@ export type Database = {
           likes_received?: number
           location?: string | null
           updated_at?: string | null
-          username?: string | null
           wallet?: Json | null
           website?: string | null
         }
@@ -338,6 +338,7 @@ export type Database = {
           bio?: string | null
           createdAt?: string
           credit_balance?: number
+          display_name?: string | null
           email?: string | null
           follower_count?: number
           following_count?: number
@@ -346,7 +347,6 @@ export type Database = {
           likes_received?: number
           location?: string | null
           updated_at?: string | null
-          username?: string | null
           wallet?: Json | null
           website?: string | null
         }
@@ -421,6 +421,29 @@ export type Database = {
       }
     }
     Functions: {
+      decrement_credit_and_insert_post: {
+        Args: {
+          author_id: string
+          post_data: Json
+        }
+        Returns: {
+          author: string
+          caption: string | null
+          category: string | null
+          cpu: number | null
+          createdAt: string
+          device: string | null
+          id: number
+          ipfsImages: Json | null
+          isDraft: boolean | null
+          isPinned: boolean | null
+          isPrivate: boolean | null
+          like_count: number | null
+          n: number | null
+          prompt: string | null
+          seed: number | null
+        }[]
+      }
       get_comments_with_likes: {
         Args: {
           post_uuid: number

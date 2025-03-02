@@ -123,3 +123,10 @@ export function downloadImage(imageUrl: string, fileName: string) {
 export const formatMoney = (value: number) => {
   return new Intl.NumberFormat("en-US").format(value);
 };
+
+export function splitName(fullName: string) {
+  let parts = fullName.trim().split(" ");
+  let firstName = parts[0];
+  let lastName = parts.slice(1).join(" "); // Handles cases with middle names
+  return { firstName, lastName };
+}

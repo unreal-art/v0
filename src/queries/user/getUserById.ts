@@ -7,7 +7,7 @@ export const getUserById = async (id: string, client: Client) => {
     const { data: profileData, error: profileError } = await client
       .from("profiles")
       .select(
-        "wallet, bio, location, likes_received, credit_balance, full_name,avatar_url",
+        "id, wallet, bio, location, likes_received, credit_balance, full_name, display_name, avatar_url"
       )
       .eq("id", id)
       .single(); // Ensures only one row is returned
@@ -15,12 +15,13 @@ export const getUserById = async (id: string, client: Client) => {
     if (profileError || !profileData) {
       console.error(
         "Error fetching profile:",
-        profileError?.message || "Profile not found",
+        profileError?.message || "Profile not found"
       );
       return null;
     }
 
     return {
+      id: profileData.id,
       wallet: profileData.wallet,
       bio: profileData.bio,
       location: profileData.location,
@@ -28,6 +29,7 @@ export const getUserById = async (id: string, client: Client) => {
       creditBalance: profileData.credit_balance,
       full_name: profileData.full_name,
       avatar_url: profileData.avatar_url,
+      username: profileData.display_name || profileData.full_name,
     };
   } catch (error) {
     console.error("Unexpected error:", error);

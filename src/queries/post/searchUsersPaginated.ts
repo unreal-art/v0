@@ -23,7 +23,7 @@ export const searchUsersPaginated = async (
   const { data, error } = await supabase
     .from("profiles")
     .select(`*, posts:posts(*)`) // Select everything from profiles and its posts
-    .textSearch("full_name", keyword, {
+    .textSearch("display_name", keyword, {
       type: "websearch",
       config: "english",
     })
@@ -38,7 +38,7 @@ export const searchUsersPaginated = async (
   return data.map((profile) => ({
     id: profile.id,
     full_name: profile.full_name || "", // Ensure non-null string
-    username: profile.username,
+    username: profile.display_name || profile.full_name || "",
     avatar_url: profile.avatar_url,
     createdAt: profile.createdAt ?? "",
     posts: Array.isArray(profile.posts)

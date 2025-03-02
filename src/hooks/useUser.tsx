@@ -58,6 +58,7 @@ const fetchUser = async (): Promise<{
   user: ExtendedUser | null;
 }> => {
   const { data, error } = await supabase.auth.getUser();
+
   if (error) throw new Error("Error fetching user");
 
   const userId = data?.user?.id || null;
@@ -79,12 +80,14 @@ const fetchUser = async (): Promise<{
     location: profileData[0].location as string,
     creditBalance: profileData[0].credit_balance as number,
     full_name: profileData[0].full_name as string,
+    username: profileData[0].display_name || profileData[0].full_name,
     avatar_url: profileData[0].avatar_url as string,
   };
 
   return { userId, user };
 };
 
+// Custom Hook using React Query for fetching authenticated user data
 export const useUser = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["user"],

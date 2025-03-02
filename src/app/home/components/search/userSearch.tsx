@@ -76,7 +76,7 @@ export function User({
           </div>
 
           <p className="text-primary-1 text-lg w-36 font-normal">
-            {data.full_name}
+            {data.username}
           </p>
 
           {userId !== data.id && (
