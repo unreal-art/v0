@@ -1,3 +1,7 @@
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
+/// <reference lib="webworker" />
+
 // Use IndexedDB or a safer storage for build version persistence
 let buildVersion = null;
 
@@ -81,6 +85,9 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  if (!(event.request.url.match("^(http|https)://"))) return;
+
 
   event.respondWith(
     (async () => {
