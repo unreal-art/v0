@@ -24,6 +24,9 @@ export function useCreateJob() {
       startGeneration();
       return sendJobRequest({ prompt, client });
     },
+    retry: false,
+    gcTime: Infinity,
+    networkMode: "always",
     onSuccess: (data) => {
       //TODO: the post id should be among the data returned
       console.log("Job created successfully:", data);
