@@ -18,6 +18,20 @@ import Search from "./components/search";
 
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
+  loading: () => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full ">
+      {Array(12)
+        .fill(null)
+        .map((_, index) => (
+          <Skeleton
+            key={index}
+            height={200}
+            baseColor="#1a1a1a" // Dark background
+            highlightColor="#333" // Slightly lighter shimmer effect
+          />
+        ))}
+    </div>
+  ),
 });
 
 export default async function Home({
