@@ -34,8 +34,35 @@ const archivo = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Unreal",
-  description: "Ai image generation.",
+  title: "Unreal Art",
+  description: "A place to let your unreal imagination come alive.",
+  openGraph: {
+    type: "website",
+    url: "https://unreal.art",
+    title: "Unreal Art",
+    description: "A place to let your unreal imagination come alive.",
+    siteName: "Unreal",
+    images: [
+      {
+        url: "https://unreal.art/unreal_wordmark.png",
+        width: 1200,
+        height: 630,
+        alt: "unreal art",
+      },
+    ],
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    // site: "@YourTwitterHandle",
+    // creator: "@YourTwitterHandle",
+    title: "Unreal Art",
+    description: "A place to let your unreal imagination come alive.",
+    images: ["https://unreal.art/unreal_wordmark.png"],
+  },
+  other: {
+    "theme-color": "#191919", // Discord embed color
+  },
 };
 
 export default function RootLayout({

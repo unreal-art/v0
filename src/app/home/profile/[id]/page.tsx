@@ -16,6 +16,53 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { getUser } from "$/queries/user";
 import UserData from "../components/userData";
+import { Metadata } from "next";
+import useUserData from "@/hooks/useUserData";
+import { getUserById } from "@/queries/user/getUserById";
+
+type Props = {
+  params: { slug: string }; // Example if using dynamic routes
+  searchParams: { [key: string]: string | undefined };
+};
+
+//for sharing
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ [key: string]: string | undefined }>;
+}): Promise<Metadata> {
+  const paramsData = await params;
+  const supabaseSSR = await createClient();
+  //fetch user details
+  const data = await getUserById(paramsData?.id as string, supabaseSSR);
+  const dynamicTitle = `Unreal Profile`;
+  const dynamicDescription = `A great creator called ${data?.username || data?.full_name}.`;
+
+  return {
+    title: dynamicTitle,
+    description: dynamicDescription,
+    openGraph: {
+      type: "website",
+      url: `https://unreal.art/home/profile/${paramsData?.id}`,
+      title: dynamicTitle,
+      description: dynamicDescription,
+      images: [
+        {
+          url: `${data?.avatar_url}`,
+          width: 1200,
+          height: 630,
+          alt: `Image for ${paramsData?.id}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: dynamicTitle,
+      description: dynamicDescription,
+      images: [`${data?.avatar_url}`],
+    },
+  };
+}
 
 export default async function Profile({
   searchParams,
