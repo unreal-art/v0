@@ -7,11 +7,13 @@ export default function PostingActions({
   setPrivatePost,
   saveAsDraft,
   postImage,
+  isDraft,
 }: {
   privatePost: boolean;
   setPrivatePost: (privatePost: boolean) => void;
   saveAsDraft: () => void;
   postImage: () => void;
+  isDraft: boolean;
 }) {
   return (
     <div className="flex flex-col md:flex-row justify-between">
@@ -38,12 +40,14 @@ export default function PostingActions({
       </div>
 
       <div className="flex justify-end py-2 md:py-0 md:gap-x-6">
-        <button
-          onClick={saveAsDraft}
-          className="text-primary-6 font-semibold px-9 py-3"
-        >
-          Save to drafts
-        </button>
+        {!isDraft && (
+          <button
+            onClick={saveAsDraft}
+            className="text-primary-6 font-semibold px-9 py-3"
+          >
+            Save to drafts
+          </button>
+        )}
 
         <ActionBtn onClick={postImage}>Publish</ActionBtn>
       </div>

@@ -22,6 +22,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import ViewSkeleton from "../components/viewSkeleton";
 import Link from "next/link";
 import Head from "next/head";
+import { toast } from "sonner";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -120,6 +121,7 @@ export default function Generation() {
   const postImage = async () => {
     console.log("post image");
     if (!caption) {
+      toast.error("Please provide a caption.");
       return;
     }
 
@@ -230,6 +232,7 @@ export default function Generation() {
                     setPrivatePost={setPrivatePost}
                     saveAsDraft={saveAsDraft}
                     postImage={postImage}
+                    isDraft={post.isDraft as boolean}
                   />
                 )}
               </div>

@@ -2,14 +2,17 @@
 import { useEffect, useState } from "react";
 import Tabs from "../../creations/components/Tabs";
 import PhotoGridTwo from "../../creations/components/PhotoGridTwo";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { indexOf } from "lodash";
 import { POST_GROUPS } from "@/app/libs/constants";
+import { useUser } from "@/hooks/useUser";
 
 export default function ProfileView() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
+  const { id } = useParams();
+  const { userId } = useUser();
 
   useEffect(() => {
     if (!s) setCurrentIndex(0);
@@ -22,7 +25,7 @@ export default function ProfileView() {
         <Tabs
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
-          hideDraft={true}
+          hideDraft={userId !== id}
         />
       </div>
 
@@ -56,6 +59,14 @@ export default function ProfileView() {
             title={"Pinned"}
             content="You haven’t pinned anything yet."
             subContent="Find something you love and pin it!"
+          />
+        )}
+
+        {currentIndex === 4 && (
+          <PhotoGridTwo
+            title={"Draft"}
+            content="You haven’t saved anything yet."
+            subContent="Create something you love to post later"
           />
         )}
       </div>
