@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     // Parse request body
     const requestData = await req.json();
-    console.log(requestData);
+    console.log("url", process.env.NEXT_PUBLIC_API_URL);
     //get user
     const user = await getUser();
 
@@ -24,8 +24,7 @@ export async function POST(req: NextRequest) {
     if (user.creditBalance <= 0) {
       headers.Authorization = `Bearer ${user.wallet.privateKey}`;
     }
-
-    const response = await fetch("https://darts.decenterai.com:8080/darts", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/darts`, {
       method: "POST",
       headers,
       body: JSON.stringify(requestData),

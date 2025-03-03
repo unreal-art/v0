@@ -1,7 +1,18 @@
 import SocialLink from "./components/social-link";
 import LandingCarousel from "./components/landingCarousel";
+import { createClient } from "$/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const supabaseSSR = await createClient();
+  const {
+    data: { user },
+  } = await supabaseSSR.auth.getUser(); // ✅ Get user session
+
+  if (user) {
+    redirect("/home"); // ✅ Redirect if authenticated
+  }
+
   return (
     <main className="bg-[#050505] h-screen overflow-clip">
       <div className="absolute w-full overflow-clip top-[16vh] md:top-[6vh] h-[50vh] md:h-[80vh] z-10">

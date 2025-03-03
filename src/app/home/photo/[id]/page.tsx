@@ -22,6 +22,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import ViewSkeleton from "../components/viewSkeleton";
 import Link from "next/link";
 import Head from "next/head";
+import { toast } from "sonner";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -95,12 +96,18 @@ export default function Generation() {
     setCaption(post?.caption || "");
   }, [post]);
 
-  // If `a` exists, it means we are completing image generation, otherwise, we are viewing
   useEffect(() => {
-    if ((a && userId && post?.author !== userId) || postError) {
-      router.push("/home");
+    // Redirect if there's an error (meaning no post to display)
+    if (postError) {
+      router.replace("/home");
+      return;
     }
-  }, [a, userId, post, postError, router]);
+
+    // If `a` is true, only the owner should see the post
+    if (a && userId && post && post.author !== userId) {
+      router.replace("/home");
+    }
+  }, [a, userId, post?.author, postError, router]);
 
   //save post as draft
   const saveAsDraft = async () => {
@@ -112,7 +119,7 @@ export default function Generation() {
 
     const success = await updatePost(post?.id as number, data);
     if (success) {
-      console.log("Post saved to drafts successfully!");
+      toast("Post saved to draft");
     }
   };
 
@@ -129,10 +136,9 @@ export default function Generation() {
       isDraft: false, //marked  to expose the post
     };
 
-    console.log(data);
     const success = await updatePost(post?.id as number, data);
     if (success) {
-      console.log("Post published successfully!");
+      toast.success("Post published successfully!");
     }
   };
 

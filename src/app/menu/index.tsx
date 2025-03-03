@@ -6,6 +6,8 @@ import Image from "next/image";
 import Topup from "./topup";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
+import { supabase } from "$/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface INotificationProps {
   children: ReactNode;
@@ -13,7 +15,7 @@ interface INotificationProps {
 
 export default function Menu({ children }: INotificationProps) {
   const { userId, user } = useUser();
-
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [topup, setTopup] = useState(false);
 
@@ -26,6 +28,19 @@ export default function Menu({ children }: INotificationProps) {
     handleClose();
   };
 
+  const logoutUser = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error logging out:", error.message);
+      } else {
+        console.log("User logged out successfully.");
+        router.replace("/");
+      }
+    } catch (err) {
+      console.error("Unexpected error during logout:", err);
+    }
+  };
   return (
     <>
       <button onClick={() => setOpen(true)}>{children}</button>
@@ -110,7 +125,7 @@ export default function Menu({ children }: INotificationProps) {
             />
 
             <MenuItem
-              onClick={handleClose}
+              onClick={logoutUser}
               icon={<LogoutIcon width={16} height={16} color="#C1C1C1" />}
               text="Logout"
               underlineOff={true}
@@ -140,11 +155,11 @@ export function MenuItem({
   return (
     <div
       onClick={onClick}
-      className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 ${
+      className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 cursor-pointer ${
         !underlineOff ? "border-b-[1px]" : ""
       }`}
     >
-      <div className="flex gap-2 items-center justify-center">
+      <div className="flex gap-2 items-center justify-center ">
         <div>{icon}</div>
         <p>{text}</p>
       </div>
