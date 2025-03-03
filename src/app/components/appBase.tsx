@@ -10,11 +10,10 @@ import { useUnreadNotificationsCount } from "@/hooks/useNotifications";
 
 export default function AppBase({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
-  // const unreadCount = useUnreadNotificationsCount(userId);
-  // console.log(unreadCount);
+
   return (
     <main
-      className={`fixed flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}
+      className={`fixed z-20 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}
     >
       <Toaster />
       <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full">
@@ -54,7 +53,7 @@ export default function AppBase({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto">
+      <div className="flex   justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto">
         {children}
       </div>
     </main>

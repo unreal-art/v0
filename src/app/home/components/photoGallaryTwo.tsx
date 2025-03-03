@@ -1,5 +1,10 @@
 "use client";
-import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
+import {
+  ColumnsPhotoAlbum,
+  RenderImageContext,
+  RenderImageProps,
+  RenderPhotoContext,
+} from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
@@ -27,11 +32,40 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
 
+function renderNextImage(
+  { alt = "", title, sizes }: RenderImageProps,
+  { photo, width, height }: RenderImageContext,
+) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        position: "relative",
+        aspectRatio: `${width} / ${height}`,
+      }}
+    >
+      <Image
+        fill
+        src={photo}
+        alt={alt}
+        title={title}
+        sizes={sizes}
+        priority
+        placeholder={"blurDataURL" in photo ? "blur" : undefined}
+      />
+    </div>
+  );
+}
+
 export default function PhotoGallaryTwo({}) {
   const [imageIndex, setImageIndex] = useState(-1);
-  const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4
-  );
+  //window is not defined on server
+  // const [columns, setColumns] = useState(
+  //   window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
+  // );
+
+  const [columns, setColumns] = useState<number | null>(null);
+
   const { userId } = useUser();
   const searchParams = useSearchParams();
   const a = searchParams.get("a");
@@ -70,7 +104,7 @@ export default function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          post?.author
+          post?.author,
         );
       } else {
         // viewing other user's posts
@@ -78,7 +112,7 @@ export default function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          post?.author
+          post?.author,
         );
       }
 
@@ -134,7 +168,7 @@ export default function PhotoGallaryTwo({}) {
   }
 
   // console.log(isLoading);
-
+  if (!columns) return null;
   return (
     <div className="w-full">
       <InfiniteScroll
@@ -154,6 +188,7 @@ export default function PhotoGallaryTwo({}) {
                 handleImageIndex={handleImageIndex}
               />
             ),
+            image: renderNextImage,
           }}
         />
       </InfiniteScroll>

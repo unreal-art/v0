@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
+import { usePathname } from "next/navigation";
+
 interface NavLinkProps {
   href: string;
   text: string;
@@ -16,6 +18,7 @@ export default function NavLink({ href, text, icon }: NavLinkProps) {
   const [active, setActive] = useState(false);
   const [hover, setHover] = useState(false);
   const { user, loading } = useUser();
+  const pathname = usePathname();
 
   let iconSvg = null;
 
@@ -125,12 +128,12 @@ export default function NavLink({ href, text, icon }: NavLinkProps) {
   }
 
   useEffect(() => {
-    if (window.location.pathname === href) {
+    if (pathname === href) {
       setActive(true);
     } else {
       setActive(false);
     }
-  }, [href]);
+  }, [href, pathname]);
 
   return (
     <Link

@@ -166,6 +166,7 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
                       width={500}
                       height={500}
                       alt={String(photo.alt)}
+                      priority
                     />
                   }
                 >
@@ -181,12 +182,13 @@ export default function PhotoGridTwo({ title, content, subContent }: TabProps) {
                       src={photo.src}
                       width={500}
                       height={500}
+                      priority
                       alt={String(photo.alt)}
                     />
 
                     <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
                       {truncateText(
-                        context.photo.caption || context.photo.prompt
+                        context.photo.caption || context.photo.prompt,
                       )}
                     </p>
                   </>
