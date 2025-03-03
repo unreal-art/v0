@@ -55,6 +55,7 @@ export interface Notification {
   sender_id: string | null; // UUID of the sender
   post_id: number | null; // bigint (assuming it's stored as a number in JavaScript)
   type: string;
+  is_read: boolean;
   created_at: string | null; // ISO timestamp
 }
 
@@ -70,6 +71,7 @@ export type ExtendedUser = SupabaseUser & {
   bio: string;
   location: string;
   full_name: string;
+  username: string | null;
   avatar_url: string;
   creditBalance: number;
 };

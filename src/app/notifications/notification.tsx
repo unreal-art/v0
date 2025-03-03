@@ -6,6 +6,9 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import { usePost } from "@/hooks/usePost";
 import { getNotificationMessage } from "$/utils";
 import { getImage } from "../home/formattedPhotos";
+import { useMarkNotificationAsRead } from "@/hooks/useMarkNotificationAsRead";
+import { useEffect } from "react";
+import NotificationSkeleton from "./components/notificationSkeleton";
 
 interface NotificationProps {
   notification: NotificationType;
@@ -16,6 +19,15 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
   const { data: username } = useAuthorUsername(notification?.sender_id);
   const { data: post } = usePost(notification?.post_id);
 
+  const markAsReadMutation = useMarkNotificationAsRead();
+
+  useEffect(() => {
+    if (notification.id && !notification.is_read && post && image && username) {
+      markAsReadMutation.mutate(notification.id);
+    }
+  }, [notification, image, username, post]);
+
+  if (!post || !image || !username) return <NotificationSkeleton />;
   return (
     <div className="border-primary-8 border-[1px] flex items-center bg-primary-12 h-28 my-4 rounded-[20px] p-3">
       <div className="flex gap-2 justify-between items-center  w-full">
@@ -27,7 +39,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
           <div className="flex gap-2 mt-1 w-ful">
             <div className="basis-10 ">
               <Image
-                src={image || "/icons/dummy-profile.png"}
+                src={image || "/profile.jpg"}
                 width={36}
                 height={36}
                 alt="profile"
@@ -57,7 +69,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
               post.ipfsImages[0].fileNames.length > 0
                 ? getImage(
                     post.ipfsImages[0].hash as string,
-                    post.ipfsImages[0].fileNames[0] as string
+                    post.ipfsImages[0].fileNames[0] as string,
                   )
                 : "/profile.jpg"
             }
@@ -72,3 +84,6 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
 };
 
 export default Notification;
+/**
+
+ */

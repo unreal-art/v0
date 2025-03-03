@@ -49,6 +49,7 @@ export const getUser = async (client?: Client) => {
     location: profileData[0].location,
     likesReceived: profileData[0].likes_received,
     creditBalance: profileData[0].credit_balance,
+    username: profileData[0].display_name || profileData[0].full_name,
   };
   return user;
 };
