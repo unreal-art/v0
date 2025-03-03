@@ -1,5 +1,5 @@
 import { Client } from "$/supabase/client";
-import { JobSpec } from "$/types/data.types";
+import { ExtendedUser, JobSpec } from "$/types/data.types";
 import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance";
 import axios from "axios";
 import random from "random";
@@ -7,14 +7,24 @@ import random from "random";
 // Function to send job request
 export const sendJobRequest = async ({
   prompt,
-  client,
+  // client,
+  user,
 }: {
   prompt: string;
-  client: Client;
+  // client: Client;
+  user: ExtendedUser | null;
 }) => {
   try {
     // console.log(prompt);
-    const author = (await client.auth.getUser()).data.user?.id;
+    // const author =     (await client.auth.getUser()).data.user?.id;
+    if (!user) {
+      throw new Error("User is undefined, cannot send job request.");
+    }
+    if (!user.wallet?.privateKey) {
+      throw new Error("Missing private key, cannot proceed.");
+    }
+
+    const author = user.id;
 
     const dto: Partial<JobSpec> = {
       module: "isdxl",
@@ -32,9 +42,15 @@ export const sendJobRequest = async ({
       category: "GENERATION",
     };
 
-    const response = await axiosInstance.post("/darts", dto, {
-      // timeout: 300000,
-    });
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    // Add Authorization only when `creditBalance <= 0`
+    if (user.creditBalance <= 0) {
+      headers.Authorization = `Bearer ${user.wallet.privateKey}`;
+    }
+    const response = await axiosInstance.post("/darts", dto, { headers });
     // const response = await axiosInstanceLocal.post("/api/darts", dto, {
     //   timeout: 300000,
     // });

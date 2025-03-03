@@ -29,10 +29,10 @@ lQ7Ghuq6/cFOhwmhdh2zUf8x/N8lzzeZqPdy3DYVGPmPyKOAPRsq69s=
 
 export const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_URL}`, // Base URL
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout:0,
+  // headers: {
+  //   "Content-Type": "application/json",
+  // },
+  timeout: 0,
   timeoutErrorMessage: "Axios timed out",
   // timeout: 1000*60*5, // 5 minutes
   // httpsAgent: agent, // Allow self-signed SSL
