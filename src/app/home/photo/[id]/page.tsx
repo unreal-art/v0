@@ -127,6 +127,7 @@ export default function Generation() {
   const postImage = async () => {
     console.log("post image");
     if (!caption) {
+      toast.error("Please provide a caption.");
       return;
     }
 
@@ -236,6 +237,7 @@ export default function Generation() {
                     setPrivatePost={setPrivatePost}
                     saveAsDraft={saveAsDraft}
                     postImage={postImage}
+                    isDraft={post.isDraft as boolean}
                   />
                 )}
               </div>
