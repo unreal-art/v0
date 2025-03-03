@@ -28,11 +28,11 @@ lQ7Ghuq6/cFOhwmhdh2zUf8x/N8lzzeZqPdy3DYVGPmPyKOAPRsq69s=
 });
 
 export const axiosInstance = axios.create({
-  baseURL: "https://darts.decenterai.com:8080", // Base URL
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}`, // Base URL
   headers: {
     "Content-Type": "application/json",
   },
-  httpsAgent: agent, // Allow self-signed SSL
+  // httpsAgent: agent, // Allow self-signed SSL
 });
 
 export const axiosInstanceLocal = axios.create({

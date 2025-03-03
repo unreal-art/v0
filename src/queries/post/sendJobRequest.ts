@@ -1,6 +1,6 @@
 import { Client } from "$/supabase/client";
 import { JobSpec } from "$/types/data.types";
-import { axiosInstanceLocal } from "@/lib/axiosInstance";
+import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance";
 import axios from "axios";
 import random from "random";
 
@@ -32,9 +32,12 @@ export const sendJobRequest = async ({
       category: "GENERATION",
     };
 
-    const response = await axiosInstanceLocal.post("/api/darts", dto, {
+    const response = await axiosInstance.post("/darts", dto, {
       timeout: 300000,
     });
+    // const response = await axiosInstanceLocal.post("/api/darts", dto, {
+    //   timeout: 300000,
+    // });
     return response.data;
   } catch (error: unknown) {
     console.error("Error sending job request:", error);
