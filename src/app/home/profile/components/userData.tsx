@@ -11,18 +11,21 @@ import { useParams } from "next/navigation";
 import useUserData from "@/hooks/useUserData";
 import ProfileSkeleton from "./profileSkeleton";
 import { useState } from "react";
-import ModalWrapper from "../../components/modalWrapper";
+import ModalWrapper from "../../components/modals/modalWrapper";
 import EditModal from "./modals/editModal";
 import DeleteModal from "./modals/deleteModal";
 import EditProfileModal from "./modals/editProfileModal";
+import ShareModal from "../../components/modals/shareModal";
 import { useUser } from "@/hooks/useUser";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 export default function UserData() {
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState<TitleType>("");
+
+  const [open, setOpen] = useState(false)
+  const [openShare, setOpenShare] = useState(false)
+  const [title, setTitle] = useState<TitleType>("")
 
   const params = useParams();
 
@@ -102,7 +105,7 @@ export default function UserData() {
                 </button>
               )}
 
-              <button className="flex justify-center items-center h-9 w-12 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
+              <button onClick={() => setOpenShare(true)} className="flex justify-center items-center h-9 w-12 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
                 <ShareModernIcon width={16} height={16} color="#DADADA" />
               </button>
             </div>
@@ -144,6 +147,7 @@ export default function UserData() {
           )}
         </div>
       </div>
+      <ShareModal open={openShare} setOpen={setOpenShare} link={"https://unreal.art/home/profile/" + userId} />
       <ModalWrapper
         title={title}
         open={open}

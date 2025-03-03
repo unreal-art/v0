@@ -77,7 +77,7 @@ export default function EditProfileModal({
           <label className="mb-1 block">First Name</label>
 
           <input
-            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none placeholder:text-primary-7 indent-4"
+            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none text-primary-5 placeholder:text-primary-7 indent-4"
             type="text"
             placeholder="Jon"
             value={firstname}
@@ -89,7 +89,7 @@ export default function EditProfileModal({
           <label className="mb-1 block">Last Name</label>
 
           <input
-            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none placeholder:text-primary-7 indent-4"
+            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none text-primary-5 placeholder:text-primary-7 indent-4"
             type="text"
             placeholder="Doe"
             value={lastname}
@@ -101,7 +101,7 @@ export default function EditProfileModal({
           <label className="text-primary-4 mb-1 block">Display name</label>
 
           <input
-            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none placeholder:text-primary-7 indent-4"
+            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none text-primary-5 placeholder:text-primary-7 indent-4"
             type="text"
             placeholder="Jon Doe"
             value={displayName}
@@ -113,7 +113,7 @@ export default function EditProfileModal({
           <label className="mb-1 block">Email Address</label>
 
           <input
-            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none placeholder:text-primary-7 indent-4"
+            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none text-primary-5 placeholder:text-primary-7 indent-4"
             type="text"
             placeholder="Jondoe@gmail.com"
             readOnly
@@ -125,7 +125,7 @@ export default function EditProfileModal({
           <label className="text-primary-4 mb-1 block">Bio</label>
 
           <input
-            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none placeholder:text-primary-7 indent-4"
+            className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none text-primary-5 placeholder:text-primary-7 indent-4"
             type="text"
             placeholder="Write about yourself"
             value={bio}

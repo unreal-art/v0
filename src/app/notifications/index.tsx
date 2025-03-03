@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, useRef, useState } from "react";
 import Notification from "./notification";
-import { ScrollTopIcon } from "../components/icons";
+import { CloseIcon, ScrollTopIcon } from "../components/icons";
 import { useUser } from "@/hooks/useUser";
 import {
   useNotifications,
@@ -52,13 +52,20 @@ export default function Notifications({ children }: INotificationProps) {
           <div className="absolute w-full max-w-[528px] h-[90vh] z-50 top-2 md:top-[5vh] left-0 md:left-60 border-primary-8 border-[1px] bg-primary-12 rounded-xl p-4">
             <div className="flex justify-between text-primary-3 px-4">
               <p className="nasalization text-2xl">Notification</p>
-              <div
-                className="flex justify-center items-center w-[120px] h-9 border-[1px] border-primary-11 rounded-[20px] gap-2 cursor-pointer"
-                onClick={scrollTop}
-              >
-                <ScrollTopIcon width={16} height={16} color="#8F8F8F" />
-                <p>To the top</p>
-              </div>
+   
+                <div className="flex gap-1 md:gap-2">
+                             
+                    <div
+                        className="flex justify-center items-center w-[120px] h-9 border-[1px] border-primary-11 rounded-[20px] gap-2 cursor-pointer"
+                        onClick={scrollTop}>
+                        <ScrollTopIcon width={16} height={16} color="#8F8F8F" />
+                        <p>To the top</p>
+                    </div>
+
+                    <button onClick={() => setOpen(false)}><CloseIcon color="#FDFDFD" /></button>
+
+                </div>
+
             </div>
 
             <div ref={ref} className="overflow-y-auto h-[82vh] !scroll-smooth">
