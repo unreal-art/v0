@@ -1,6 +1,7 @@
 "use client";
 
 import { Client } from "$/supabase/client";
+import { ExtendedUser } from "$/types/data.types";
 import { useGenerationStore } from "@/app/providers/GenerationStoreProvider";
 import { sendJobRequest } from "@/queries/post/sendJobRequest";
 import { useMutation } from "@tanstack/react-query";
@@ -15,14 +16,14 @@ export function useCreateJob() {
   return useMutation({
     mutationFn: async ({
       prompt,
-      client,
+      user,
     }: {
       prompt: string;
-      client: Client;
+      user: ExtendedUser | null;
     }) => {
       if (!prompt) throw new Error("Prompt is required");
       startGeneration();
-      return sendJobRequest({ prompt, client });
+      return sendJobRequest({ prompt, user });
     },
 
     onSuccess: (data) => {
