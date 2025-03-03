@@ -9,7 +9,9 @@ export default function GenerationProgress() {
 
   const [expand, setExpand] = useState(false);
   const [size, setSize] = useState(
-    typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT ? 16 : 24
+    typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT
+      ? 16
+      : 24,
   );
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes countdown
   const [isFinishing, setIsFinishing] = useState(false);
@@ -53,7 +55,7 @@ export default function GenerationProgress() {
   if (!isActive) return null; // Don't auto-hide, but remove when inactive
 
   return (
-    <div className="fixed bottom-20 md:bottom-4 right-4 md:right-16 rounded-xl max-w-[496px] w-4/5 bg-primary-13">
+    <div className="fixed z-50 bottom-20 md:bottom-4 right-4 md:right-16 rounded-xl max-w-[496px] w-4/5 bg-primary-13">
       <div className="flex items-center justify-between h-12 md:h-[84px] px-5 text-sm md:text-2xl text-primary-6">
         <p>
           {isFinishing

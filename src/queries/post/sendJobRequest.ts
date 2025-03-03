@@ -13,7 +13,7 @@ export const sendJobRequest = async ({
   client: Client;
 }) => {
   try {
-    console.log(prompt);
+    // console.log(prompt);
     const author = (await client.auth.getUser()).data.user?.id;
 
     const dto: Partial<JobSpec> = {
