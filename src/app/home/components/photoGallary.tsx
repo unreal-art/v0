@@ -1,5 +1,10 @@
 "use client";
-import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
+import {
+  ColumnsPhotoAlbum,
+  RenderImageContext,
+  RenderImageProps,
+  RenderPhotoContext,
+} from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
@@ -25,11 +30,40 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 
+function renderNextImage(
+  { alt = "", title, sizes }: RenderImageProps,
+  { photo, width, height }: RenderImageContext,
+) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        position: "relative",
+        aspectRatio: `${width} / ${height}`,
+      }}
+    >
+      <Image
+        fill
+        src={photo}
+        alt={alt}
+        title={title}
+        sizes={sizes}
+        priority
+        placeholder={"blurDataURL" in photo ? "blur" : undefined}
+      />
+    </div>
+  );
+}
+
 export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
-  const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
-  );
+  //window is not defined on server
+  // const [columns, setColumns] = useState(
+  //   window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
+  // );
+
+  const [columns, setColumns] = useState<number | null>(null);
+
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
 
@@ -110,7 +144,7 @@ export default function PhotoGallary({}) {
   // console.log(isLoading);
 
   const photos = formattedPhotosForGallary(data?.pages ?? []);
-
+  if (!columns) return null;
   return (
     <div className="w-full">
       <InfiniteScroll
@@ -130,6 +164,7 @@ export default function PhotoGallary({}) {
                 handleImageIndex={handleImageIndex}
               />
             ),
+            image: renderNextImage,
           }}
         />
       </InfiniteScroll>

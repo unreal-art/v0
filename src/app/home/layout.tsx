@@ -10,7 +10,7 @@ import AppBase from "../components/appBase";
 
 const GenerationProgress = dynamic(
   () => import("./components/generationProgress"),
-  { ssr: false }
+  { ssr: false },
 );
 
 export default function RootLayout({
