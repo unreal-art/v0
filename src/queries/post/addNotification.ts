@@ -9,7 +9,7 @@ export const addNotification = async ({
   userId: string;
   senderId: string;
   postId: number; // Ensure this matches BIGINT
-  type: "like" | "comment" | "share";
+  type: "like" | "comment" | "share" | "follow";
 }) => {
   const { error } = await supabase.from("notifications").insert([
     {

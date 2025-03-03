@@ -78,6 +78,8 @@ export const getNotificationMessage = (
       return `${senderName} commented on your post!`;
     case "share":
       return `${senderName} just shared your post! Your content is reaching more people.`;
+    case "follow":
+      return `${senderName} followed you!`;
     default:
       return "You have a new notification!";
   }

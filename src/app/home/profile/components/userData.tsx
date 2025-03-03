@@ -22,10 +22,9 @@ import { useUser } from "@/hooks/useUser";
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 export default function UserData() {
-
-  const [open, setOpen] = useState(false)
-  const [openShare, setOpenShare] = useState(false)
-  const [title, setTitle] = useState<TitleType>("")
+  const [open, setOpen] = useState(false);
+  const [openShare, setOpenShare] = useState(false);
+  const [title, setTitle] = useState<TitleType>("");
 
   const params = useParams();
 
@@ -105,7 +104,10 @@ export default function UserData() {
                 </button>
               )}
 
-              <button onClick={() => setOpenShare(true)} className="flex justify-center items-center h-9 w-12 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11">
+              <button
+                onClick={() => setOpenShare(true)}
+                className="flex justify-center items-center h-9 w-12 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11"
+              >
                 <ShareModernIcon width={16} height={16} color="#DADADA" />
               </button>
             </div>
@@ -147,7 +149,12 @@ export default function UserData() {
           )}
         </div>
       </div>
-      <ShareModal open={openShare} setOpen={setOpenShare} link={"https://unreal.art/home/profile/" + userId} />
+      <ShareModal
+        open={openShare}
+        setOpen={setOpenShare}
+        link={"https://unreal.art/home/profile/" + userId}
+        isProfile={true}
+      />
       <ModalWrapper
         title={title}
         open={open}
