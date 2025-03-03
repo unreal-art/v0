@@ -33,7 +33,7 @@ export const sendJobRequest = async ({
     };
 
     const response = await axiosInstance.post("/darts", dto, {
-      timeout: 300000,
+      // timeout: 300000,
     });
     // const response = await axiosInstanceLocal.post("/api/darts", dto, {
     //   timeout: 300000,

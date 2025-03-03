@@ -32,6 +32,9 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout:0,
+  timeoutErrorMessage: "Axios timed out",
+  // timeout: 1000*60*5, // 5 minutes
   // httpsAgent: agent, // Allow self-signed SSL
 });
 
