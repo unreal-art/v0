@@ -13,13 +13,13 @@ export default function GenerateTextField({
   open,
   setOpen,
 }: GenerateTextFieldProps) {
-  const { mutate } = useCreateJob();
-  const [prompt, setPrompt] = useState<string | null>(null);
   const { user } = useUser();
+  const { mutate } = useCreateJob(user);
+  const [prompt, setPrompt] = useState<string | null>(null);
 
   const generate = async () => {
     if (!prompt) return;
-    mutate({ prompt, user });
+    mutate({ prompt });
     handleClose();
   };
 
