@@ -25,7 +25,7 @@ POST {{u}}/api/darts
 Content-Type: application/json
 ###
 
-POST https://darts.decenterai.com:8080/darts
+POST {{ideo}}/darts
 Content-Type: application/json
 
 {
@@ -37,13 +37,18 @@ Content-Type: application/json
 }
 
 HTTP/1.1 500  - Internal Server Error
-server: nginx
-date: Thu, 27 Feb 2025 01:40:25 GMT
+date: Mon, 03 Mar 2025 15:54:46 GMT
 content-type: application/json
-content-length: 560
+content-length: 1037
 connection: close
 access-control-allow-origin: *
-strict-transport-security: max-age=31536000; includeSubDomains; preload
+cf-cache-status: DYNAMIC
+report-to: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=87gJdkrBoWvPrHgvNhmq16IoZAqGOeqOUGsa87ko0YqKL7xGaV63jNuZvRgaA2fHQkcblmK4aEPktqOo7ebi7cIF42GYE2KXI2iTvm9EejyPfX3Hko3Ky5DG1mvnPHS%2BpoSRbkoQcF0ilw%3D%3D"}],"group":"cf-nel","max_age":604800}
+nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+server: cloudflare
+cf-ray: 91aa50241c02f940-MXP
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=200661&min_rtt=199893&rtt_var=76496&sent=5&recv=5&lost=0&retrans=0&sent_bytes=2819&recv_bytes=901&delivery_rate=19627&cwnd=249&unsent_bytes=0&cid=421bfcc1cba1b6e3&ts=14222&x=0"
 ###
 POST {{u}}/darts
 Authorization: Bearer 0xa618896c28db371a21f9d805c25e622425319d85684a1f9478568509a3f3f4a9
