@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CloseIcon } from "../../components/icons";
+import { CloseIcon } from "../../../components/icons";
 
 
 interface ModalWrapperProps {
@@ -29,7 +29,7 @@ export default function ModalWrapper({ open, title, titleColor, children, setOpe
                     onClick={handleClose}
                     className="absolute z-30 top-0 left-0 h-screen w-full shadow-bg"></div>
 
-                <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 w-[520px] flex flex-col">
+                <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-2 py-3 md:p-6 bg-primary-12 w-[98%] max-w-[520px] flex flex-col">
 
                     <div className="flex justify-between mb-6">
                         <p style={{color: titleColor}} className="text-2xl text-primary-3 nasalization">{title}</p>

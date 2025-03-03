@@ -105,6 +105,8 @@ For our carousel, we will need to add some custom CSS to our global styles.
   display: none;
 }
 
+
+
 @media screen and (max-width: 746px) {
   .bottom-nav {
     position: fixed;
