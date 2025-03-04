@@ -16,6 +16,7 @@ import { timeAgo } from "@/app/libs/timeAgo";
 import { useComments, useRealtimeComments } from "@/hooks/useComments";
 import ImageOptionMenu from "./imageOptionMenu";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
   photo: Photo & {
@@ -49,12 +50,12 @@ export default function PhotoOverlay({
   const { userId } = useUser();
   const { data: likes, isLoading: loadingLikes } = usePostLikes(
     Number(context.photo.id),
-    supabase
+    supabase,
   );
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author
+    context.photo.author,
   );
 
   const userHasLiked = likes?.some((like) => like.author === userId);
@@ -65,7 +66,7 @@ export default function PhotoOverlay({
   };
 
   const { data: comments, isLoading: loadingComments } = useComments(
-    context.photo.id
+    context.photo.id,
   );
   useRealtimeComments(context.photo.id);
 
@@ -82,6 +83,7 @@ export default function PhotoOverlay({
       >
         {hover && (
           <div className="relative flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
+            {/* <Link href={`/home/photo/${context.photo.id}`}> */}
             <div
               onClick={handleView}
               className="absolute top-0 left-0 w-full h-full"
@@ -89,6 +91,7 @@ export default function PhotoOverlay({
               {" "}
               {photo}{" "}
             </div>
+            {/* </Link> */}
 
             <div
               onClick={handleView}
@@ -132,9 +135,13 @@ export default function PhotoOverlay({
             {/* )} */}
 
             {!hideContent ? (
-              <p className="text-left text-primary-1 text-sm z-10">
-                {truncateText(context.photo.caption || context.photo.prompt)}
-              </p>
+              <Link href={`/home/photo/${context.photo.id}`}>
+                {" "}
+                {/*Link is added to enable prefetch */}
+                <p className="text-left text-primary-1 text-sm z-10">
+                  {truncateText(context.photo.caption || context.photo.prompt)}
+                </p>
+              </Link>
             ) : (
               <p></p>
             )}
