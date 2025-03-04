@@ -8,16 +8,31 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 import { supabase } from "$/supabase/client";
 import { useRouter } from "next/navigation";
+import { getContractInstance } from "$/utils";
+import { torusTestnet } from "$/constants/chains";
+import { useReadContract } from "thirdweb/react";
+import { formatEther } from "ethers";
 
 interface INotificationProps {
   children: ReactNode;
 }
+
+const dartContract = getContractInstance(
+  torusTestnet,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+);
 
 export default function Menu({ children }: INotificationProps) {
   const { userId, user } = useUser();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [topup, setTopup] = useState(false);
+
+  const { data: dartBalance } = useReadContract({
+    contract: dartContract,
+    method: "function balanceOf(address account) returns (uint256)",
+    params: [user?.wallet?.address || ""],
+  });
 
   const handleClose = () => {
     setOpen(false);
@@ -75,7 +90,12 @@ export default function Menu({ children }: INotificationProps) {
             <MenuItem
               onClick={handleClose}
               icon={<FlashIcon width={16} height={16} color="#C1C1C1" />}
-              text="10 credits"
+              text={(() => {
+                const balance =
+                  (user?.creditBalance ?? 0) +
+                  Number(formatEther(dartBalance ?? BigInt(0)));
+                return `${balance} Credit${balance !== 1 ? "s" : ""}`; //accounting for plural cases
+              })()}
               action={
                 <button onClick={handleTopup} className="underline">
                   Top Up
