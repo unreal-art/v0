@@ -3,11 +3,21 @@ import { useCreateJob } from "@/hooks/useCreateJob";
 import { supabase } from "$/supabase/client";
 import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
+import Topup from "@/app/menu/topup";
+import { useReadContract } from "thirdweb/react";
+import { getContractInstance } from "$/utils";
+import { torusTestnet } from "$/constants/chains";
+import { formatEther } from "ethers";
+import { toast } from "sonner";
 
 interface GenerateTextFieldProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
+const dartContract = getContractInstance(
+  torusTestnet,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+);
 
 export default function GenerateTextField({
   open,
@@ -16,9 +26,29 @@ export default function GenerateTextField({
   const { user } = useUser();
   const { mutate } = useCreateJob(user);
   const [prompt, setPrompt] = useState<string | null>(null);
+  const [topup, setTopup] = useState(false);
+
+  const { data: dartBalance } = useReadContract({
+    contract: dartContract,
+    method: "function balanceOf(address account) returns (uint256)",
+    params: [user?.wallet?.address || ""],
+  });
 
   const generate = async () => {
-    if (!prompt) return;
+    if (!prompt?.trim()) {
+      toast.error("Please provide a prompt.");
+      return;
+    }
+
+    if (
+      (user?.creditBalance ?? 0) +
+        Number(formatEther(dartBalance ?? BigInt(0))) <
+      1
+    ) {
+      toast.error("Credit balance too low.");
+      return;
+    }
+
     mutate({ prompt });
     handleClose();
   };
@@ -58,12 +88,28 @@ export default function GenerateTextField({
                 Close
               </button>
 
-              <button
-                onClick={generate}
-                className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
-              >
-                Generate
-              </button>
+              <Topup open={topup} setOpen={setTopup} />
+
+              {(user?.creditBalance ?? 0) +
+                Number(formatEther(dartBalance ?? BigInt(0))) <
+                1 && (
+                <button
+                  onClick={() => setTopup(true)}
+                  className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
+                >
+                  Top Up
+                </button>
+              )}
+              {(user?.creditBalance ?? 0) +
+                Number(formatEther(dartBalance ?? BigInt(0))) >=
+                1 && (
+                <button
+                  onClick={generate}
+                  className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
+                >
+                  Generate
+                </button>
+              )}
             </div>
           </div>
         </div>

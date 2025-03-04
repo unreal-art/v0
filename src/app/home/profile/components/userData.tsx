@@ -17,12 +17,23 @@ import DeleteModal from "./modals/deleteModal";
 import EditProfileModal from "./modals/editProfileModal";
 import ShareModal from "../../components/modals/shareModal";
 import { useUser } from "@/hooks/useUser";
+import Topup from "@/app/menu/topup";
+import { useReadContract } from "thirdweb/react";
+import { getContractInstance } from "$/utils";
+import { torusTestnet } from "$/constants/chains";
+import { formatEther } from "ethers";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
+const dartContract = getContractInstance(
+  torusTestnet,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+);
+
 export default function UserData() {
   const [open, setOpen] = useState(false);
+  const [topup, setTopup] = useState(false);
   const [openShare, setOpenShare] = useState(false);
   const [title, setTitle] = useState<TitleType>("");
 
@@ -42,6 +53,13 @@ export default function UserData() {
 
   //fetch like stat
   const { data: likeCount } = useLikeStat(userId);
+
+  // credit
+  const { data: dartBalance } = useReadContract({
+    contract: dartContract,
+    method: "function balanceOf(address account) returns (uint256)",
+    params: [authUser?.wallet?.address || ""],
+  });
 
   if (isLoading || authUserLoading || !authUser) return <ProfileSkeleton />;
   // if (error) return <p>Error loading user data.</p>;
@@ -138,13 +156,25 @@ export default function UserData() {
           <p className="text-primary-7 my-4"> {user?.bio} </p>
         </div>
 
+        <Topup open={topup} setOpen={setTopup} />
+
         <div className="hidden md:block">
           {authUserId === userId && (
-            <button className="flex gap-2 text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11">
+            <button
+              onClick={() => setTopup(true)}
+              className="flex gap-2 whitespace-nowrap text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11"
+            >
               <div>
                 <FlashIcon width={16} height={16} color="#DADADA" />
               </div>
-              <p>10 Credits</p>
+              <p>
+                {(() => {
+                  const balance =
+                    (user?.creditBalance ?? 0) +
+                    Number(formatEther(dartBalance ?? BigInt(0)));
+                  return `${balance} Credit${balance !== 1 ? "s" : ""}`; //accounting for plural cases
+                })()}
+              </p>
             </button>
           )}
         </div>
