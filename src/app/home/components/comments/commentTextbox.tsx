@@ -9,11 +9,8 @@ interface CommentTextboxProps {
   closeReply(): void;
 }
 
-export default function CommentTextbox({
-  reply,
-  postId,
-  closeReply,
-}: CommentTextboxProps) {
+export default function CommentTextbox({reply, postId, closeReply}: CommentTextboxProps) {
+
   const postComment = usePostComment();
 
   const [content, setContent] = useState<string | null>(null);
@@ -71,7 +68,7 @@ export default function CommentTextbox({
           className="flex-grow bg-primary-10 outline-none resize-none mt-[18px] text-primary-4"
         ></textarea>
 
-        <button type="submit" className="text-primary-8 text-sm w-12">
+        <button disabled={!content} type="submit" className="text-primary-4 disable:text-primary-8 text-sm w-12">
           Post
         </button>
       </form>

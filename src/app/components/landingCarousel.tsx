@@ -13,21 +13,20 @@ export default function LandingCarousel() {
   const image = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    //let xPos = 0;
-    gsap
-      .timeline()
+    let xPos = 0;
+    gsap.timeline()
       .set(".img", {
         // apply transform rotations to each image
         rotateY: (i) => i * -36,
         transformOrigin: "50% 50% 500px",
         z: -500,
-        backgroundImage:(i)=> 'url(/images/landing-'+(i + 1)+'.png)',
+        //backgroundImage:(i)=> 'url(/images/landing-'+(i + 1)+'.png)',
         backgroundSize:'cover',
         repeat:-1,
         backfaceVisibility:'hidden'
       })
       .from(".img", {
-        duration: 1.5,
+        duration: 2,
         y: 200,
         opacity: 0,
         stagger: 0.1,
@@ -90,13 +89,26 @@ export default function LandingCarousel() {
       //   clientX: number;
       // }
 
-      // interface GetBgPos {
-      //   (i: number): string;
-      // }
+      interface GetBgPos {
+        (i: number): string;
+      }
 
-      // const getBgPos: GetBgPos = (i) => { //returns the background-position string to create parallax movement in each image
-      //   return (100 - gsap.utils.wrap(0, 360, gsap.getProperty('.ring', 'rotationY') as number - 180 - i * 36) / 360 * 500) + 'px 0px';
-      // };
+      const getBgPos: GetBgPos = (i) => { //returns the background-position string to create parallax movement in each image
+        return (100 - gsap.utils.wrap(0, 360, gsap.getProperty('.ring', 'rotationY') as number - 180 - i * 36) / 360 * 500) + 'px 0px';
+      };
+
+      const move = (distance: number) => {
+        gsap.to('.ring', {
+          rotationY: '-=' +((Math.round(distance)-xPos)%360 ),
+          onUpdate:()=>{ gsap.set('.img', { backgroundPosition:(i: number)=>getBgPos(i) }) }
+        });
+
+      }
+
+      const interval = setInterval(() => move(40), 3000)
+
+      return () => clearInterval(interval)
+
 
     }
     
@@ -109,17 +121,18 @@ export default function LandingCarousel() {
           <div className="absolute top-0 z-10 flex justify-center w-full mb-10 scale-50">
             <Image src={"/logo.png"} alt="logo" width={140} height={36} />
           </div>
+
           <div className="ring -z-20">
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
-            <div ref={image} className="img"></div>
+            <Image className="img" src="/images/landing-1.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-2.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-3.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-4.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-5.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-6.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-7.png" width={300} height={400} alt=""/>
+            <Image className="img" src="/images/landing-8.png" width={300} height={400} alt=""/>
+            <Image className="img" src="/images/landing-9.png" width={300} height={400} alt=""/> 
+            <Image className="img" src="/images/landing-10.png" width={300} height={400}  alt=""/>
           </div>
 
           <div className={`absolute flex justify-center w-full bottom-20 scale-50 z-10`}>
