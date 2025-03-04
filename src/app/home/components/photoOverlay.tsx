@@ -49,12 +49,12 @@ export default function PhotoOverlay({
   const { userId } = useUser();
   const { data: likes, isLoading: loadingLikes } = usePostLikes(
     Number(context.photo.id),
-    supabase,
+    supabase
   );
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author,
+    context.photo.author
   );
 
   const userHasLiked = likes?.some((like) => like.author === userId);
@@ -65,7 +65,7 @@ export default function PhotoOverlay({
   };
 
   const { data: comments, isLoading: loadingComments } = useComments(
-    context.photo.id,
+    context.photo.id
   );
   useRealtimeComments(context.photo.id);
 
@@ -97,7 +97,10 @@ export default function PhotoOverlay({
             {!hideContent ? (
               <div className="flex justify-between text-primary-1 text-sm z-20">
                 <p>{timeAgo(context.photo.createdAt)}</p>
-                <ImageOptionMenu image={context.photo}>
+                <ImageOptionMenu
+                  image={context.photo}
+                  postId={context.photo.id}
+                >
                   <OptionMenuIcon color="#FFFFFF" />
                 </ImageOptionMenu>
               </div>

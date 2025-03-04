@@ -106,14 +106,17 @@ export function getImageResolution(imageUrl: string) {
   });
 }
 
-export function downloadImage(imageUrl: string, fileName: string) {
+export function downloadImage(imageUrl: string, fileName?: string) {
+  const uniqueId = Date.now(); // Unique timestamp
+  const defaultFileName = `downloaded-image-${uniqueId}.jpg`; //  unique filename
+
   fetch(imageUrl)
     .then((response) => response.blob())
     .then((blob) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = fileName || "downloaded-image.jpg";
+      a.download = fileName || defaultFileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
