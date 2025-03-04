@@ -42,7 +42,7 @@ export default function Comment(data: CommentWithUser) {
               <HeartIcon color="#FFFFFF" />
             )}
           </button>
-          {data.like_count}
+          <p className="text-center">{data.like_count}</p>
         </div>
       </div>
     </div>
