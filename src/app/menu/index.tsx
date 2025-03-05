@@ -19,7 +19,7 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 export default function Menu({ children }: INotificationProps) {
@@ -103,41 +103,55 @@ export default function Menu({ children }: INotificationProps) {
               }
             />
 
-            <MenuItem
-              onClick={handleClose}
-              icon={
-                <Image
-                  src={"/icons/linkedin.png"}
-                  width={16}
-                  height={16}
-                  alt="telegram"
-                />
-              }
-              text="LinkedIn"
-              underlineOff={true}
-            />
+            <Link
+              href={"https://www.linkedin.com/company/decenter-ai/"}
+              target="_blank"
+            >
+              <MenuItem
+                onClick={handleClose}
+                icon={
+                  <Image
+                    src={"/icons/linkedin.png"}
+                    width={16}
+                    height={16}
+                    alt="telegram"
+                  />
+                }
+                text="LinkedIn"
+                underlineOff={true}
+              />
+            </Link>
 
-            <MenuItem
-              onClick={handleClose}
-              icon={
-                <Image
-                  src={"/icons/telegram.png"}
-                  width={16}
-                  height={16}
-                  alt="telegram"
-                />
-              }
-              text="Telegram"
-              underlineOff={true}
-            />
+            <Link href={"https://t.me/decenteraicomchat"} target="_blank">
+              <MenuItem
+                onClick={handleClose}
+                icon={
+                  <Image
+                    src={"/icons/telegram.png"}
+                    width={16}
+                    height={16}
+                    alt="telegram"
+                  />
+                }
+                text="Telegram"
+                underlineOff={true}
+              />
+            </Link>
 
-            <MenuItem
-              onClick={handleClose}
-              icon={
-                <Image src={"/icons/x.png"} width={16} height={16} alt="x" />
+            <Link
+              href={
+                "https://twitter.com/decenteraicom?s=21&t=th7q1ztmiuaE2PoODm3k0A"
               }
-              text="x  (formerly Twitter)"
-            />
+              target="_blank"
+            >
+              <MenuItem
+                onClick={handleClose}
+                icon={
+                  <Image src={"/icons/x.png"} width={16} height={16} alt="x" />
+                }
+                text="x  (formerly Twitter)"
+              />
+            </Link>
 
             <MenuItem
               icon={<MoonIcon width={16} height={16} color="#C1C1C1" />}

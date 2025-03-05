@@ -1,5 +1,6 @@
 import { supabase } from "$/supabase/client";
 import { CommentWithUser } from "$/types/data.types";
+import { addNotification } from "@/queries/post/addNotification";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React from "react";
@@ -23,8 +24,20 @@ export function usePostComment() {
       post_id: string;
       content: string;
       parent_id?: string;
+      author: string;
+      senderId: string;
     }) => {
       const { data } = await axios.post("/api/comments", comment);
+
+      if (data) {
+        addNotification({
+          userId: comment.author as string,
+          senderId: comment.senderId as string,
+          postId: Number(comment.post_id),
+          type: "comment",
+        });
+      }
+
       return data;
     },
     onSuccess: (_, variables) => {
@@ -47,14 +60,14 @@ export function useRealtimeComments(postId: string) {
         { event: "*", schema: "public", table: "comments" },
         () => {
           queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-        },
+        }
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "comment_likes" },
         () => {
           queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-        },
+        }
       )
       .subscribe();
 
@@ -88,9 +101,9 @@ export function useLikeComment(postId: string) {
                   like_count: comment.like_count + 1,
                   user_liked: true,
                 }
-              : comment,
+              : comment
           );
-        },
+        }
       );
 
       return { previousComments };
@@ -100,7 +113,7 @@ export function useLikeComment(postId: string) {
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["comments", postId],
-          context.previousComments,
+          context.previousComments
         );
       }
     },
@@ -136,9 +149,9 @@ export function useUnlikeComment(postId: string) {
                   like_count: Math.max(comment.like_count - 1, 0),
                   user_liked: false,
                 }
-              : comment,
+              : comment
           );
-        },
+        }
       );
 
       return { previousComments };
@@ -147,7 +160,7 @@ export function useUnlikeComment(postId: string) {
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["comments", postId],
-          context.previousComments,
+          context.previousComments
         );
       }
     },
