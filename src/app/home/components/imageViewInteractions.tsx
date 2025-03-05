@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import { getImage } from "../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
 import ShareModal from "./modals/shareModal";
+import { useCountShareNotifications } from "@/hooks/useNotifications";
 
 interface IInteractions {
   commentCount: number;
@@ -27,11 +28,16 @@ export default function ImageViewInteractions({
   const { data: likes } = usePostLikes(Number(postId), supabase);
   const { userId } = useUser();
   const { data: post } = usePost(Number(postId));
+
   const [openShare, setOpenShare] = useState(false);
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string,
+    post?.author as string
+  );
+  const shareNotifications = useCountShareNotifications(
+    userId as string,
+    Number(postId)
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
 
@@ -59,7 +65,7 @@ export default function ImageViewInteractions({
         className="flex items-center gap-[2px] justify-center"
       >
         <ShareIcon color="#F0F0F0" />
-        <p className="text-xs text-primary-3">0</p>
+        <p className="text-xs text-primary-3">{shareNotifications}</p>
       </button>
 
       {post && userId && openShare && (
@@ -80,9 +86,9 @@ export default function ImageViewInteractions({
           downloadImage(
             getImage(
               (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
             ),
-            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
           )
         }
       >

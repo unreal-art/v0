@@ -66,7 +66,7 @@ export default function PhotoGallary({}) {
 
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
-  console.log(s);
+
   const {
     isLoading,
     isError,
@@ -80,7 +80,6 @@ export default function PhotoGallary({}) {
     queryKey: ["posts", s || "explore"],
     queryFn: async ({ pageParam = 0 }) => {
       let result: Post[] = [];
-      console.log(s);
       if (s?.toUpperCase() === "EXPLORE") {
         result = await getPosts(supabase, pageParam);
       } else if (s?.toUpperCase() === "FOLLOWING") {
