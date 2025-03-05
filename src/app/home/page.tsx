@@ -74,7 +74,7 @@ export default async function Home({
           <GenerateInput />
         </div>
 
-        <div className="flex gap-x-2 items-center w-full h-10 mt-8 md:mt-0 mb-2">
+        <div className="flex gap-x-2 items-center w-full h-10 mt-1 md:mt-0 mb-2">
           <Search />
           <TabBtn text="Explore" />
           <TabBtn text="Following" />
