@@ -5,7 +5,7 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import Image from "next/image";
 import { useLikeComment, useUnlikeComment } from "@/hooks/useComments";
 
-export default function Comment(data: CommentWithUser) {
+export default function Comment({data, setReplyTo} : {data: CommentWithUser, setReplyTo: (id: string | null) => void}) {
   const { data: user } = useAuthorUsername(data.user_id);
   const likeComment = useLikeComment(data.post_id.toString());
   const unlikeComment = useUnlikeComment(data.post_id.toString());
@@ -22,11 +22,14 @@ export default function Comment(data: CommentWithUser) {
         />
       </div>
       <div className="flex gap-2 w-full">
-        <div className="flex flex-col">
+        <div className="flex flex-col basis-1/6">
           <p className="text-primary-4 text-md font-medium">{user}</p>
           <p className="text-xs">{timeAgo(data.created_at)}</p>
         </div>
-        <p className="text-primary-6 text-sm flex-grow">{data.content}</p>
+        <div className="flex-grow">
+          <p className="text-primary-6 text-sm flex-grow">{data.content}</p>
+          <button className="text-primary-4" onClick={() => setReplyTo(data.id)}>reply</button>
+        </div>
         <div className="justify-end">
           <button
             className="flex gap-1 items-center"

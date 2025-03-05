@@ -23,6 +23,7 @@ import ViewSkeleton from "../components/viewSkeleton";
 import Link from "next/link";
 import Head from "next/head";
 import { toast } from "sonner";
+import ImageOptionMenu from "../../components/imageOptionMenu";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -207,9 +208,11 @@ export default function Generation() {
                     <p className="text-primary-7 nasalization">Creator</p>
                   </div>
                 </Link>
-                <button>
-                  <OptionMenuIcon color="#C1C1C1" />
-                </button>
+
+                <ImageOptionMenu postId={String(postId)} image={post as any}> 
+                  <OptionMenuIcon color="#C1C1C1" /> 
+                </ImageOptionMenu>
+                 
               </div>
 
               <div className="flex justify-center  w-full">

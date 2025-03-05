@@ -7,14 +7,15 @@ import { useState } from "react";
 import { useComments, useRealtimeComments } from "@/hooks/useComments";
 import { CommentWithUser } from "$/types/data.types";
 import ImageOptionMenu from "../imageOptionMenu";
-import { ExtendedRenderPhotoContext } from "../photoOverlay";
 import { IPhoto } from "@/app/libs/interfaces";
+import { Following } from "../followingBtn";
 
 interface CommentAreaProps {
   image: string;
   imageLoading: boolean;
   userName: string;
   isLoading: boolean;
+  authorId: string;
   postId: string;
   imageDetails: IPhoto;
 }
@@ -24,15 +25,16 @@ export default function CommentArea({
   imageLoading,
   userName,
   isLoading,
+  authorId,
   postId,
   imageDetails
 }: CommentAreaProps) {
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
   // console.log(comments);
-  const [reply, setReply] = useState(false);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
   const handleCloseReply = () => {
-    setReply(false);
+    setReplyTo(null);
   };
 
   return (
@@ -58,6 +60,10 @@ export default function CommentArea({
               </p>
               <p className="text-primary-7 nasalization">Creator</p>
             </div>
+
+            {/* <div className="bg-red-400 h-full">
+              <Following authorId={authorId} />
+            </div> */}
           </div>
           <ImageOptionMenu image={imageDetails}>
             <div className="h-8">
@@ -68,33 +74,30 @@ export default function CommentArea({
       </div>
 
       <div className="px-6">
-        {" "}
-        <hr />{" "}
+        <hr />
       </div>
 
       <div
-        className={`flex-grow py-2 px-6 overflow-y-auto ${reply ? "h-[calc(40vh_-_64px)] md:h-[346px]" : "h-[40vh] md:h-[400px]"}`}
+        className={`flex-grow py-2 px-6 overflow-y-auto ${replyTo ? "h-[calc(40vh_-_64px)] md:h-[346px]" : "h-[40vh] md:h-[400px]"}`}
       >
         {comments?.map((comment: CommentWithUser, index: number) => (
-          <Comment key={index} {...comment} />
+          <Comment key={index} data={comment} setReplyTo={setReplyTo}  />
         ))}
       </div>
 
       <div className="flex py-2 px-6 border-y-[1px] border-primary-6">
-        {" "}
         <ImageViewInteractions
           commentCount={comments.length}
           postId={postId}
-        />{" "}
+        />
       </div>
 
       <div>
-        {" "}
         <CommentTextbox
           postId={postId}
-          reply={reply}
+          replyTo={replyTo}
           closeReply={handleCloseReply}
-        />{" "}
+        />
       </div>
     </div>
   );

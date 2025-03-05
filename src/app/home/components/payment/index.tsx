@@ -26,7 +26,7 @@ export default function Payment({open, amount, setOpen, close }: TopupProps) {
 
                 <div onClick={handleClose} className="absolute z-30 top-0 left-0 h-screen w-full"></div>
 
-                <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 w-[460px] flex flex-col">
+                <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 w-[98%] max-w-[460px] flex flex-col">
                 
                     <div className="flex justify-between">
                         

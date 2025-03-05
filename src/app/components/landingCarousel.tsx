@@ -127,12 +127,12 @@ export default function LandingCarousel() {
             <Image className="img" src="/images/landing-2.png" width={300} height={400} alt="" />
             <Image className="img" src="/images/landing-3.png" width={300} height={400} alt="" />
             <Image className="img" src="/images/landing-4.png" width={300} height={400} alt="" />
-            <Image className="img" src="/images/landing-5.png" width={300} height={400} alt="" />
-            <Image className="img" src="/images/landing-6.png" width={300} height={400} alt="" />
-            <Image className="img" src="/images/landing-7.png" width={300} height={400} alt=""/>
-            <Image className="img" src="/images/landing-8.png" width={300} height={400} alt=""/>
-            <Image className="img" src="/images/landing-9.png" width={300} height={400} alt=""/> 
-            <Image className="img" src="/images/landing-10.png" width={300} height={400}  alt=""/>
+            <Image className="img" src="/images/landing-2.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-3.png" width={300} height={400} alt="" />
+            <Image className="img" src="/images/landing-4.png" width={300} height={400} alt=""/>
+            <Image className="img" src="/images/landing-1.png" width={300} height={400} alt=""/>
+            <Image className="img" src="/images/landing-3.png" width={300} height={400} alt=""/> 
+            <Image className="img" src="/images/landing-4.png" width={300} height={400}  alt=""/>
           </div>
 
           <div className={`absolute flex justify-center w-full bottom-20 scale-50 z-10`}>

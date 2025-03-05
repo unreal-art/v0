@@ -5,11 +5,11 @@ import { useState } from "react";
 
 interface CommentTextboxProps {
   postId: string;
-  reply: boolean;
+  replyTo: string | null;
   closeReply(): void;
 }
 
-export default function CommentTextbox({reply, postId, closeReply}: CommentTextboxProps) {
+export default function CommentTextbox({replyTo, postId, closeReply}: CommentTextboxProps) {
 
   const postComment = usePostComment();
 
@@ -24,7 +24,7 @@ export default function CommentTextbox({reply, postId, closeReply}: CommentTextb
 
   return (
     <div className="p-1">
-      {reply && (
+      {replyTo && (
         <div className="h-16 rounded-t-lg w-full bg-primary-12 py-2 px-3 border-2 border-primary-10">
           <div className="flex justify-between w-full">
             <p className="font-bold text-primary-2 text-[10px]">REPLAY TO</p>
@@ -56,7 +56,7 @@ export default function CommentTextbox({reply, postId, closeReply}: CommentTextb
 
       <form
         onSubmit={handleSubmit}
-        className={`flex h-16 bg-primary-10 px-2 ${reply ? "rounded-b-lg" : "m-1 mt-2 rounded-lg"}  pl-4`}
+        className={`flex h-16 bg-primary-10 px-2 ${replyTo ? "rounded-b-lg" : "m-1 mt-2 rounded-lg"}  pl-4`}
       >
         <button className="w-8">
           <EmojiIcon color="#C1C1C1" />
