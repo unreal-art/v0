@@ -44,7 +44,7 @@ export const useNotifications = (userId: string | null) => {
           queryClient.invalidateQueries({
             queryKey: ["notifications", userId],
           });
-        },
+        }
       )
       .subscribe();
 
@@ -103,7 +103,7 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
           queryClient.invalidateQueries({
             queryKey: ["unread-notifications", userId],
           });
-        },
+        }
       )
       .on(
         "postgres_changes",
@@ -117,7 +117,7 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
           queryClient.invalidateQueries({
             queryKey: ["unread-notifications", userId],
           });
-        },
+        }
       )
       .subscribe();
 
@@ -125,6 +125,69 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
       supabase.removeChannel(channel);
     };
   }, [userId, queryClient]);
+
+  return unreadCount;
+};
+
+export const useCountShareNotifications = (
+  userId: string | null,
+  post_id: number | null
+) => {
+  const queryClient = useQueryClient();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread notifications count
+  const { data } = useQuery<number, Error>({
+    queryKey: ["share-notifications", userId, post_id],
+    queryFn: async (): Promise<number> => {
+      if (!post_id || !userId) return 0;
+
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact" })
+        .eq("post_id", post_id)
+        .neq("sender_id", userId) // Ignore self-notifications
+        .eq("type", "share");
+
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: !!userId && !!post_id, // Ensures query only runs when userId and post_id are available
+  });
+
+  // Update unread count when data changes
+  useEffect(() => {
+    if (data !== undefined) {
+      setUnreadCount(data);
+    }
+  }, [data]);
+
+  // Real-time subscription to listen for new notifications (only INSERT)
+  useEffect(() => {
+    if (!post_id) return;
+
+    const channel = supabase
+      .channel(`realtime-notifications-${post_id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications" },
+        (payload) => {
+          if (
+            payload.new?.post_id === post_id &&
+            payload.new?.type === "share"
+          ) {
+            queryClient.invalidateQueries({
+              queryKey: ["share-notifications", userId, post_id],
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe(); // Proper cleanup
+    };
+  }, [queryClient, post_id, userId]);
 
   return unreadCount;
 };

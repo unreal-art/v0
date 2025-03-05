@@ -37,19 +37,19 @@ export default function ShareModal({
       });
   };
 
-  const shareOnX = () => {
-    //no notification for profile share
-    if (!isProfile) {
-      addNotification({
-        userId: post?.author as string,
-        senderId: userId as string,
-        postId: post?.id as number,
-        type: "share",
-      });
-    }
-    const url = `https://x.com/share?url=${encodeURIComponent(link)}`;
-    window.open(url, "_blank");
-  };
+  // const shareOnX = () => {
+  //   //no notification for profile share
+  //   if (!isProfile) {
+  //     addNotification({
+  //       userId: post?.author as string,
+  //       senderId: userId as string,
+  //       postId: post?.id as number,
+  //       type: "share",
+  //     });
+  //   }
+  //   const url = `https://x.com/share?url=${encodeURIComponent(link)}`;
+  //   window.open(url, "_blank");
+  // };
 
   const shareOnDiscord = () => {
     //no notification for profile share
@@ -62,42 +62,42 @@ export default function ShareModal({
       });
     }
     const url = `https://discord.com/channels/@me?url=${encodeURIComponent(
-      link,
+      link
     )}`;
     window.open(url, "_blank");
   };
 
-  const shareOnFacebook = () => {
-    //no notification for profile share
-    if (!isProfile) {
-      addNotification({
-        userId: post?.author as string,
-        senderId: userId as string,
-        postId: post?.id as number,
-        type: "share",
-      });
-    }
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      link,
-    )}`;
-    window.open(url, "_blank");
-  };
+  // const shareOnFacebook = () => {
+  //   //no notification for profile share
+  //   if (!isProfile) {
+  //     addNotification({
+  //       userId: post?.author as string,
+  //       senderId: userId as string,
+  //       postId: post?.id as number,
+  //       type: "share",
+  //     });
+  //   }
+  //   const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+  //     link,
+  //   )}`;
+  //   window.open(url, "_blank");
+  // };
 
-  const shareOnLinkedIn = () => {
-    //no notification for profile share
-    if (!isProfile) {
-      addNotification({
-        userId: post?.author as string,
-        senderId: userId as string,
-        postId: post?.id as number,
-        type: "share",
-      });
-    }
-    const url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
-      link,
-    )}`;
-    window.open(url, "_blank");
-  };
+  // const shareOnLinkedIn = () => {
+  //   //no notification for profile share
+  //   if (!isProfile) {
+  //     addNotification({
+  //       userId: post?.author as string,
+  //       senderId: userId as string,
+  //       postId: post?.id as number,
+  //       type: "share",
+  //     });
+  //   }
+  //   const url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+  //     link,
+  //   )}`;
+  //   window.open(url, "_blank");
+  // };
 
   return (
     <ModalWrapper title={"Share"} open={open} setOpen={setOpen}>
@@ -190,7 +190,9 @@ function ShareItem({
   return (
     <span
       onClick={onClick}
-      className={`flex items-center cursor-pointer justify-between flex-col px-2  h-14 ${image === "x.png" ? "pt-2" : ""} `}
+      className={`flex items-center cursor-pointer justify-between flex-col px-2  h-14 ${
+        image === "x.png" ? "pt-2" : ""
+      } `}
     >
       <Image
         src={"/icons/" + image}

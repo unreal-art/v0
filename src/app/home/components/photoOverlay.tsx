@@ -50,12 +50,12 @@ export default function PhotoOverlay({
   const { userId } = useUser();
   const { data: likes, isLoading: loadingLikes } = usePostLikes(
     Number(context.photo.id),
-    supabase,
+    supabase
   );
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author,
+    context.photo.author
   );
 
   const userHasLiked = likes?.some((like) => like.author === userId);
@@ -66,7 +66,7 @@ export default function PhotoOverlay({
   };
 
   const { data: comments, isLoading: loadingComments } = useComments(
-    context.photo.id,
+    context.photo.id
   );
   useRealtimeComments(context.photo.id);
 
@@ -122,14 +122,15 @@ export default function PhotoOverlay({
                 ) : (
                   <HeartIcon color="#FFFFFF" />
                 )}
-                <p>{likes?.length}</p>
+                <p>{likes ? likes?.length : ""}</p>
               </button>
 
               <button
                 className="flex gap-1 items-center"
                 onClick={() => handleCommentClick()}
               >
-                <ChatIcon color="#FFFFFF" /> <p>{comments?.length}</p>
+                <ChatIcon color="#FFFFFF" />{" "}
+                <p>{comments ? comments?.length : ""}</p>
               </button>
             </div>
             {/* )} */}

@@ -24,6 +24,10 @@ import { Post, UploadResponse } from "$/types/data.types";
 import { downloadImage } from "$/utils";
 import ShareModal from "../../components/modals/shareModal";
 import { useState } from "react";
+import {
+  useCountShareNotifications,
+  useNotifications,
+} from "@/hooks/useNotifications";
 
 export default function Interactions({ postId }: { postId: number }) {
   const [openShare, setOpenShare] = useState(false);
@@ -45,6 +49,12 @@ export default function Interactions({ postId }: { postId: number }) {
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
   const { mutate: unpinPost } = useUnpinPost(userId as string);
+  const shareNotifications = useCountShareNotifications(
+    userId as string,
+    postId
+  );
+
+  console.log(shareNotifications);
   const togglePostPin = () => {
     if (isPinned) {
       unpinPost(postId);
@@ -78,7 +88,7 @@ export default function Interactions({ postId }: { postId: number }) {
           className="flex items-center gap-[2px] justify-center"
         >
           <ShareIcon color="#F0F0F0" />
-          {/* <p className="text-xs text-primary-3">0</p> */}
+          <p className="text-xs text-primary-3">{shareNotifications}</p>
         </button>
       </div>
 
