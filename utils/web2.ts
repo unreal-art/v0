@@ -58,7 +58,7 @@ export function isHighQualityImage(filename: string): boolean {
 
 export function truncateText(
   text: string | undefined | null,
-  wordLimit: number = 10
+  wordLimit: number = 10,
 ): string {
   if (!text) return "";
   const words = text.split(" ");
@@ -69,7 +69,7 @@ export function truncateText(
 
 export const getNotificationMessage = (
   type: string,
-  senderName: string | null | undefined
+  senderName: string | null | undefined,
 ) => {
   switch (type) {
     case "like":
@@ -106,21 +106,39 @@ export function getImageResolution(imageUrl: string) {
   });
 }
 
-export function downloadImage(imageUrl: string, fileName?: string) {
-  const uniqueId = Date.now(); // Unique timestamp
-  const defaultFileName = `downloaded-image-${uniqueId}.jpg`; //  unique filename
+// export function downloadImage(imageUrl: string, fileName?: string) {
+//   const uniqueId = Date.now(); // Unique timestamp
+//   const defaultFileName = `downloaded-image-${uniqueId}.jpg`; //  unique filename
 
+//   fetch(imageUrl)
+//     .then((response) => response.blob())
+//     .then((blob) => {
+//       const url = window.URL.createObjectURL(blob);
+//       const a = document.createElement("a");
+//       a.href = url;
+//       a.download = fileName || defaultFileName;
+//       document.body.appendChild(a);
+//       a.click();
+//       document.body.removeChild(a);
+//       window.URL.revokeObjectURL(url);
+//     })
+//     .catch((error) => console.error("Error downloading image:", error));
+// }
+
+export function downloadImage(imageUrl: string, fileName?: string) {
   fetch(imageUrl)
     .then((response) => response.blob())
     .then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName || defaultFileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const a = document.createElement("a");
+        a.href = reader.result as string;
+        a.download = fileName || `downloaded-image-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+      reader.readAsDataURL(blob);
     })
     .catch((error) => console.error("Error downloading image:", error));
 }
