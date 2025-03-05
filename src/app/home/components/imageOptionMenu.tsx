@@ -47,7 +47,7 @@ export default function ImageOptionMenu({
 
   const { data: isPinned, isLoading } = useIsPostPinned(
     Number(postId),
-    userId as string
+    userId as string,
   );
   const { data: post } = usePost(Number(postId));
   const { mutate: pinPost } = usePinPost(userId as string);
@@ -89,7 +89,7 @@ export default function ImageOptionMenu({
             className="fixed z-50  top-0 left-0 h-screen w-full"
           ></div>
 
-          <div className="absolute w-[240px] z-50 top-2 md:top-6 right-0 border-primary-8 border-[1px] bg-[#191919] bg-primary-12 rounded-lg">
+          <div className="absolute w-[180px] xl:w-[240px] z-50 top-2 md:top-6 -right-4 xl:right-0 border-primary-8 border-[1px] bg-[#191919] bg-primary-12 rounded-lg">
             {/* <MenuItem onClick={handlePrompt} icon={<PromptIcon width={16} height={16} color="#8F8F8F" />} text="Prompt" underlineOff={true} /> */}
 
             {/* <MenuItem onClick={handleClose} icon={<NoteIcon width={16} height={16} color="#8F8F8F" />} text="Upscale" /> */}

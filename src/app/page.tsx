@@ -21,10 +21,19 @@ export default async function Home() {
 
       <div className="flex justify-center w-full absolute bottom-10">
         <div className="flex gap-9 justify-center py-3 px-6 borderColor-primary-10/50 border-[1px] rounded-[20px]">
-          <SocialLink icon="/icons/discord.png" url="" />
-          <SocialLink icon="/icons/linkedin.png" url="" />
-          <SocialLink icon="/icons/telegram.png" url="" />
-          <SocialLink icon="/icons/x.png" url="" />
+          {/* <SocialLink icon="/icons/discord.png" url="" /> */}
+          <SocialLink
+            icon="/icons/linkedin.png"
+            url="https://www.linkedin.com/company/decenter-ai/"
+          />
+          <SocialLink
+            icon="/icons/telegram.png"
+            url="https://t.me/decenteraicomchat"
+          />
+          <SocialLink
+            icon="/icons/x.png"
+            url="https://twitter.com/decenteraicom?s=21&t=th7q1ztmiuaE2PoODm3k0A"
+          />
         </div>
       </div>
     </main>
