@@ -78,7 +78,11 @@ export default function CommentArea({
       </div>
 
       <div
-        className={`flex-grow py-2 px-6 overflow-y-auto ${replyTo ? "h-[calc(40vh_-_64px)] md:h-[346px]" : "h-[40vh] md:h-[400px]"}`}
+        className={`flex-grow py-2 px-6 overflow-y-auto ${
+          replyTo
+            ? "h-[calc(40vh_-_64px)] md:h-[346px]"
+            : "h-[40vh] md:h-[400px]"
+        }`}
       >
         {comments?.map((comment: CommentWithUser, index: number) => (
           <Comment key={index} data={comment} setReplyTo={setReplyTo} />
@@ -94,6 +98,7 @@ export default function CommentArea({
           postId={postId}
           replyTo={replyTo}
           closeReply={handleCloseReply}
+          authorId={authorId}
         />
       </div>
     </div>

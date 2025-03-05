@@ -29,7 +29,7 @@ const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
   {
     ssr: false,
-  },
+  }
 );
 
 export default function Generation() {
@@ -60,7 +60,7 @@ export default function Generation() {
   const [isFetching, setIsFetching] = useState(true);
   const [dynamicTitle, setDynamicTitle] = useState("Default Title");
   const [dynamicDescription, setDynamicDescription] = useState(
-    "Default Description",
+    "Default Description"
   );
   const [dynamicImage, setDynamicImage] = useState("/default-image.jpg");
 
@@ -79,7 +79,7 @@ export default function Generation() {
         description: truncateText(post?.prompt, 100),
         image: getImage(
           (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-          (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+          (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
         ),
       };
 
@@ -127,10 +127,10 @@ export default function Generation() {
   //post image to db
   const postImage = async () => {
     console.log("post image");
-    if (!caption) {
-      toast.error("Please provide a caption.");
-      return;
-    }
+    // if (!caption) {
+    //   toast.error("Please provide a caption.");
+    //   return;
+    // }
 
     const data = {
       caption,
@@ -209,17 +209,16 @@ export default function Generation() {
                   </div>
                 </Link>
 
-                <ImageOptionMenu postId={String(postId)} image={post as any}> 
-                  <OptionMenuIcon color="#C1C1C1" /> 
+                <ImageOptionMenu postId={String(postId)} image={post as any}>
+                  <OptionMenuIcon color="#C1C1C1" />
                 </ImageOptionMenu>
-                 
               </div>
 
               <div className="flex justify-center  w-full">
                 <Image
                   src={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
                   )}
                   width={306}
                   height={408}
@@ -254,7 +253,7 @@ export default function Generation() {
                   <Image
                     src={getImage(
                       (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
                     )}
                     width={98}
                     height={128}
@@ -281,7 +280,7 @@ export default function Generation() {
                 <ImageResolutionFeature
                   imageUrl={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
                   )}
                 />
 

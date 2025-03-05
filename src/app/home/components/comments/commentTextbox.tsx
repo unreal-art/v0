@@ -1,5 +1,6 @@
 import { CloseIcon, EmojiIcon } from "@/app/components/icons";
 import { usePostComment } from "@/hooks/useComments";
+import { useUser } from "@/hooks/useUser";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -7,18 +8,28 @@ interface CommentTextboxProps {
   postId: string;
   replyTo: string | null;
   closeReply(): void;
+  authorId: string;
 }
 
-export default function CommentTextbox({replyTo, postId, closeReply}: CommentTextboxProps) {
-
+export default function CommentTextbox({
+  replyTo,
+  postId,
+  closeReply,
+  authorId,
+}: CommentTextboxProps) {
   const postComment = usePostComment();
 
   const [content, setContent] = useState<string | null>(null);
-
+  const { userId } = useUser();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content || !content.trim()) return;
-    postComment.mutate({ post_id: postId, content });
+    if (!content || !content.trim() || !userId) return;
+    postComment.mutate({
+      post_id: postId,
+      content,
+      author: authorId,
+      senderId: userId,
+    });
     setContent("");
   };
 
@@ -56,7 +67,9 @@ export default function CommentTextbox({replyTo, postId, closeReply}: CommentTex
 
       <form
         onSubmit={handleSubmit}
-        className={`flex h-16 bg-primary-10 px-2 ${replyTo ? "rounded-b-lg" : "m-1 mt-2 rounded-lg"}  pl-4`}
+        className={`flex h-16 bg-primary-10 px-2 ${
+          replyTo ? "rounded-b-lg" : "m-1 mt-2 rounded-lg"
+        }  pl-4`}
       >
         <button className="w-8">
           <EmojiIcon color="#C1C1C1" />
@@ -68,7 +81,11 @@ export default function CommentTextbox({replyTo, postId, closeReply}: CommentTex
           className="flex-grow bg-primary-10 outline-none resize-none mt-[18px] text-primary-4"
         ></textarea>
 
-        <button disabled={!content} type="submit" className="text-primary-4 disable:text-primary-8 text-sm w-12">
+        <button
+          disabled={!content}
+          type="submit"
+          className="text-primary-4 disable:text-primary-8 text-sm w-12"
+        >
           Post
         </button>
       </form>
