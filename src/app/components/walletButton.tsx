@@ -22,6 +22,7 @@ const wallets = [
       options: ["google", "apple", "email", "passkey"],
     },
   }),
+  createWallet("walletConnect"),
   createWallet("io.metamask"),
   createWallet("com.coinbase.wallet"),
   createWallet("com.binance"),

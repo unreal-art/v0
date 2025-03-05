@@ -27,7 +27,7 @@ export default function CommentArea({
   isLoading,
   authorId,
   postId,
-  imageDetails
+  imageDetails,
 }: CommentAreaProps) {
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
@@ -67,9 +67,9 @@ export default function CommentArea({
           </div>
           <ImageOptionMenu image={imageDetails}>
             <div className="h-8">
-                <OptionMenuIcon color="#C1C1C1" />
+              <OptionMenuIcon color="#C1C1C1" />
             </div>
-           </ImageOptionMenu>
+          </ImageOptionMenu>
         </div>
       </div>
 
@@ -81,15 +81,12 @@ export default function CommentArea({
         className={`flex-grow py-2 px-6 overflow-y-auto ${replyTo ? "h-[calc(40vh_-_64px)] md:h-[346px]" : "h-[40vh] md:h-[400px]"}`}
       >
         {comments?.map((comment: CommentWithUser, index: number) => (
-          <Comment key={index} data={comment} setReplyTo={setReplyTo}  />
+          <Comment key={index} data={comment} setReplyTo={setReplyTo} />
         ))}
       </div>
 
       <div className="flex py-2 px-6 border-y-[1px] border-primary-6">
-        <ImageViewInteractions
-          commentCount={comments.length}
-          postId={postId}
-        />
+        <ImageViewInteractions commentCount={comments.length} postId={postId} />
       </div>
 
       <div>

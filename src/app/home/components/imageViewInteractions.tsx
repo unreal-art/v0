@@ -11,9 +11,10 @@ import { useLikePost } from "@/hooks/useLikePost";
 import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
-import React from "react";
+import React, { useState } from "react";
 import { getImage } from "../formattedPhotos";
-import { UploadResponse } from "$/types/data.types";
+import { Post, UploadResponse } from "$/types/data.types";
+import ShareModal from "./modals/shareModal";
 
 interface IInteractions {
   commentCount: number;
@@ -26,15 +27,16 @@ export default function ImageViewInteractions({
   const { data: likes } = usePostLikes(Number(postId), supabase);
   const { userId } = useUser();
   const { data: post } = usePost(Number(postId));
+  const [openShare, setOpenShare] = useState(false);
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string
+    post?.author as string,
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
 
   return (
-    <div className="flex justify-between w-full">
+    <div className="flex justify-between w-full relative">
       <button
         onClick={() => toggleLike()}
         className="flex items-center gap-[2px] justify-center"
@@ -52,19 +54,35 @@ export default function ImageViewInteractions({
         <p className="text-xs text-primary-3">{commentCount}</p>
       </button>
 
-      <button className="flex items-center gap-[2px] justify-center">
+      <button
+        onClick={() => setOpenShare(true)}
+        className="flex items-center gap-[2px] justify-center"
+      >
         <ShareIcon color="#F0F0F0" />
         <p className="text-xs text-primary-3">0</p>
       </button>
+
+      {post && userId && openShare && (
+        <div className="fixed z-50 top-0 left-0 h-screen w-full">
+          {" "}
+          <ShareModal
+            open={openShare}
+            post={post as Post}
+            userId={userId as string}
+            setOpen={setOpenShare}
+            link={"https://unreal.art/home/photo/" + postId}
+          />
+        </div>
+      )}
 
       <button
         onClick={() =>
           downloadImage(
             getImage(
               (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
             ),
-            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
           )
         }
       >
