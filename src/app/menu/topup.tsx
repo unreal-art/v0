@@ -71,7 +71,7 @@ export default function Topup({ open, setOpen }: TopupProps) {
           onClick={handleClose}
           className={"absolute z-30 top-0 left-0 h-screen w-full"}></div>
 
-        <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 h-[394px] w-[520px] flex flex-col">
+        <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 h-[394px] w-[98p%] max-w-[520px] flex flex-col">
           <div className="flex justify-between">
             <p className="text-2xl text-primary-3 nasalization">Top up</p>
             <button onClick={handleClose}>
