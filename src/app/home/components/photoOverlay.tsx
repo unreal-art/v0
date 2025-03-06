@@ -25,7 +25,7 @@ export interface ExtendedRenderPhotoContext extends RenderPhotoContext {
     author: string;
     createdAt: string;
     caption?: string;
-  }; // Extending `Photo`
+  };
 }
 
 interface PhotoOverlayProps {

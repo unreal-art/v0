@@ -13,7 +13,7 @@ export type ProfileWithPosts = {
 export const searchUsersPaginated = async (
   keyword: string,
   page: number,
-  limit = 10,
+  limit = 10
 ): Promise<ProfileWithPosts[]> => {
   if (!keyword?.trim()) return []; // Prevent empty searches
 
