@@ -16,11 +16,30 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { useUser } from "@/hooks/useUser";
 import { Post } from "$/types/data.types";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 
 // Dynamically import PhotoGridTwo
 const PhotoGridTwo = dynamic(() => import("./PhotoGridTwo"), {
   loading: () => (
-    <div className="animate-pulse bg-gray-800 w-full h-screen"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
+        {Array(12)
+          .fill(null)
+          .map((_, index) => (
+            <div
+              key={index}
+              // style={{ width: size.width, height: size.height }}
+              className="relative grid-cols-1"
+            >
+              <Skeleton
+                height="100%"
+                baseColor="#1a1a1a"
+                highlightColor="#333"
+              />
+            </div>
+          ))}
+      </div>
   ),
 });
 

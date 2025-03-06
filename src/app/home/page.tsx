@@ -27,10 +27,12 @@ const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
+  const searchType = await searchParams;
+
   return (
-    <PostsProvider searchType={searchParams?.s}>
+    <PostsProvider searchType={searchType?.s}>
       <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
         <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
           <GenerateInput />

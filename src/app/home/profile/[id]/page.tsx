@@ -30,10 +30,11 @@ type Props = {
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ [key: string]: string | undefined }>;
 }): Promise<Metadata> {
+  const paramsData = await params;
   // Ensure params.id is available
-  if (!params?.id) {
+  if (!paramsData?.id) {
     return {
       title: "Unreal Profile",
       description: "Profile page on Unreal",
@@ -42,11 +43,11 @@ export async function generateMetadata({
 
   try {
     const supabaseSSR = await createClient();
-    const data = await getUserById(params.id, supabaseSSR);
+    const data = await getUserById(paramsData.id, supabaseSSR);
 
     const username = data?.username || data?.full_name || "Unreal Creator";
     const avatarUrl = data?.avatar_url || "";
-    const profileUrl = `https://unreal.art/home/profile/${params.id}`;
+    const profileUrl = `https://unreal.art/home/profile/${paramsData.id}`;
 
     return {
       title: `${username} | Unreal Profile`,
@@ -87,21 +88,22 @@ export default async function Profile({
   searchParams,
   params,
 }: {
-  searchParams: { [key: string]: string | undefined };
-  params: { id: string };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+  params: Promise<{ [key: string]: string | undefined }>;
 }) {
   const supabaseSSR = await createClient();
   const queryClient = new QueryClient();
-
+  const queryParams = await searchParams;
+  const paramsData = await params;
   // Prefetch only the first page of data initially
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["creation_posts", searchParams?.s || "public"],
+    queryKey: ["creation_posts", queryParams?.s || "public"],
     queryFn: async ({ pageParam = 0 }) => {
       const result = await getInitialPosts(
         supabaseSSR,
         pageParam,
-        params.id,
-        searchParams?.s
+        paramsData?.id as string,
+        queryParams?.s,
       );
       return {
         data: result ?? [],
@@ -129,7 +131,7 @@ async function getInitialPosts(
   supabase: any,
   pageParam: number,
   userId: string,
-  type?: string
+  type?: string,
 ) {
   switch (type?.toUpperCase()) {
     case "PUBLIC":
