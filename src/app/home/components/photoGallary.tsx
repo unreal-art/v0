@@ -29,10 +29,11 @@ import { useSearchParams } from "next/navigation";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
+import Skeleton from "react-loading-skeleton";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height }: RenderImageContext,
+  { photo, width, height }: RenderImageContext
 ) {
   return (
     <div
@@ -57,11 +58,6 @@ function renderNextImage(
 
 export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
-  //window is not defined on server
-  // const [columns, setColumns] = useState(
-  //   window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
-  // );
-
   const [columns, setColumns] = useState<number | null>(null);
 
   const searchParams = useSearchParams();
@@ -73,7 +69,6 @@ export default function PhotoGallary({}) {
     error,
     data,
     isFetchingNextPage,
-    // isFetching,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -92,36 +87,32 @@ export default function PhotoGallary({}) {
 
       return {
         data: result ?? [],
-        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined, // ✅ Ensure cursor is only set if limit is reached
+        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
       };
     },
     initialPageParam: 0,
-
-    getNextPageParam: (lastPage) => {
-      if (!lastPage?.data || !Array.isArray(lastPage.data)) {
-        return undefined;
-      }
-
-      if (lastPage.data.length < 10) {
-        return undefined; // ✅ No more pages if the last page has less than `limit`
-      }
-
-      return lastPage.nextCursor; // ✅ Correctly use the cursor for pagination
-    },
+    getNextPageParam: (lastPage) => lastPage?.nextCursor,
+    staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
+    if (typeof window === "undefined") return;
 
     const handleResize = () => {
-      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+      requestAnimationFrame(() => {
+        setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+      });
     };
 
-    window.addEventListener("resize", handleResize);
-    handleResize(); // ✅ Call initially to set correct columns
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(document.body);
+
+    handleResize();
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
     };
   }, []);
 
@@ -129,26 +120,50 @@ export default function PhotoGallary({}) {
     setImageIndex(context.index);
   };
 
-  // console.log(isLoading, isFetching, isError);
-
   if (isError) {
     return (
       <p className="wrapper">{"message" in error ? error.message : error}</p>
     );
   }
 
-  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
-    return <p className="text-center">No Data found.</p>;
+  // Show loading state during initial data fetch
+  if (isLoading || !columns) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
+        {Array(12)
+          .fill(null)
+          .map((_, index) => (
+            <Skeleton
+              key={index}
+              height={200}
+              baseColor="#1a1a1a"
+              highlightColor="#333"
+            />
+          ))}
+      </div>
+    );
   }
 
-  // console.log(isLoading);
+  // Only show no data message when we have data object but it's empty
+  if (data && data.pages.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full min-h-[200px]">
+        <p className="text-center text-lg text-primary-6">No posts found</p>
+        <p className="text-center text-sm text-primary-7 mt-2">
+          {s?.toUpperCase() === "FOLLOWING"
+            ? "Follow some creators to see their posts here"
+            : "Be the first to share something amazing"}
+        </p>
+      </div>
+    );
+  }
 
   const photos = formattedPhotosForGallary(data?.pages ?? []);
-  if (!columns) return null;
+
   return (
     <div className="w-full">
       <InfiniteScroll
-        isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
+        isLoadingInitial={isLoading}
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
         hasNextPage={hasNextPage}

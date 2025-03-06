@@ -19,49 +19,69 @@ import UserData from "../components/userData";
 import { Metadata } from "next";
 import useUserData from "@/hooks/useUserData";
 import { getUserById } from "@/queries/user/getUserById";
+import dynamic from "next/dynamic";
 
 type Props = {
   params: { slug: string }; // Example if using dynamic routes
   searchParams: { [key: string]: string | undefined };
 };
 
-//for sharing
+// Optimize metadata generation
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ [key: string]: string | undefined }>;
 }): Promise<Metadata> {
   const paramsData = await params;
-  const supabaseSSR = await createClient();
-  //fetch user details
-  const data = await getUserById(paramsData?.id as string, supabaseSSR);
-  const dynamicTitle = `Unreal Profile`;
-  const dynamicDescription = `A great creator called ${data?.username || data?.full_name}.`;
+  // Ensure params.id is available
+  if (!paramsData?.id) {
+    return {
+      title: "Unreal Profile",
+      description: "Profile page on Unreal",
+    };
+  }
 
-  return {
-    title: dynamicTitle,
-    description: dynamicDescription,
-    openGraph: {
-      type: "website",
-      url: `https://unreal.art/home/profile/${paramsData?.id}`,
-      title: dynamicTitle,
-      description: dynamicDescription,
-      images: [
-        {
-          url: `${data?.avatar_url}`,
-          width: 1200,
-          height: 630,
-          alt: `Image for ${paramsData?.id}`,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: dynamicTitle,
-      description: dynamicDescription,
-      images: [`${data?.avatar_url}`],
-    },
-  };
+  try {
+    const supabaseSSR = await createClient();
+    const data = await getUserById(paramsData.id, supabaseSSR);
+
+    const username = data?.username || data?.full_name || "Unreal Creator";
+    const avatarUrl = data?.avatar_url || "";
+    const profileUrl = `https://unreal.art/home/profile/${paramsData.id}`;
+
+    return {
+      title: `${username} | Unreal Profile`,
+      description: `Check out ${username}'s creations on Unreal.`,
+      openGraph: {
+        type: "website",
+        url: profileUrl,
+        title: `${username} | Unreal Profile`,
+        description: `Check out ${username}'s creations on Unreal.`,
+        images: avatarUrl
+          ? [
+              {
+                url: avatarUrl,
+                width: 1200,
+                height: 630,
+                alt: `${username}'s profile picture`,
+              },
+            ]
+          : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${username} | Unreal Profile`,
+        description: `Check out ${username}'s creations on Unreal.`,
+        images: avatarUrl ? [avatarUrl] : [],
+      },
+    };
+  } catch (error) {
+    // Fallback metadata if there's an error
+    return {
+      title: "Unreal Profile",
+      description: "Profile page on Unreal",
+    };
+  }
 }
 
 export default async function Profile({
@@ -75,68 +95,56 @@ export default async function Profile({
   const queryClient = new QueryClient();
   const queryParams = await searchParams;
   const paramsData = await params;
-
+  // Prefetch only the first page of data initially
   await queryClient.prefetchInfiniteQuery({
     queryKey: ["creation_posts", queryParams?.s || "public"],
-    queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
-      // console.log("Prefetching page:", pageParam); // Debugging line
-
-      let result: Post[] = [];
-      if (queryParams.s?.toUpperCase() === "PUBLIC") {
-        result = await getPostsByUser(supabaseSSR, pageParam, paramsData?.id);
-      } else if (queryParams.s?.toUpperCase() === "PRIVATE") {
-        result = await getPrivatePostsByUser(
-          supabaseSSR,
-          pageParam,
-          paramsData?.id,
-        );
-      } else if (queryParams.s?.toUpperCase() === "LIKED") {
-        result = await getUserLikedPosts(
-          supabaseSSR,
-          pageParam,
-          paramsData?.id,
-        );
-      } else if (queryParams.s?.toUpperCase() === "PINNED") {
-        result = await getPinnedPostsByUser(
-          supabaseSSR,
-          pageParam,
-          paramsData?.id,
-        );
-      } else if (queryParams.s?.toUpperCase() === "DRAFT") {
-        result = await getIsDraftPostsByUser(
-          supabaseSSR,
-          pageParam,
-          paramsData?.id,
-        );
-      } else {
-        result = await getPostsByUser(supabaseSSR, pageParam, paramsData?.id);
-      }
+    queryFn: async ({ pageParam = 0 }) => {
+      const result = await getInitialPosts(
+        supabaseSSR,
+        pageParam,
+        paramsData?.id as string,
+        queryParams?.s,
+      );
       return {
         data: result ?? [],
-        nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Handle pagination
+        nextCursor: result.length > 0 ? pageParam + 1 : undefined,
       };
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage: { data: Post[]; nextCursor?: number }) =>
       lastPage?.nextCursor ?? undefined,
+    pages: 1, // Only prefetch first page
   });
-
-  // //from server
-  // await queryClient.prefetchQuery({
-  //   queryKey: ["user"],
-  //   queryFn: async () => await getUser(),
-  // });
-
-  // const userData = queryClient.getQueryData(["user"]);
-  // console.log(userData);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
         <UserData />
-
         <ProfileView />
       </div>
     </HydrationBoundary>
   );
+}
+
+// Separate function to handle initial post fetching logic
+async function getInitialPosts(
+  supabase: any,
+  pageParam: number,
+  userId: string,
+  type?: string,
+) {
+  switch (type?.toUpperCase()) {
+    case "PUBLIC":
+      return await getPostsByUser(supabase, pageParam, userId);
+    case "PRIVATE":
+      return await getPrivatePostsByUser(supabase, pageParam, userId);
+    case "LIKED":
+      return await getUserLikedPosts(supabase, pageParam, userId);
+    case "PINNED":
+      return await getPinnedPostsByUser(supabase, pageParam, userId);
+    case "DRAFT":
+      return await getIsDraftPostsByUser(supabase, pageParam, userId);
+    default:
+      return await getPostsByUser(supabase, pageParam, userId);
+  }
 }

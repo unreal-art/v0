@@ -6,10 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 export default function useAuthorImage(authorId: string | undefined | null) {
   return useQuery({
     queryKey: ["authorImage", authorId],
-    queryFn: async () => {
-      return getAuthorImage(authorId as string, supabase);
-    },
-    enabled: !!authorId, // Ensures query only runs if authorId exists
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    queryFn: async () => (authorId ? getAuthorImage(authorId, supabase) : null),
+    enabled: !!authorId, // Runs only if authorId exists
+    staleTime: 1000 * 60 * 5, // Remove if global config is enough
   });
 }

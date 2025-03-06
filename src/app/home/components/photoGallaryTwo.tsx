@@ -6,7 +6,7 @@ import {
   RenderPhotoContext,
 } from "react-photo-album";
 import "react-photo-album/columns.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
@@ -34,7 +34,7 @@ import { usePost } from "@/hooks/usePost";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height }: RenderImageContext,
+  { photo, width, height }: RenderImageContext
 ) {
   return (
     <div
@@ -59,27 +59,16 @@ function renderNextImage(
 
 export default function PhotoGallaryTwo({}) {
   const [imageIndex, setImageIndex] = useState(-1);
-  //window is not defined on server
-  // const [columns, setColumns] = useState(
-  //   window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
-  // );
-
   const [columns, setColumns] = useState<number | null>(null);
 
   const { userId } = useUser();
   const searchParams = useSearchParams();
-  const a = searchParams.get("a");
   const { id } = useParams();
+  const a = searchParams.get("a");
 
-  // Ensure id is valid before making API call
-  const postId = id ? parseInt(id as string) : null;
-
+  // Move postId calculation into a useMemo to maintain consistent hook ordering
+  const postId = useMemo(() => (id ? parseInt(id as string) : null), [id]);
   const { data: post } = usePost(postId);
-
-  // Ensure loading state is handled before rendering and a can be any text
-  // if (!a && loading) {
-  //   return null; // or a loading spinner if needed
-  // }
 
   const {
     isLoading,
@@ -87,7 +76,6 @@ export default function PhotoGallaryTwo({}) {
     error,
     data,
     isFetchingNextPage,
-    // isFetching,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -99,63 +87,53 @@ export default function PhotoGallaryTwo({}) {
       let result: Post[] = [];
 
       if (a) {
-        // completing image generation
         result = await getOtherIsDraftPostsByUser(
           supabase,
           pageParam,
           Number(postId),
-          post?.author,
+          post?.author
         );
       } else {
-        // viewing other user's posts
         result = await getOtherPostsByUser(
           supabase,
           pageParam,
           Number(postId),
-          post?.author,
+          post?.author
         );
       }
 
       return {
         data: result ?? [],
-        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined, // ✅ Ensure cursor is only set if limit is reached
+        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
       };
     },
     initialPageParam: 0,
-
     getNextPageParam: (lastPage) => {
       if (!lastPage?.data || !Array.isArray(lastPage.data)) {
         return undefined;
       }
-
-      if (lastPage.data.length < 10) {
-        return undefined; // ✅ No more pages if the last page has less than `limit`
-      }
-
-      return lastPage.nextCursor; // ✅ Correctly use the cursor for pagination
+      return lastPage.data.length < 10 ? undefined : lastPage.nextCursor;
     },
   });
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
+    if (typeof window === "undefined") return;
 
     const handleResize = () => {
       setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // ✅ Call initially to set correct columns
+    handleResize();
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  const handleImageIndex = (context: RenderPhotoContext) => {
+  const handleImageIndex = useCallback((context: RenderPhotoContext) => {
     setImageIndex(context.index);
-  };
-
-  // console.log(isLoading, isFetching, isError);
+  }, []);
 
   if (isError) {
     return (
@@ -167,12 +145,12 @@ export default function PhotoGallaryTwo({}) {
     return <p className="text-center">No Data found.</p>;
   }
 
-  // console.log(isLoading);
   if (!columns) return null;
+
   return (
     <div className="w-full">
       <InfiniteScroll
-        isLoadingInitial={isLoading || (!data && !error)} // during initial load or no data
+        isLoadingInitial={isLoading || (!data && !error)}
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
         hasNextPage={hasNextPage}

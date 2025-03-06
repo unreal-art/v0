@@ -98,14 +98,16 @@ export default function TabBtn({ text }: NavBtnProps) {
     //set active the right tab or default to explore
     setActive(
       s?.toUpperCase() === text.toUpperCase() ||
-        (!s && text.toUpperCase() === "EXPLORE"),
+        (!s && text.toUpperCase() === "EXPLORE")
     );
   }, [text, s]);
 
   if (text === "Search") {
     return (
       <button
-        className={`flex items-center p-2 rounded-full border-primary-9 border-[1px] ${hover || active ? "bg-primary-10" : ""}`}
+        className={`flex items-center p-2 rounded-full border-primary-9 border-[1px] ${
+          hover || active ? "bg-primary-10" : ""
+        }`}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
@@ -117,7 +119,9 @@ export default function TabBtn({ text }: NavBtnProps) {
   return (
     <Link href={`/home?s=${text}`}>
       <button
-        className={`flex gap-x-1 items-center p-2 pr-4 rounded-full ${hover || active ? "bg-primary-10" : ""}`}
+        className={`flex gap-x-1 items-center p-2 pr-4 rounded-full ${
+          hover || active ? "bg-primary-10" : ""
+        }`}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
