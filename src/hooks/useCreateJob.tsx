@@ -11,7 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 export function useCreateJob(user: ExtendedUser | null) {
   const router = useRouter();
   const { startGeneration, stopGeneration } = useGenerationStore(
-    (state) => state,
+    (state) => state
   );
 
   // 🔥 Fire-and-Forget Mutation
@@ -19,7 +19,7 @@ export function useCreateJob(user: ExtendedUser | null) {
     mutationFn: async ({ prompt }: { prompt: string }) => {
       if (!prompt) throw new Error("Prompt is required");
       startGeneration();
-      sendJobRequest({ prompt, user }); // Fire-and-forget!
+      sendJobRequest({ prompt, user, stopGeneration }); // Fire-and-forget!
     },
   });
 
@@ -38,10 +38,10 @@ export function useCreateJob(user: ExtendedUser | null) {
 
             stopGeneration();
             router.push(
-              `/home/photo/${payload.new.id}?a=${payload.new.author}`,
+              `/home/photo/${payload.new.id}?a=${payload.new.author}`
             );
           }
-        },
+        }
       )
       .subscribe();
 
