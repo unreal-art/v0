@@ -1,3 +1,4 @@
+import { CommentWithUser } from "$/types/data.types";
 import { CloseIcon, EmojiIcon } from "@/app/components/icons";
 import { usePostComment } from "@/hooks/useComments";
 import { useUser } from "@/hooks/useUser";
@@ -6,7 +7,7 @@ import { useState } from "react";
 
 interface CommentTextboxProps {
   postId: string;
-  replyTo: string | null;
+  replyTo: CommentWithUser | null;
   closeReply(): void;
   authorId: string;
 }
@@ -21,15 +22,19 @@ export default function CommentTextbox({
 
   const [content, setContent] = useState<string | null>(null);
   const { userId } = useUser();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content || !content.trim() || !userId) return;
     postComment.mutate({
       post_id: postId,
       content,
+      parent_id: replyTo?.id,
       author: authorId,
       senderId: userId,
     });
+
+    if (replyTo) closeReply();
     setContent("");
   };
 
@@ -38,7 +43,7 @@ export default function CommentTextbox({
       {replyTo && (
         <div className="h-16 rounded-t-lg w-full bg-primary-12 py-2 px-3 border-2 border-primary-10">
           <div className="flex justify-between w-full">
-            <p className="font-bold text-primary-2 text-[10px]">REPLAY TO</p>
+            <p className="font-bold text-primary-2 text-[10px]">REPLY TO</p>
             <button onClick={closeReply} className="w-3 h-3">
               <CloseIcon color="#F5F5F5" width={"10px"} height={"10px"} />
             </button>
@@ -47,18 +52,20 @@ export default function CommentTextbox({
           <div className="flex gap-2 items-center">
             <div>
               <Image
-                src={"/icons/dummy-profile.png"}
+                src={replyTo.avatar_url || "/profile.jpg"}
                 width={32}
                 height={32}
                 alt="profile"
+                className="rounded-full"
               />
             </div>
 
             <div className="flex gap-3 mt-1">
-              <p className="text-primary-4 text-xs font-medium">David</p>
+              <p className="text-primary-4 text-xs font-medium">
+                {replyTo.username}
+              </p>
               <p className="text-xs text-primary-6 line-clamp-1">
-                Pixar Fest at Disneyland sounds amazing! I need to see the new
-                parades! 🎉🎈max isol
+                {replyTo.content}
               </p>
             </div>
           </div>

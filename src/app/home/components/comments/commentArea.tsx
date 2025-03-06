@@ -32,7 +32,10 @@ export default function CommentArea({
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
   // console.log(comments);
-  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<CommentWithUser | null>(null);
+  const [comentToReply, setCommentToReply] = useState<CommentWithUser | null>(
+    null,
+  );
   const handleCloseReply = () => {
     setReplyTo(null);
   };
@@ -41,7 +44,7 @@ export default function CommentArea({
     <div className="flex flex-col">
       <div className="p-[2px]">
         <div className="flex justify-between h-18 py-2 px-5 gap-5 w-full">
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center">
             <div className="flex items-center">
               {!imageLoading && (
                 <Image
@@ -61,9 +64,9 @@ export default function CommentArea({
               <p className="text-primary-7 nasalization">Creator</p>
             </div>
 
-            {/* <div className="bg-red-400 h-full">
+            <div className=" h-full pl-2">
               <Following authorId={authorId} />
-            </div> */}
+            </div>
           </div>
           <ImageOptionMenu image={imageDetails}>
             <div className="h-8">
@@ -85,7 +88,12 @@ export default function CommentArea({
         }`}
       >
         {comments?.map((comment: CommentWithUser, index: number) => (
-          <Comment key={index} data={comment} setReplyTo={setReplyTo} />
+          <Comment
+            key={index}
+            data={comment}
+            setReplyTo={setReplyTo}
+            // setCommentToReply={setCommentToReply}
+          />
         ))}
       </div>
 
