@@ -2,14 +2,17 @@ import { ExtendedUser, JobSpec } from "$/types/data.types";
 import { axiosInstance } from "@/lib/axiosInstance";
 import axios from "axios";
 import random from "random";
+import { toast } from "sonner";
 
 // Function to send job request (Fire-and-Forget)
 export const sendJobRequest = ({
   prompt,
   user,
+  stopGeneration,
 }: {
   prompt: string;
   user: ExtendedUser | null;
+  stopGeneration: () => void;
 }) => {
   if (!user) {
     console.error("User is undefined, cannot send job request.");
@@ -48,9 +51,14 @@ export const sendJobRequest = ({
 
   // 🚀 Fire-and-Forget: No need to `await`, just send the request
   axiosInstance.post("/darts", dto, { headers }).catch((error) => {
+    stopGeneration();
+    toast.error(
+      "Error sending job request:",
+      error.response?.data || error.message
+    );
     console.error(
       "Error sending job request:",
-      error.response?.data || error.message,
+      error.response?.data || error.message
     );
   });
 };
