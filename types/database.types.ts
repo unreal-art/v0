@@ -499,6 +499,24 @@ export type Database = {
               avatar_url: string
             }[]
           }
+      get_replies_with_likes: {
+        Args: {
+          given_parent_id: string
+          current_user_id: string
+        }
+        Returns: {
+          id: string
+          post_id: string
+          user_id: string
+          content: string
+          parent_id: string
+          created_at: string
+          username: string
+          avatar_url: string
+          like_count: number
+          user_liked: boolean
+        }[]
+      }
       search_posts: {
         Args: {
           keyword: string

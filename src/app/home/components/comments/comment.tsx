@@ -3,7 +3,13 @@ import { CommentWithUser } from "$/types/data.types";
 import { timeAgo } from "@/app/libs/timeAgo";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import Image from "next/image";
-import { useLikeComment, useUnlikeComment } from "@/hooks/useComments";
+import {
+  useLikeComment,
+  useRealtimeReplies,
+  useReplies,
+  useUnlikeComment,
+} from "@/hooks/useComments";
+import Reply from "./Reply";
 
 export default function Comment({
   data,
@@ -18,8 +24,11 @@ export default function Comment({
   const likeComment = useLikeComment(data.post_id.toString());
   const unlikeComment = useUnlikeComment(data.post_id.toString());
 
+  const { data: replies } = useReplies(data.id);
+  useRealtimeReplies(data.id);
+
   return (
-    <div className=" gap-2 py-2 border-b border-primary-10">
+    <div className=" gap-2 py-2  border-primary-10">
       <div className="flex w-full  gap-2">
         <div className="h-12 w-12">
           <Image
@@ -71,6 +80,16 @@ export default function Comment({
           </div>
         </div>
       </div>
+
+      {/* Reply list */}
+      {replies?.map((reply: CommentWithUser, idx: number) => (
+        <Reply
+          key={idx}
+          data={reply}
+
+          // setCommentToReply={setCommentToReply}
+        />
+      ))}
     </div>
   );
 }
