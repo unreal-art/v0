@@ -91,7 +91,7 @@ export default function PhotoGridTwo({
   const [imageIndex, setImageIndex] = useState(-1);
   const [size, setSize] = useState<GridSize>(GRID_SIZES.LG);
 
-  // Memoize photos array to prevent unnecessary recalculations
+  // Memoized values and callbacks
   const photos = useMemo(() => {
     if (!data?.pages) return [];
     const transformedPhotos = new Map();
@@ -99,7 +99,6 @@ export default function PhotoGridTwo({
     return data.pages
       .flatMap((page: any) => page.data || [])
       .reduce((acc: TransformedPhoto[], post: PhotoData) => {
-        // Skip if already processed this photo
         if (transformedPhotos.has(post.id)) {
           return acc;
         }
@@ -127,7 +126,67 @@ export default function PhotoGridTwo({
       }, []);
   }, [data?.pages, size]);
 
-  // Window resize handler with debouncing
+  const handleImageIndex = useCallback(
+    (context: ExtendedRenderPhotoContext) => {
+      setImageIndex(context.index);
+    },
+    []
+  );
+
+  const loadMore = useCallback(() => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, fetchNextPage]);
+
+  // Memoized loading skeleton
+  const loadingSkeleton = useMemo(
+    () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
+        {Array(12)
+          .fill(null)
+          .map((_, index) => (
+            <div
+              key={index}
+              style={{ width: size.width, height: size.height }}
+              className="relative grid-cols-1"
+            >
+              <Skeleton
+                height="100%"
+                baseColor="#1a1a1a"
+                highlightColor="#333"
+              />
+            </div>
+          ))}
+      </div>
+    ),
+    [size]
+  );
+
+  // Memoized loading more skeleton
+  const loadingMoreSkeleton = useMemo(
+    () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
+        {Array(4)
+          .fill(null)
+          .map((_, index) => (
+            <div
+              key={`loading-${index}`}
+              style={{ width: size.width, height: size.height }}
+              className="relative"
+            >
+              <Skeleton
+                height="100%"
+                baseColor="#1a1a1a"
+                highlightColor="#333"
+              />
+            </div>
+          ))}
+      </div>
+    ),
+    [size]
+  );
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -156,40 +215,8 @@ export default function PhotoGridTwo({
     };
   }, []);
 
-  // Memoized handlers
-  const handleImageIndex = useCallback(
-    (context: ExtendedRenderPhotoContext) => {
-      setImageIndex(context.index);
-    },
-    []
-  );
-
-  // Loading skeleton component
-  const LoadingSkeleton = useMemo(
-    () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
-        {Array(12)
-          .fill(null)
-          .map((_, index) => (
-            <div
-              key={index}
-              style={{ width: size.width, height: size.height }}
-              className="relative grid-cols-1"
-            >
-              <Skeleton
-                height="100%"
-                baseColor="#1a1a1a"
-                highlightColor="#333"
-              />
-            </div>
-          ))}
-      </div>
-    ),
-    [size]
-  );
-
   // Show initial loading state
-  if (isLoading) return LoadingSkeleton;
+  if (isLoading) return loadingSkeleton;
 
   // Show empty state
   if (!data?.pages || !photos.length) {
@@ -203,10 +230,7 @@ export default function PhotoGridTwo({
       <InfiniteScroll
         isLoadingInitial={false}
         isLoadingMore={isFetchingNextPage}
-        loadMore={useCallback(
-          () => hasNextPage && fetchNextPage(),
-          [hasNextPage, fetchNextPage]
-        )}
+        loadMore={loadMore}
         hasNextPage={hasNextPage}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
@@ -275,27 +299,7 @@ export default function PhotoGridTwo({
 
         {isFetchingNextPage && (
           <div className="w-full py-4 flex justify-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
-              {useMemo(
-                () =>
-                  Array(4)
-                    .fill(null)
-                    .map((_, index) => (
-                      <div
-                        key={`loading-${index}`}
-                        style={{ width: size.width, height: size.height }}
-                        className="relative"
-                      >
-                        <Skeleton
-                          height="100%"
-                          baseColor="#1a1a1a"
-                          highlightColor="#333"
-                        />
-                      </div>
-                    )),
-                [size]
-              )}
-            </div>
+            {loadingMoreSkeleton}
           </div>
         )}
       </InfiniteScroll>
