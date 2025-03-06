@@ -32,40 +32,55 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const supabaseSSR = await createClient();
-  const data = await getUserById(params.id, supabaseSSR);
+  // Ensure params.id is available
+  if (!params?.id) {
+    return {
+      title: "Unreal Profile",
+      description: "Profile page on Unreal",
+    };
+  }
 
-  const metadata = {
-    title: "Unreal Profile",
-    description: `A great creator called ${data?.username || data?.full_name}.`,
-    url: `https://unreal.art/home/profile/${params.id}`,
-    images: data?.avatar_url || "",
-  };
+  try {
+    const supabaseSSR = await createClient();
+    const data = await getUserById(params.id, supabaseSSR);
 
-  return {
-    title: metadata.title,
-    description: metadata.description,
-    openGraph: {
-      type: "website",
-      url: metadata.url,
-      title: metadata.title,
-      description: metadata.description,
-      images: [
-        {
-          url: metadata.images,
-          width: 1200,
-          height: 630,
-          alt: `Image for ${params.id}`,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: metadata.title,
-      description: metadata.description,
-      images: [metadata.images],
-    },
-  };
+    const username = data?.username || data?.full_name || "Unreal Creator";
+    const avatarUrl = data?.avatar_url || "";
+    const profileUrl = `https://unreal.art/home/profile/${params.id}`;
+
+    return {
+      title: `${username} | Unreal Profile`,
+      description: `Check out ${username}'s creations on Unreal.`,
+      openGraph: {
+        type: "website",
+        url: profileUrl,
+        title: `${username} | Unreal Profile`,
+        description: `Check out ${username}'s creations on Unreal.`,
+        images: avatarUrl
+          ? [
+              {
+                url: avatarUrl,
+                width: 1200,
+                height: 630,
+                alt: `${username}'s profile picture`,
+              },
+            ]
+          : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${username} | Unreal Profile`,
+        description: `Check out ${username}'s creations on Unreal.`,
+        images: avatarUrl ? [avatarUrl] : [],
+      },
+    };
+  } catch (error) {
+    // Fallback metadata if there's an error
+    return {
+      title: "Unreal Profile",
+      description: "Profile page on Unreal",
+    };
+  }
 }
 
 export default async function Profile({

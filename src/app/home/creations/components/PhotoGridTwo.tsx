@@ -8,7 +8,7 @@ import { OptionMenuIcon } from "@/app/components/icons";
 import { TabText } from "./Tabs";
 import NoItemFound from "./NoItemFound";
 import InfiniteScroll from "../../components/InfiniteScroll";
-import ImageView from "../../components/imageView";
+import dynamic from "next/dynamic";
 import PhotoOverlay, {
   ExtendedRenderPhotoContext,
 } from "../../components/photoOverlay";
@@ -60,16 +60,22 @@ interface PhotoData {
 }
 
 interface TransformedPhoto {
-  id: number;
+  id: string;
   src: string;
   width: number;
   height: number;
   alt: string;
   caption?: string;
-  prompt?: string;
+  prompt: string;
   createdAt: string;
   author: string;
 }
+
+// Dynamically import ImageView with no SSR since it's only needed on client
+const ImageView = dynamic(() => import("../../components/imageView"), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function PhotoGridTwo({
   title,
@@ -88,31 +94,37 @@ export default function PhotoGridTwo({
   // Memoize photos array to prevent unnecessary recalculations
   const photos = useMemo(() => {
     if (!data?.pages) return [];
+    const transformedPhotos = new Map();
+
     return data.pages
       .flatMap((page: any) => page.data || [])
-      .map((post: PhotoData) => {
+      .reduce((acc: TransformedPhoto[], post: PhotoData) => {
+        // Skip if already processed this photo
+        if (transformedPhotos.has(post.id)) {
+          return acc;
+        }
+
         const image = post.ipfsImages?.[0];
-        if (!image?.hash || !image?.fileNames?.[0]) return null;
+        if (!image?.hash || !image?.fileNames?.[0]) return acc;
 
-        const imageUrl =
-          process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY +
-          image.hash +
-          "/" +
-          image.fileNames[0];
+        const imageUrl = `${process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY}${image.hash}/${image.fileNames[0]}`;
 
-        return {
-          id: post.id,
+        const transformedPhoto = {
+          id: post.id.toString(),
           src: imageUrl,
           width: size.width,
           height: size.height,
           alt: post.caption || post.prompt || "",
           caption: post.caption,
-          prompt: post.prompt,
+          prompt: post.prompt || "",
           createdAt: post.createdAt,
           author: post.author,
         } as TransformedPhoto;
-      })
-      .filter(Boolean);
+
+        transformedPhotos.set(post.id, true);
+        acc.push(transformedPhoto);
+        return acc;
+      }, []);
   }, [data?.pages, size]);
 
   // Window resize handler with debouncing
@@ -191,11 +203,14 @@ export default function PhotoGridTwo({
       <InfiniteScroll
         isLoadingInitial={false}
         isLoadingMore={isFetchingNextPage}
-        loadMore={() => hasNextPage && fetchNextPage()}
+        loadMore={useCallback(
+          () => hasNextPage && fetchNextPage(),
+          [hasNextPage, fetchNextPage]
+        )}
         hasNextPage={hasNextPage}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
-          {photos.map((photo: any, index: number) => {
+          {photos.map((photo: TransformedPhoto, index: number) => {
             const context = {
               index,
               photo,
@@ -205,7 +220,7 @@ export default function PhotoGridTwo({
 
             return (
               <div
-                key={index}
+                key={photo.id}
                 style={{ width: size.width, height: size.height }}
                 className="relative grid-cols-1"
               >
@@ -222,6 +237,8 @@ export default function PhotoGridTwo({
                       alt={String(photo.alt)}
                       priority={index < 4}
                       className="object-cover"
+                      loading={index < 8 ? "eager" : "lazy"}
+                      sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
                     />
                   }
                 >
@@ -240,6 +257,8 @@ export default function PhotoGridTwo({
                       alt={String(photo.alt)}
                       priority={index < 4}
                       className="object-cover"
+                      loading={index < 8 ? "eager" : "lazy"}
+                      sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
                     />
 
                     <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
@@ -257,21 +276,25 @@ export default function PhotoGridTwo({
         {isFetchingNextPage && (
           <div className="w-full py-4 flex justify-center">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
-              {Array(4)
-                .fill(null)
-                .map((_, index) => (
-                  <div
-                    key={`loading-${index}`}
-                    style={{ width: size.width, height: size.height }}
-                    className="relative"
-                  >
-                    <Skeleton
-                      height="100%"
-                      baseColor="#1a1a1a"
-                      highlightColor="#333"
-                    />
-                  </div>
-                ))}
+              {useMemo(
+                () =>
+                  Array(4)
+                    .fill(null)
+                    .map((_, index) => (
+                      <div
+                        key={`loading-${index}`}
+                        style={{ width: size.width, height: size.height }}
+                        className="relative"
+                      >
+                        <Skeleton
+                          height="100%"
+                          baseColor="#1a1a1a"
+                          highlightColor="#333"
+                        />
+                      </div>
+                    )),
+                [size]
+              )}
             </div>
           </div>
         )}

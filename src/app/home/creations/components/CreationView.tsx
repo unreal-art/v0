@@ -1,7 +1,7 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import Tabs from "./Tabs";
-import PhotoGridTwo from "./PhotoGridTwo";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { indexOf } from "lodash";
 import { POST_GROUPS } from "@/app/libs/constants";
@@ -15,7 +15,14 @@ import {
   getUserLikedPosts,
 } from "@/queries/post/getPostsByUser";
 import { useUser } from "@/hooks/useUser";
-import { Post, UploadResponse } from "$/types/data.types";
+import { Post } from "$/types/data.types";
+
+// Dynamically import PhotoGridTwo
+const PhotoGridTwo = dynamic(() => import("./PhotoGridTwo"), {
+  loading: () => (
+    <div className="animate-pulse bg-gray-800 w-full h-screen"></div>
+  ),
+});
 
 // Memoize tab configurations to prevent recreating on each render
 const TAB_CONFIGS = {
@@ -53,6 +60,36 @@ interface QueryResult {
   nextCursor?: number;
 }
 
+// Memoize the query function to prevent recreating on each render
+const createQueryFn =
+  (userId: string | null, searchType: string) =>
+  async ({ pageParam = 0 }: { pageParam?: unknown }) => {
+    const page = typeof pageParam === "number" ? pageParam : 0;
+    let result: Post[] = [];
+
+    switch (searchType.toUpperCase()) {
+      case "PRIVATE":
+        result = await getPrivatePostsByUser(supabase, page, userId || "");
+        break;
+      case "LIKED":
+        result = await getUserLikedPosts(supabase, page, userId || "");
+        break;
+      case "PINNED":
+        result = await getPinnedPostsByUser(supabase, page, userId || "");
+        break;
+      case "DRAFT":
+        result = await getIsDraftPostsByUser(supabase, page, userId || "");
+        break;
+      default:
+        result = await getPostsByUser(supabase, page, userId || "");
+    }
+
+    return {
+      data: result,
+      nextCursor: result.length > 0 ? page + 1 : undefined,
+    };
+  };
+
 export default function CreationView() {
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
@@ -63,6 +100,13 @@ export default function CreationView() {
     if (!s) return 0;
     return indexOf(POST_GROUPS, s.toUpperCase());
   }, [s]);
+
+  // Memoize the query function
+  const queryFn = useCallback(
+    (context: { pageParam?: unknown }) =>
+      createQueryFn(userId, s || "")(context),
+    [userId, s]
+  );
 
   // Single query that handles all types of posts
   const {
@@ -75,38 +119,14 @@ export default function CreationView() {
     error,
   } = useInfiniteQuery<QueryResult>({
     queryKey: ["creation_posts", s || "public", userId],
-    queryFn: async ({ pageParam = 0 }) => {
-      let result: Post[] = [];
-      const searchType = s?.toUpperCase() || "";
-      const page = typeof pageParam === "number" ? pageParam : 0;
-
-      switch (searchType) {
-        case "PRIVATE":
-          result = await getPrivatePostsByUser(supabase, page, userId || "");
-          break;
-        case "LIKED":
-          result = await getUserLikedPosts(supabase, page, userId || "");
-          break;
-        case "PINNED":
-          result = await getPinnedPostsByUser(supabase, page, userId || "");
-          break;
-        case "DRAFT":
-          result = await getIsDraftPostsByUser(supabase, page, userId || "");
-          break;
-        default:
-          result = await getPostsByUser(supabase, page, userId || "");
-      }
-
-      return {
-        data: result,
-        nextCursor: result.length > 0 ? page + 1 : undefined,
-      };
-    },
+    queryFn,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: 0,
     enabled: !!userId,
-    retry: 2, // Retry failed requests twice
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+    gcTime: 1000 * 60 * 10, // Keep unused data for 10 minutes
   });
 
   // Get current tab config
@@ -117,9 +137,9 @@ export default function CreationView() {
     return TAB_CONFIGS[configKey];
   }, [s]);
 
-  // Handle error state
-  if (isError) {
-    return (
+  // Memoize the error component
+  const ErrorComponent = useMemo(
+    () => (
       <div className="w-full">
         <div className="w-full mb-4">
           <Tabs
@@ -134,8 +154,12 @@ export default function CreationView() {
             : "An error occurred while loading posts"}
         </div>
       </div>
-    );
-  }
+    ),
+    [error, currentIndex]
+  );
+
+  // Handle error state
+  if (isError) return ErrorComponent;
 
   // Handle loading state when no data is available yet
   if (isLoading && !data) {
