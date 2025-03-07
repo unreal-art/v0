@@ -34,8 +34,12 @@ import { usePost } from "@/hooks/usePost";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
+  // Use priority loading for the first 4 images (eagerly loaded)
+  // This provides fast initial rendering for visible content
+  const shouldPrioritize = index < 4;
+
   return (
     <div
       style={{
@@ -50,8 +54,10 @@ function renderNextImage(
         alt={alt}
         title={title}
         sizes={sizes}
-        priority
+        loading={shouldPrioritize ? "eager" : "lazy"}
+        priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
+        data-index={index} // Add index as data attribute for debugging
       />
     </div>
   );

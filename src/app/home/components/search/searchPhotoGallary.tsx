@@ -1,5 +1,10 @@
 "use client";
-import { ColumnsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
+import {
+  ColumnsPhotoAlbum,
+  RenderPhotoContext,
+  RenderImageProps,
+  RenderImageContext,
+} from "react-photo-album";
 import "react-photo-album/columns.css";
 import { useEffect, useState } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
@@ -24,6 +29,37 @@ import { useSearchParams } from "next/navigation";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
+
+// Add renderNextImage function for lazy/eager loading
+function renderNextImage(
+  { alt = "", title, sizes }: RenderImageProps,
+  { photo, width, height, index = 0 }: RenderImageContext
+) {
+  // Use priority loading for the first 4 images (eagerly loaded)
+  // This provides fast initial rendering for visible content
+  const shouldPrioritize = index < 4;
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        position: "relative",
+        aspectRatio: `${width} / ${height}`,
+      }}
+    >
+      <Image
+        fill
+        src={photo}
+        alt={alt}
+        title={title}
+        sizes={sizes}
+        loading={shouldPrioritize ? "eager" : "lazy"}
+        priority={shouldPrioritize}
+        placeholder={"blurDataURL" in photo ? "blur" : undefined}
+      />
+    </div>
+  );
+}
 
 export default function SearchPhotoGallary({
   searchTerm,
@@ -140,6 +176,7 @@ export default function SearchPhotoGallary({
                 handleImageIndex={handleImageIndex}
               />
             ),
+            image: renderNextImage,
           }}
         />
       </InfiniteScroll>
