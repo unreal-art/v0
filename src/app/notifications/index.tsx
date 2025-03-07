@@ -23,7 +23,7 @@ export default function Notifications({ children }: INotificationProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const { notifications } = useNotifications(userId);
-
+  console.log(notifications);
   const unreadCount = useUnreadNotificationsCount(userId);
   // console.log(unreadCount);
 

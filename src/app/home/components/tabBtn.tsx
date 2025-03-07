@@ -1,22 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useGalleryStore, GalleryTab } from "@/stores/galleryStore";
 
 interface NavBtnProps {
   text: "Explore" | "Following" | "Top" | "Search";
 }
 
 export default function TabBtn({ text }: NavBtnProps) {
-  const [active, setActive] = useState(false);
   const [hover, setHover] = useState(false);
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const s = searchParams.get("s");
+
+  // Get state from Zustand
+  const { activeTab, setActiveTab, initFromUrl } = useGalleryStore();
+
+  // Sync store with URL on initial load
+  useEffect(() => {
+    const urlParam = searchParams.get("s");
+    initFromUrl(urlParam);
+  }, [searchParams, initFromUrl]);
+
+  // Determine if this tab is active
+  const isActive = activeTab === text.toUpperCase();
+
   let iconSvg = null;
 
   function getIconColor() {
-    if (active) {
+    if (isActive) {
       return "#8F8F8F";
     } else if (hover) {
       return "#8F8F8F";
@@ -24,6 +37,15 @@ export default function TabBtn({ text }: NavBtnProps) {
       return "#5D5D5D";
     }
   }
+
+  // Handle tab click - update Zustand state and URL
+  const handleTabClick = () => {
+    // Update Zustand state
+    setActiveTab(text.toUpperCase() as GalleryTab);
+
+    // Update URL without page reload
+    router.replace(`?s=${text.toLowerCase()}`, { scroll: false });
+  };
 
   switch (text) {
     case "Explore":
@@ -94,19 +116,12 @@ export default function TabBtn({ text }: NavBtnProps) {
       throw new Error("Invalid icon");
   }
 
-  useEffect(() => {
-    //set active the right tab or default to explore
-    setActive(
-      s?.toUpperCase() === text.toUpperCase() ||
-        (!s && text.toUpperCase() === "EXPLORE")
-    );
-  }, [text, s]);
-
+  // Special handling for Search tab
   if (text === "Search") {
     return (
       <button
         className={`flex items-center p-2 rounded-full border-primary-9 border-[1px] ${
-          hover || active ? "bg-primary-10" : ""
+          hover || isActive ? "bg-primary-10" : ""
         }`}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
@@ -116,20 +131,24 @@ export default function TabBtn({ text }: NavBtnProps) {
     );
   }
 
+  // Regular tabs
   return (
-    <Link href={`/home?s=${text}`}>
-      <button
-        className={`flex gap-x-1 items-center p-2 pr-4 rounded-full ${
-          hover || active ? "bg-primary-10" : ""
-        }`}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+    <button
+      className={`relative flex items-center gap-2 rounded-full  ${
+        isActive ? "bg-primary-10" : ""
+      } px-2 md:px-4 py-2 cursor-pointer hover:bg-primary-10 transition`}
+      onClick={handleTabClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      {iconSvg}
+      <span
+        className={`${
+          isActive ? "text-primary-8" : "text-primary-5"
+        } font-poppins hidden md:block text-sm transition select-none`}
       >
-        <div>{iconSvg}</div>
-        <p className={`text-sm ${hover || active ? "text-primary-6" : ""}`}>
-          {text}
-        </p>
-      </button>
-    </Link>
+        {text}
+      </span>
+    </button>
   );
 }
