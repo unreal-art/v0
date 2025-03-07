@@ -17,19 +17,20 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 // Constants for breakpoints and grid sizing
 const BREAKPOINTS = {
+  FOUR_XL: 2000,
   TWO_XL: 1536,
+  XL: 1280,
   LG: 1024,
   MD: 768,
+  SM: 640
 } as const;
 
 const GRID_SIZES = {
-  TWO_XL: { width: 380, height: 380 },
-  LG: { width: 320, height: 320 },
-  MD: { width: 320, height: 320 },
-  SM: { width: 300, height: 300 },
+  TWO_XL: 380,
+  LG: 320,
+  MD: 320,
+  SM: 300,
 } as const;
-
-type GridSize = (typeof GRID_SIZES)[keyof typeof GRID_SIZES];
 
 // Props interface for the PhotoGridTwo component
 interface TabProps {
@@ -89,7 +90,7 @@ export default function PhotoGridTwo({
 }: TabProps): ReactElement {
   // State management
   const [imageIndex, setImageIndex] = useState(-1);
-  const [size, setSize] = useState<GridSize>(GRID_SIZES.LG);
+  const [size, setSize] = useState<number>(GRID_SIZES.LG);
 
   // Memoized values and callbacks
   const photos = useMemo(() => {
@@ -111,8 +112,8 @@ export default function PhotoGridTwo({
         const transformedPhoto = {
           id: post.id.toString(),
           src: imageUrl,
-          width: size.width,
-          height: size.height,
+          width: size,
+          height: size,
           alt: post.caption || post.prompt || "",
           caption: post.caption,
           prompt: post.prompt || "",
@@ -184,15 +185,21 @@ export default function PhotoGridTwo({
     const handleResize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        const width = window.innerWidth;
-        if (width >= BREAKPOINTS.TWO_XL) {
-          setSize(GRID_SIZES.TWO_XL);
+        const width = Number(window.innerWidth);
+        if (width >= BREAKPOINTS.FOUR_XL) {
+          setSize(width * 0.22);
+        } else if (width >= BREAKPOINTS.TWO_XL) {
+          setSize(width * 0.21);
+        } else if (width >= BREAKPOINTS.XL) {
+          setSize(width * 0.276);
         } else if (width >= BREAKPOINTS.LG) {
-          setSize(GRID_SIZES.LG);
+          setSize(width * 0.266);
         } else if (width >= BREAKPOINTS.MD) {
-          setSize(GRID_SIZES.MD);
+          setSize(width * 0.41);
+        } else if (width >= BREAKPOINTS.SM) {
+          setSize(width * 0.49);
         } else {
-          setSize(GRID_SIZES.SM);
+          setSize(width * 0.98);
         }
       }, 100);
     };
@@ -221,9 +228,8 @@ export default function PhotoGridTwo({
         isLoadingInitial={false}
         isLoadingMore={isFetchingNextPage}
         loadMore={loadMore}
-        hasNextPage={hasNextPage}
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
+        hasNextPage={hasNextPage}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
           {photos.map((photo: TransformedPhoto, index: number) => {
             const context = {
               index,
@@ -235,7 +241,7 @@ export default function PhotoGridTwo({
             return (
               <div
                 key={photo.id}
-                style={{ width: size.width, height: size.height }}
+                style={{ width: size, height: size }}
                 className="relative grid-cols-1"
               >
                 <PhotoOverlay
@@ -246,8 +252,7 @@ export default function PhotoGridTwo({
                   photo={
                     <Image
                       src={photo.src}
-                      width={500}
-                      height={500}
+                      fill={true}
                       alt={String(photo.alt)}
                       priority={index < 4}
                       className="object-cover"
@@ -266,8 +271,7 @@ export default function PhotoGridTwo({
 
                     <Image
                       src={photo.src}
-                      width={500}
-                      height={500}
+                      fill={true}
                       alt={String(photo.alt)}
                       priority={index < 4}
                       className="object-cover"

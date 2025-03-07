@@ -137,7 +137,7 @@ export default function NavLink({ href, text, icon }: NavLinkProps) {
 
   return (
     <Link
-      className="flex md:p-2 md:m-5 flex-col items-center justify-center"
+      className="flex md:p-2 md:my-5 flex-col items-center justify-center"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       href={href}
