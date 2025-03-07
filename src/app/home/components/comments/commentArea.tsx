@@ -34,14 +34,14 @@ export default function CommentArea({
   // console.log(comments);
   const [replyTo, setReplyTo] = useState<CommentWithUser | null>(null);
   const [comentToReply, setCommentToReply] = useState<CommentWithUser | null>(
-    null
+    null,
   );
   const handleCloseReply = () => {
     setReplyTo(null);
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col ">
       <div className="p-[2px]">
         <div className="flex justify-between h-18 py-2 px-5 gap-5 w-full">
           <div className="flex gap-1 items-center">
