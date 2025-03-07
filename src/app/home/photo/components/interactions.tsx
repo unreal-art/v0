@@ -21,7 +21,7 @@ import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
 import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
-import { downloadImage } from "$/utils";
+import { downloadImage } from "@/utils";
 import ShareModal from "../../components/modals/shareModal";
 import { useState } from "react";
 import {

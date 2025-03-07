@@ -1,4 +1,4 @@
-import { splitName } from "$/utils";
+import { splitName } from "@/utils";
 import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
 import Image from "next/image";
 import { FormEvent, ReactEventHandler, useEffect, useState } from "react";
@@ -14,10 +14,10 @@ export default function EditProfileModal({
   const updateUser = useUpdateUserDetails();
 
   const [firstname, setFirstName] = useState<string>(
-    splitName(user.full_name).firstName,
+    splitName(user.full_name).firstName
   );
   const [lastname, setLastName] = useState<string>(
-    splitName(user.full_name).lastName,
+    splitName(user.full_name).lastName
   );
   const [full_name, setFullName] = useState<string>(user.full_name);
   const [bio, setBio] = useState<string>(user.bio);
@@ -51,7 +51,7 @@ export default function EditProfileModal({
         },
         onError: (error) =>
           toast.error("Opps an error occured during profile update."),
-      },
+      }
     );
   };
   return (

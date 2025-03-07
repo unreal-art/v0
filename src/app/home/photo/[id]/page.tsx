@@ -15,7 +15,7 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
-import { formatDate, getImageResolution, truncateText } from "$/utils";
+import { formatDate, getImageResolution, truncateText } from "@/utils";
 import { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";

@@ -1,5 +1,5 @@
 import { supabase } from "$/supabase/client";
-import { downloadImage } from "$/utils";
+import { downloadImage } from "@/utils";
 import {
   DownloadIcon,
   HeartFillIcon,

@@ -1,12 +1,12 @@
 import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
-import { getRange } from "$/utils";
+import { getRange } from "@/utils";
 import { LIST_LIMIT } from "@/app/libs/constants";
 
 export async function getPostsByUser(
   client: Client,
   start = 0,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -45,8 +45,8 @@ export async function getPostsByUser(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 
@@ -54,7 +54,7 @@ export async function getOtherPostsByUser(
   client: Client,
   start = 0,
   postId: number,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -93,15 +93,15 @@ export async function getOtherPostsByUser(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 
 export async function getPrivatePostsByUser(
   client: Client,
   start = 0,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -139,14 +139,14 @@ export async function getPrivatePostsByUser(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 export async function getPinnedPostsByUser(
   client: Client,
   start = 0,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -171,7 +171,7 @@ export async function getPinnedPostsByUser(
       *,
       createdAt
     )
-  `,
+  `
     ) // ✅ Aliases `posts` for better structure
     .eq("user_id", id)
     .filter("posts.isPrivate", "neq", true)
@@ -197,8 +197,8 @@ export async function getPinnedPostsByUser(
       ipfsImages: Array.isArray(posts?.ipfsImages)
         ? (posts.ipfsImages as UploadResponse[]) // ✅ Already an array
         : typeof posts?.ipfsImages === "string"
-          ? (JSON.parse(posts.ipfsImages) as UploadResponse[]) // ✅ Parse string
-          : null, // ❌ Set to null if neither
+        ? (JSON.parse(posts.ipfsImages) as UploadResponse[]) // ✅ Parse string
+        : null, // ❌ Set to null if neither
     })) ?? []
   );
 }
@@ -206,7 +206,7 @@ export async function getPinnedPostsByUser(
 export async function getIsDraftPostsByUser(
   client: Client,
   start = 0,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -243,15 +243,15 @@ export async function getIsDraftPostsByUser(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 export async function getOtherIsDraftPostsByUser(
   client: Client,
   start = 0,
   postId: number,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -289,15 +289,15 @@ export async function getOtherIsDraftPostsByUser(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   }));
 }
 
 export async function getUserLikedPosts(
   client: Client,
   start = 0,
-  id?: string,
+  id?: string
 ): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
 
@@ -338,7 +338,7 @@ export async function getUserLikedPosts(
     ipfsImages: Array.isArray(post.ipfsImages)
       ? (post.ipfsImages as UploadResponse[])
       : typeof post.ipfsImages === "string"
-        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-        : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
   })) as Post[]; // ✅ Cast the final array as `Post[]`
 }

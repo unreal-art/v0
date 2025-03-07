@@ -1,5 +1,5 @@
 import { Page, Post } from "$/types/data.types";
-import { isHighQualityImage } from "$/utils";
+import { isHighQualityImage } from "@/utils";
 import type { Photo } from "react-photo-album";
 
 export interface ExtendedPhoto extends Photo {

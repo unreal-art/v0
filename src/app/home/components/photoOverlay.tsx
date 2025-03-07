@@ -7,7 +7,7 @@ import {
   OptionMenuIcon,
 } from "@/app/components/icons";
 import { Photo, RenderPhotoContext } from "react-photo-album";
-import { truncateText } from "$/utils";
+import { truncateText } from "@/utils";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { supabase } from "$/supabase/client";
 import { useLikePost } from "@/hooks/useLikePost";

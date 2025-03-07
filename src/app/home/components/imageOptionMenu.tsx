@@ -19,7 +19,7 @@ import {
   useUnpinPost,
 } from "@/hooks/usePinnedPosts";
 import { getImage } from "../formattedPhotos";
-import { downloadImage } from "$/utils";
+import { downloadImage } from "@/utils";
 import { Post } from "$/types/data.types";
 import { ExtendedRenderPhotoContext } from "./photoOverlay";
 import Link from "next/link";
@@ -47,7 +47,7 @@ export default function ImageOptionMenu({
 
   const { data: isPinned, isLoading } = useIsPostPinned(
     Number(postId),
-    userId as string,
+    userId as string
   );
   const { data: post } = usePost(Number(postId));
   const { mutate: pinPost } = usePinPost(userId as string);

@@ -1,6 +1,6 @@
 import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
-import { getRange } from "$/utils";
+import { getRange } from "@/utils";
 import { LIST_LIMIT } from "@/app/libs/constants";
 
 export async function getPosts(client: Client, start = 0): Promise<Post[]> {

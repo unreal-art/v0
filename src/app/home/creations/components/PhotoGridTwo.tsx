@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 import Image from "next/image";
-import { truncateText } from "$/utils";
+import { truncateText } from "@/utils";
 import { timeAgo } from "@/app/libs/timeAgo";
 import { OptionMenuIcon } from "@/app/components/icons";
 import { TabText } from "./Tabs";

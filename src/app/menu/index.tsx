@@ -8,7 +8,7 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 import { supabase } from "$/supabase/client";
 import { useRouter } from "next/navigation";
-import { getContractInstance } from "$/utils";
+import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { useReadContract } from "thirdweb/react";
 import { formatEther } from "ethers";
@@ -19,7 +19,7 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 export default function Menu({ children }: INotificationProps) {

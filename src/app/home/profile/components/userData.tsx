@@ -19,7 +19,7 @@ import ShareModal from "../../components/modals/shareModal";
 import { useUser } from "@/hooks/useUser";
 import Topup from "@/app/menu/topup";
 import { useReadContract } from "thirdweb/react";
-import { getContractInstance } from "$/utils";
+import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
 // import { getUser } from "$/queries/user/getUser";
@@ -28,7 +28,7 @@ type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 export default function UserData() {
