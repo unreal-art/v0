@@ -57,6 +57,10 @@ export function usePostComment() {
       return data;
     },
     onSuccess: (_, variables) => {
+      //console.log(variables);
+      queryClient.invalidateQueries({
+        queryKey: ["replies", variables.parent_id],
+      });
       queryClient.invalidateQueries({
         queryKey: ["comments", variables.post_id],
       });

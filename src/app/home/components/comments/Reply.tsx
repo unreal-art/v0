@@ -30,7 +30,7 @@ export default function Reply({
     data.post_id.toString(),
     data.parent_id as string,
   );
-  console.log(data);
+
   return (
     <div className="pl-10 ">
       <div className=" gap-2 py-2  border-primary-10">
