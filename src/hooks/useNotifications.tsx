@@ -255,27 +255,23 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
 };
 
 // Optimized hook for counting share notifications for a specific post
-export const useCountShareNotifications = (
-  userId: string | null,
-  post_id: number | null
-) => {
+export const useCountShareNotifications = (post_id: number | null) => {
   const queryClient = useQueryClient();
 
   const query = useQuery<number, Error>({
-    queryKey: ["shareNotificationsCount", userId, post_id],
+    queryKey: ["shareNotificationsCount", post_id],
     queryFn: async (): Promise<number> => {
-      if (!userId || !post_id) return 0;
+      if (!post_id) return 0;
 
       // Use deduplication for count queries
       return dedupedRequest(
-        `share-notifications-count-${userId}-${post_id}`,
+        `share-notifications-count-${post_id}`,
         async () => {
           const { count, error } = await supabase
             .from("notifications")
             .select("*", { count: "exact", head: true })
-            .eq("user_id", userId)
             .eq("post_id", post_id)
-            .eq("type", "share");
+            .eq("type", "share"); // Add type filter to only count share notifications
 
           if (error) throw error;
           return count || 0;
@@ -285,33 +281,33 @@ export const useCountShareNotifications = (
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     gcTime: 1000 * 60 * 15, // Keep in cache for 15 minutes
     refetchOnWindowFocus: false,
-    enabled: !!userId && !!post_id,
+    enabled: !!post_id,
   });
 
   // Set up real-time subscription for live updates
   useEffect(() => {
-    if (!userId || !post_id) return;
+    if (!post_id) return;
 
     const channel = supabase
-      .channel(`share-notifications-${userId}-${post_id}`)
+      .channel(`share-notifications-${post_id}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${userId} AND post_id=eq.${post_id} AND type=eq.share`,
+          filter: `post_id=eq.${post_id} AND type=eq.share`,
         },
         () => {
           // Optimistic increment for better UX
           queryClient.setQueryData(
-            ["shareNotificationsCount", userId, post_id],
+            ["shareNotificationsCount", post_id],
             (oldCount: number | undefined) => (oldCount || 0) + 1
           );
 
           // Still invalidate to get actual data
           queryClient.invalidateQueries({
-            queryKey: ["shareNotificationsCount", userId, post_id],
+            queryKey: ["shareNotificationsCount", post_id],
           });
         }
       )
@@ -320,17 +316,17 @@ export const useCountShareNotifications = (
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, post_id, queryClient]);
+  }, [post_id, queryClient]);
 
   // Helper for incrementing count optimistically
   const incrementShareCount = useCallback(() => {
-    if (!userId || !post_id) return;
+    if (!post_id) return;
 
     queryClient.setQueryData(
-      ["shareNotificationsCount", userId, post_id],
+      ["shareNotificationsCount", post_id],
       (oldCount: number | undefined) => (oldCount || 0) + 1
     );
-  }, [userId, post_id, queryClient]);
+  }, [post_id, queryClient]);
 
   return {
     shareCount: query.data || 0,

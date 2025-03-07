@@ -23,6 +23,7 @@ import { useReadContract } from "thirdweb/react";
 import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
+import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
@@ -49,26 +50,32 @@ export default function UserData() {
   const queryClient = useQueryClient();
 
   const params = useParams();
+  const profileId = params.id as string;
 
-  const userId = params.id as string;
-  //fetch user details
+  // Fetch data about the profile being viewed
   const {
-    data: user,
-    isLoading,
-    error,
+    data: profileData,
+    isLoading: profileLoading,
+    error: profileError,
+    isOwnProfile,
     updateUserDataOptimistically,
-  } = useUserData(userId);
+  } = useUserData(profileId);
+
+  // Get the current authenticated user's information
   const {
     userId: authUserId,
     user: authUser,
     loading: authUserLoading,
   } = useUser();
 
+  // Get the update function for profile data
+  const { updateViewedProfile } = useUpdateUserDetails();
+
   //fetch follow stats
-  const { followeeCount, followerCount } = useFollowStats(userId);
+  const { followeeCount, followerCount } = useFollowStats(profileId);
 
   //fetch like stat
-  const { data: likeCount } = useLikeStat(userId);
+  const { data: likeCount } = useLikeStat(profileId);
 
   // credit
   const { data: dartBalance } = useReadContract({
@@ -79,12 +86,12 @@ export default function UserData() {
 
   // Prefetch related users when this profile is viewed
   useEffect(() => {
-    if (user && followeeCount && followeeCount > 0) {
+    if (profileData && followeeCount && followeeCount > 0) {
       // Prefetch followers data when available
       const prefetchFollowers = async () => {
         try {
           // Get follower IDs
-          const followerIds = await getFollowerIds(userId);
+          const followerIds = await getFollowerIds(profileId);
           // Prefetch the first 3-5 followers for better UX
           followerIds.slice(0, 5).forEach((followerId: string) => {
             prefetchUserData(queryClient, followerId);
@@ -96,28 +103,36 @@ export default function UserData() {
 
       prefetchFollowers();
     }
-  }, [userId, followeeCount, queryClient, user]);
+  }, [profileId, followeeCount, queryClient, profileData]);
 
-  // Example of how to use optimistic updates
-  const updateUserBio = (newBio: string) => {
-    if (!userId) return;
+  // Example of how to use profile updates when it's the user's own profile
+  const updateProfileBio = async (newBio: string) => {
+    if (!isOwnProfile || !profileId) return;
 
     // Optimistically update the UI
     updateUserDataOptimistically({
       bio: newBio,
     });
 
-    // Then perform the actual update (this would call your API)
-    // updateUserBioAPI(userId, newBio).catch(error => {
-    //   console.error("Failed to update bio:", error);
-    //   // The UI will automatically revert if the query is invalidated
-    // });
+    // Then perform the actual update
+    try {
+      await updateViewedProfile(profileId, { bio: newBio });
+    } catch (error) {
+      const err = error as Error;
+      console.error("Failed to update bio:", err.message);
+      // The UI will automatically revert if the mutation fails
+    }
   };
 
-  if (isLoading || authUserLoading || !authUser) return <ProfileSkeleton />;
-  if (error) return <p>Error loading user data: {error.message}</p>;
+  if (profileLoading || authUserLoading || !authUser)
+    return <ProfileSkeleton />;
+  if (profileError)
+    return <p>Error loading profile data: {profileError.message}</p>;
 
   const showEditAccount = () => {
+    // Only allow editing if it's the user's own profile
+    if (!isOwnProfile) return;
+
     setOpen(true);
     setTitle("Edit Account");
   };
@@ -134,7 +149,7 @@ export default function UserData() {
           <div className="w-28 h-28 md:w-52 md:h-52">
             <Image
               className="rounded-full"
-              src={user?.avatar_url || "/profile.jpg"}
+              src={profileData?.avatar_url || "/profile.jpg"}
               width={200}
               height={200}
               alt="profile"
@@ -142,10 +157,10 @@ export default function UserData() {
           </div>
 
           <div className="block md:hidden">
-            <p className="text-3xl font-medium">{user?.full_name}</p>
+            <p className="text-3xl font-medium">{profileData?.full_name}</p>
 
             <div className="flex my-4 gap-3">
-              {authUserId === userId && (
+              {isOwnProfile && (
                 <button
                   onClick={showEditAccount}
                   className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11"
@@ -163,10 +178,10 @@ export default function UserData() {
 
         <div className="flex-grow text-primary-5">
           <div className="hidden md:block">
-            <p className="text-3xl font-medium">{user?.full_name}</p>
+            <p className="text-3xl font-medium">{profileData?.full_name}</p>
 
             <div className="flex my-4 gap-3">
-              {authUserId === userId && (
+              {isOwnProfile && (
                 <button
                   onClick={showEditAccount}
                   className="flex justify-center items-center h-9 w-28 text-primary-4 font-medium text-sm topup-btn-gradient rounded-2xl bg-primary-11"
@@ -202,13 +217,13 @@ export default function UserData() {
           </div>
 
           <p className="text-primary-7 my-4"> Bio </p>
-          <p className="text-primary-7 my-4"> {user?.bio} </p>
+          <p className="text-primary-7 my-4"> {profileData?.bio} </p>
         </div>
 
         <Topup open={topup} setOpen={setTopup} />
 
         <div className="hidden md:block">
-          {authUserId === userId && (
+          {isOwnProfile && (
             <button
               onClick={() => setTopup(true)}
               className="flex gap-2 whitespace-nowrap text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11"
@@ -219,7 +234,7 @@ export default function UserData() {
               <p>
                 {(() => {
                   const balance =
-                    (user?.creditBalance ?? 0) +
+                    (profileData?.creditBalance ?? 0) +
                     Number(formatEther(dartBalance ?? BigInt(0)));
                   return `${balance} Credit${balance !== 1 ? "s" : ""}`; //accounting for plural cases
                 })()}
@@ -231,7 +246,7 @@ export default function UserData() {
       <ShareModal
         open={openShare}
         setOpen={setOpenShare}
-        link={"https://unreal.art/home/profile/" + userId}
+        link={"https://unreal.art/home/profile/" + profileId}
         isProfile={true}
       />
       <ModalWrapper
@@ -247,8 +262,8 @@ export default function UserData() {
           />
         )}
         {title === "Delete Account" && <DeleteModal close={handleClose} />}
-        {title === "Edit Profile" && user && (
-          <EditProfileModal user={authUser} close={handleClose} />
+        {title === "Edit Profile" && profileData && (
+          <EditProfileModal profileId={profileId} close={handleClose} />
         )}
       </ModalWrapper>
     </>

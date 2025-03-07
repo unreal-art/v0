@@ -72,7 +72,6 @@ export default function Menu({ children }: INotificationProps) {
               onClick={handleClose}
               href={`/home/profile/${userId}`}
               className="flex items-center gap-2 text-primary-6 h-16 p-3 border-primary-8 border-b-[1px]"
-              onClick={handleClose}
             >
               <div>
                 <Image

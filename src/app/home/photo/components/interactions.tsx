@@ -50,10 +50,7 @@ export default function Interactions({ postId }: { postId: number }) {
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
   const { mutate: unpinPost } = useUnpinPost(userId as string);
-  const { shareCount: shareNotifications } = useCountShareNotifications(
-    userId as string,
-    postId
-  );
+  const { shareCount: shareNotifications } = useCountShareNotifications(postId);
 
   console.log(shareNotifications);
   const togglePostPin = () => {

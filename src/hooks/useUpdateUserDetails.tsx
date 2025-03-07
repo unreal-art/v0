@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
-import { normalizeEntity } from "@/utils/queryOptimizer";
+import { normalizeEntity, getEntity } from "@/utils/queryOptimizer";
 import { useCallback, useRef } from "react";
+import { toast } from "sonner";
 
 // Enhanced interface for user data
 interface UserData {
@@ -19,7 +20,10 @@ interface UserData {
 
 /**
  * Enhanced hook for updating user profile details with optimized
- * performance and better error handling
+ * performance and better error handling.
+ *
+ * This hook is primarily for updating the authenticated user's profile,
+ * but can also be used to update any profile when appropriate permissions exist.
  */
 export const useUpdateUserDetails = () => {
   const queryClient = useQueryClient();
@@ -32,25 +36,35 @@ export const useUpdateUserDetails = () => {
     mutationFn: async ({
       user,
       id,
+      preserveFields = false,
     }: {
       user: UserData;
       id: string;
+      preserveFields?: boolean;
     }): Promise<UserData> => {
       if (!id) throw new Error("User ID is required");
 
-      // Filter out undefined values to perform a partial update
-      const updates: UserData = {};
+      // Create an update object with only the fields the database expects
+      const updates: Partial<UserData> = {};
+
+      // Only include fields the database expects
+      const allowedFields = ["full_name", "display_name", "bio"];
+
       Object.entries(user).forEach(([key, value]) => {
-        if (value !== undefined) {
+        if (allowedFields.includes(key) && value !== undefined) {
           updates[key] = value;
         }
       });
 
       // Only send the update if there are actual changes
       if (Object.keys(updates).length === 0) {
+        console.log("No valid fields to update");
         return user; // No changes to make
       }
 
+      console.log("Final updates to send to API:", updates);
+
+      // Send only the expected fields to the database
       const { data, error } = await supabase
         .from("profiles")
         .update(updates)
@@ -59,8 +73,18 @@ export const useUpdateUserDetails = () => {
 
       if (error) throw new Error(error.message);
 
-      // Return the updated data for cache integration
-      return data?.[0] || user;
+      // For the return data, preserve all the fields but update the ones from the server
+      const returnData = {
+        ...user,
+        ...(data?.[0] || {}),
+      };
+
+      // Map credit_balance to creditBalance for UI if needed
+      if (returnData.credit_balance && returnData.credit_balance !== 0) {
+        (returnData as any).creditBalance = returnData.credit_balance;
+      }
+
+      return returnData;
     },
 
     onMutate: async ({ user, id }) => {
@@ -84,7 +108,7 @@ export const useUpdateUserDetails = () => {
 
       const previousUserData = queryClient.getQueryData(["user", id]);
 
-      // Optimistically update all user data in cache
+      // Optimistically update all user data in cache - preserve existing data
       queryClient.setQueryData(["user"], (oldData: any) => {
         if (!oldData || !oldData.user) return oldData;
 
@@ -94,16 +118,37 @@ export const useUpdateUserDetails = () => {
         };
       });
 
-      queryClient.setQueryData(["profile_data", id], (oldData: any) => ({
-        ...oldData,
-        ...user,
-      }));
-
-      // Update normalized cache
-      if (id) {
-        normalizeEntity("users", {
-          id,
+      // Update profile data - preserve existing data
+      queryClient.setQueryData(["profile_data", id], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
           ...user,
+        };
+      });
+
+      // Update normalized cache - preserve existing data
+      if (id) {
+        const existingEntity = getEntity("users", id) || {};
+
+        // Log for debugging
+        console.log("Existing entity before update:", existingEntity);
+        console.log("Updates being applied:", user);
+
+        // Create an enhanced update with only valid fields and field mappings
+        const validUpdateFields = ["full_name", "display_name", "bio"];
+        const clientCacheUpdate = { ...user };
+
+        // If display_name is being updated, also update username for UI
+
+        clientCacheUpdate.username = user.display_name;
+
+        console.log("Enhanced client cache update:", clientCacheUpdate);
+
+        normalizeEntity("users", {
+          ...existingEntity,
+          ...clientCacheUpdate,
+          id,
         });
       }
 
@@ -112,6 +157,7 @@ export const useUpdateUserDetails = () => {
 
     onError: (error, { id }, context) => {
       console.error("Error updating user details:", error);
+      toast.error(`Failed to update profile: ${error.message}`);
 
       // Revert all optimistic updates
       if (context?.previousUser) {
@@ -128,8 +174,10 @@ export const useUpdateUserDetails = () => {
     },
 
     onSuccess: (data, { id }) => {
-      // Update all related queries for consistency
+      // Toast success message
+      toast.success("Profile updated successfully");
 
+      // Update all related queries for consistency
       // Add updated data to normalized cache
       normalizeEntity("users", {
         id,
@@ -150,8 +198,20 @@ export const useUpdateUserDetails = () => {
   // Helper to throttle rapid consecutive updates
   const throttledUpdate = useCallback(
     (id: string, updates: UserData) => {
+      console.log("Throttled update called with:", id, updates);
+
       // If an update is already pending, combine the updates
       if (pendingUpdatesRef.current) {
+        console.log("Existing pending updates:", pendingUpdatesRef.current);
+
+        // Before combining, check if we need to preserve the display_name
+        const needToPreserveDisplayName =
+          (updates.hasOwnProperty("firstname") ||
+            updates.hasOwnProperty("lastname")) &&
+          !updates.hasOwnProperty("display_name") &&
+          pendingUpdatesRef.current.user.display_name;
+
+        // Combine the updates
         pendingUpdatesRef.current = {
           id,
           user: {
@@ -159,11 +219,23 @@ export const useUpdateUserDetails = () => {
             ...updates,
           },
         };
+
+        // If updating first/last name but not display_name, preserve the existing display_name
+        if (needToPreserveDisplayName) {
+          console.log(
+            "Preserving display_name when combining updates with first/last name changes"
+          );
+          pendingUpdatesRef.current.user.display_name =
+            pendingUpdatesRef.current.user.display_name;
+        }
+
+        console.log("Combined pending updates:", pendingUpdatesRef.current);
         return;
       }
 
       // Store the current update
       pendingUpdatesRef.current = { user: updates, id };
+      console.log("Stored pending update:", pendingUpdatesRef.current);
 
       // Clear any existing timeout
       if (throttleTimeoutRef.current) {
@@ -173,8 +245,128 @@ export const useUpdateUserDetails = () => {
       // Set a timeout to process the update
       throttleTimeoutRef.current = setTimeout(() => {
         if (pendingUpdatesRef.current) {
-          // Process the update
-          mutation.mutate(pendingUpdatesRef.current);
+          console.log("Processing throttled update...");
+
+          // Get the current data from cache before making the update
+          const currentProfileData = queryClient.getQueryData<UserData>([
+            "profile_data",
+            id,
+          ]);
+          console.log("Current profile data from cache:", currentProfileData);
+
+          if (currentProfileData) {
+            // Create an update object that only includes fields the database expects
+            const updateData: Partial<UserData> = {};
+            const pendingUpdates = pendingUpdatesRef.current?.user || {};
+
+            // Only include fields the database expects
+            const allowedFields = ["full_name", "display_name", "bio"];
+
+            // First check if we're updating first/last name without explicitly updating display_name
+            const isUpdatingName =
+              (pendingUpdates.hasOwnProperty("firstname") ||
+                pendingUpdates.hasOwnProperty("lastname")) &&
+              !pendingUpdates.hasOwnProperty("display_name");
+
+            // If we're updating name but not display_name, make sure to preserve the current display_name
+            if (isUpdatingName && currentProfileData.display_name) {
+              console.log(
+                "Name update detected - explicitly preserving display_name:",
+                currentProfileData.display_name
+              );
+              // Include the current display_name in our update to prevent it from being lost
+              pendingUpdates.display_name = currentProfileData.display_name;
+            }
+
+            // Process each pending update for allowed fields
+            Object.entries(pendingUpdates).forEach(([key, value]) => {
+              if (allowedFields.includes(key) && value !== undefined) {
+                updateData[key] = value;
+              }
+            });
+
+            // Special handling for first/last name which affect full_name
+            if (
+              !updateData.full_name &&
+              (pendingUpdates.hasOwnProperty("firstname") ||
+                pendingUpdates.hasOwnProperty("lastname"))
+            ) {
+              // This means we're updating firstname or lastname, but not directly full_name
+              console.log("Handling firstname/lastname update");
+
+              // We need to get the current full_name and update it
+              const currentFirstName =
+                pendingUpdates.firstname ||
+                (currentProfileData.full_name
+                  ? currentProfileData.full_name.split(" ")[0]
+                  : "");
+
+              const currentLastName =
+                pendingUpdates.lastname ||
+                (currentProfileData.full_name &&
+                currentProfileData.full_name.split(" ").length > 1
+                  ? currentProfileData.full_name.split(" ").slice(1).join(" ")
+                  : "");
+
+              updateData.full_name =
+                `${currentFirstName} ${currentLastName}`.trim();
+              console.log(
+                "Setting full_name from first/last name:",
+                updateData.full_name
+              );
+            }
+
+            // Double-check that display_name is preserved
+            if (
+              updateData.full_name &&
+              !updateData.display_name &&
+              currentProfileData.display_name
+            ) {
+              console.log(
+                "Re-checking display_name is preserved during name update"
+              );
+              updateData.display_name = currentProfileData.display_name;
+            }
+
+            // Skip update if nothing to update
+            if (Object.keys(updateData).length === 0) {
+              console.log("No valid fields to update, skipping");
+              pendingUpdatesRef.current = null;
+              throttleTimeoutRef.current = null;
+              return;
+            }
+
+            console.log("Final update data to send to API:", updateData);
+
+            // Execute the mutation with only the allowed fields
+            mutation.mutate({
+              user: updateData,
+              id,
+              preserveFields: true,
+            });
+          } else {
+            // If we don't have current data, use a safer approach
+            console.log("No current data found, using safer update approach");
+
+            const updateData: Partial<UserData> = {};
+            const pendingUpdates = pendingUpdatesRef.current?.user || {};
+
+            // Only include fields the database expects
+            const allowedFields = ["full_name", "display_name", "bio"];
+            Object.entries(pendingUpdates).forEach(([key, value]) => {
+              if (allowedFields.includes(key) && value !== undefined) {
+                updateData[key] = value;
+              }
+            });
+
+            if (Object.keys(updateData).length > 0) {
+              mutation.mutate({
+                user: updateData,
+                id,
+                preserveFields: true,
+              });
+            }
+          }
 
           // Reset state
           pendingUpdatesRef.current = null;
@@ -182,7 +374,7 @@ export const useUpdateUserDetails = () => {
         }
       }, 500); // 500ms throttle
     },
-    [mutation]
+    [mutation, queryClient]
   );
 
   // Helper for field-by-field updates
@@ -196,9 +388,50 @@ export const useUpdateUserDetails = () => {
     [mutation]
   );
 
+  // Helper to update a viewed profile (works with useUserData)
+  const updateViewedProfile = useCallback(
+    (profileId: string, updates: UserData) => {
+      // Get the current data from cache to ensure we preserve important fields
+      const currentProfileData = queryClient.getQueryData<UserData>([
+        "profile_data",
+        profileId,
+      ]);
+
+      // Create an update object that only includes fields the database expects
+      const updateData: Partial<UserData> = {};
+      const allowedFields = ["full_name", "display_name", "bio"];
+
+      // Process each update for allowed fields
+      Object.entries(updates).forEach(([key, value]) => {
+        if (allowedFields.includes(key) && value !== undefined) {
+          updateData[key] = value;
+        }
+      });
+
+      // Ensure display_name is preserved if we're updating full_name
+      if (
+        updateData.full_name &&
+        !updateData.display_name &&
+        currentProfileData?.display_name
+      ) {
+        updateData.display_name = currentProfileData.display_name;
+      }
+
+      // This updates both the authenticated user's data (if this is their profile)
+      // and the viewed profile data
+      return mutation.mutate({
+        user: updateData,
+        id: profileId,
+        preserveFields: true,
+      });
+    },
+    [mutation, queryClient]
+  );
+
   return {
     ...mutation,
     updateUserField,
     throttledUpdateUser: throttledUpdate,
+    updateViewedProfile,
   };
 };
