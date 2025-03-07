@@ -130,7 +130,7 @@ export default function PhotoGridTwo({
     (context: ExtendedRenderPhotoContext) => {
       setImageIndex(context.index);
     },
-    []
+    [],
   );
 
   const loadMore = useCallback(() => {
@@ -146,45 +146,35 @@ export default function PhotoGridTwo({
         {Array(12)
           .fill(null)
           .map((_, index) => (
-            <div
+            <Skeleton
               key={index}
-              style={{ width: size.width, height: size.height }}
-              className="relative grid-cols-1"
-            >
-              <Skeleton
-                height="100%"
-                baseColor="#1a1a1a"
-                highlightColor="#333"
-              />
-            </div>
+              height={200}
+              baseColor="#1a1a1a"
+              highlightColor="#333"
+            />
           ))}
       </div>
     ),
-    [size]
+    [size],
   );
 
   // Memoized loading more skeleton
   const loadingMoreSkeleton = useMemo(
     () => (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
-        {Array(4)
+        {Array(12)
           .fill(null)
           .map((_, index) => (
-            <div
-              key={`loading-${index}`}
-              style={{ width: size.width, height: size.height }}
-              className="relative"
-            >
-              <Skeleton
-                height="100%"
-                baseColor="#1a1a1a"
-                highlightColor="#333"
-              />
-            </div>
+            <Skeleton
+              key={index}
+              height={200}
+              baseColor="#1a1a1a"
+              highlightColor="#333"
+            />
           ))}
       </div>
     ),
-    [size]
+    [size],
   );
 
   useEffect(() => {
@@ -287,7 +277,7 @@ export default function PhotoGridTwo({
 
                     <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
                       {truncateText(
-                        context.photo.caption || context.photo.prompt
+                        context.photo.caption || context.photo.prompt,
                       )}
                     </p>
                   </>

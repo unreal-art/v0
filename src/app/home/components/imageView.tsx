@@ -24,10 +24,10 @@ export default function ImageView({
     <>
       <div
         onClick={() => setImageIndex(-1)}
-        className="fixed  top-0 left-0 h-screen w-full bg-gray-950/50"
+        className="relative  top-0 left-0 h-screen w-full bg-gray-950/50 inset-0 "
       ></div>
 
-      <div className="absolute flex justify-center items-center top-0 left-0 h-screen w-full">
+      <div className="fixed z-50 flex justify-center items-center top-0 left-0 h-screen w-full ">
         <div
           onClick={() => setImageIndex(-1)}
           className="absolute flex justify-center items-center top-0 left-0 h-screen w-full"
@@ -58,7 +58,5 @@ export default function ImageView({
         </div>
       </div>
     </>
-
   );
-  
 }

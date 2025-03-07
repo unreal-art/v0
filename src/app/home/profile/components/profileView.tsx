@@ -92,7 +92,7 @@ export default function ProfileView() {
         subContent: "Create something you love to post later",
       },
     }),
-    []
+    [],
   );
 
   const renderContent = useCallback(() => {
@@ -149,7 +149,7 @@ export default function ProfileView() {
   ]);
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <div className="w-full mb-4">
         <Tabs
           currentIndex={currentIndex}
@@ -158,7 +158,7 @@ export default function ProfileView() {
         />
       </div>
 
-      <div className="w-full">{renderContent()}</div>
+      <div className="w-full ">{renderContent()}</div>
     </div>
   );
 }
