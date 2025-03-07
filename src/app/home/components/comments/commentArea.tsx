@@ -1,4 +1,4 @@
-import { OptionMenuIcon } from "@/app/components/icons";
+import { BackIcon, CloseIcon, OptionMenuIcon } from "@/app/components/icons";
 import Image from "next/image";
 import ImageViewInteractions from "../imageViewInteractions";
 import CommentTextbox from "./commentTextbox";
@@ -18,6 +18,7 @@ interface CommentAreaProps {
   authorId: string;
   postId: string;
   imageDetails: IPhoto;
+  handleClose: () => void;
 }
 
 export default function CommentArea({
@@ -28,24 +29,25 @@ export default function CommentArea({
   authorId,
   postId,
   imageDetails,
+  handleClose
 }: CommentAreaProps) {
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
-  // console.log(comments);
   const [replyTo, setReplyTo] = useState<CommentWithUser | null>(null);
-  const [comentToReply, setCommentToReply] = useState<CommentWithUser | null>(
-    null,
-  );
+
   const handleCloseReply = () => {
     setReplyTo(null);
   };
 
   return (
-    <div className="flex flex-col ">
-      <div className="p-[2px]">
-        <div className="flex justify-between h-18 py-2 px-5 gap-5 w-full">
+    <div className="flex flex-col">
+      <div className="md:p-[2px]">
+        <div className="flex justify-between h-18 py-2 px-2 md:px-5 gap-5 w-full text-sm lg:text-base">
           <div className="flex gap-1 items-center">
             <div className="flex items-center">
+              <button onClick={handleClose} className="p-4 md:hidden">
+                <BackIcon width={24} height={24} color="#C1C1C1" />
+              </button>
               {!imageLoading && (
                 <Image
                   className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
@@ -68,11 +70,11 @@ export default function CommentArea({
               <Following authorId={authorId} />
             </div>
           </div>
-          <ImageOptionMenu image={imageDetails}>
-            <div className="h-8">
+          <div className="h-full py-2">
+            <ImageOptionMenu image={imageDetails}>
               <OptionMenuIcon color="#C1C1C1" />
-            </div>
-          </ImageOptionMenu>
+            </ImageOptionMenu>
+          </div>
         </div>
       </div>
 
@@ -83,8 +85,8 @@ export default function CommentArea({
       <div
         className={`flex-grow py-2 px-6 overflow-y-auto ${
           replyTo
-            ? "h-[calc(40vh_-_64px)] md:h-[346px]"
-            : "h-[40vh] md:h-[400px]"
+            ? "h-[calc(81vh_-_118px)] md:h-[346px]"
+            : "h-[calc(81vh_-_64px)] md:h-[400px]"
         }`}
       >
         {comments?.map((comment: CommentWithUser, index: number) => (
@@ -92,7 +94,6 @@ export default function CommentArea({
             key={index}
             data={comment}
             setReplyTo={setReplyTo}
-            // setCommentToReply={setCommentToReply}
           />
         ))}
       </div>
@@ -111,7 +112,7 @@ export default function CommentArea({
           closeReply={handleCloseReply}
           authorId={authorId}
         />
-      </div>
+      </div> 
     </div>
   );
 }

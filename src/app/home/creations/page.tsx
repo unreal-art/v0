@@ -54,11 +54,10 @@ export default async function Creation({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col items-center background-color-primary-1 px-10 w-full">
+      <div className="flex flex-col items-center background-color-primary-1 px-1 md:px-2 lg:px-10 w-full">
         <div className="hidden md:flex flex-col justify-center items-center py-5 w-full">
           <GenerateInput />
         </div>
-
         <CreationView />
       </div>
     </HydrationBoundary>
