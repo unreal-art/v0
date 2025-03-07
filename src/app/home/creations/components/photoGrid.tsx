@@ -9,7 +9,7 @@ import { getPostsByUser } from "@/queries/post/getPostsByUser";
 import { supabase } from "$/supabase/client";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import { formattedPhotos, formattedPhotosForGrid } from "../../formattedPhotos";
-import { truncateText } from "$/utils";
+import { truncateText } from "@/utils";
 
 const PhotoGrid = () => {
   const [hover, setHover] = useState(false);

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "$/supabase/server";
-import { generateEthereumWallet } from "$/utils";
+import { generateEthereumWallet } from "@/utils";
 import { Client } from "$/supabase/client";
 
 export const getUser = async (client?: Client) => {

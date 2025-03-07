@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import Topup from "@/app/menu/topup";
 import { useReadContract } from "thirdweb/react";
-import { getContractInstance } from "$/utils";
+import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ interface GenerateTextFieldProps {
 }
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 export default function GenerateTextField({
@@ -24,9 +24,10 @@ export default function GenerateTextField({
   setOpen,
 }: GenerateTextFieldProps) {
   const { user } = useUser();
-  const { mutate } = useCreateJob(user);
+  const { mutate, isGenerating, progress, cancelJob } = useCreateJob(user);
   const [prompt, setPrompt] = useState<string | null>(null);
   const [topup, setTopup] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
 
   const { data: dartBalance } = useReadContract({
     contract: dartContract,
@@ -49,8 +50,27 @@ export default function GenerateTextField({
       return;
     }
 
-    mutate({ prompt });
-    handleClose();
+    setShowProgress(true);
+
+    mutate(
+      { prompt },
+      {
+        onSuccess: () => {
+          setShowProgress(false);
+          handleClose();
+        },
+        onError: (error) => {
+          setShowProgress(false);
+          toast.error(`Error generating image: ${error.message}`);
+        },
+      }
+    );
+  };
+
+  const cancelGeneration = () => {
+    cancelJob();
+    setShowProgress(false);
+    toast.info("Image generation canceled");
   };
 
   const handleClose = () => {

@@ -91,7 +91,7 @@ export default function Comment({
           <Reply key={idx} data={reply} />
         ))}
 
-      {replies?.length > 2 && (
+      {replies && replies?.length > 2 && (
         <p className="text-right">
           <button
             onClick={() => setSeeMore(!seeMore)}

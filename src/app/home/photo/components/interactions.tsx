@@ -21,13 +21,14 @@ import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
 import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
-import { downloadImage } from "$/utils";
+import { downloadImage } from "@/utils";
 import ShareModal from "../../components/modals/shareModal";
 import { useState } from "react";
 import {
   useCountShareNotifications,
   useNotifications,
 } from "@/hooks/useNotifications";
+import { toast } from "sonner";
 
 export default function Interactions({ postId }: { postId: number }) {
   const [openShare, setOpenShare] = useState(false);
@@ -35,31 +36,60 @@ export default function Interactions({ postId }: { postId: number }) {
   const { data: comments } = useComments(postId.toString());
   useRealtimeComments(postId.toString());
   const { userId } = useUser();
-  const { data: post } = usePost(Number(postId));
+  const { data: post, updatePostOptimistically } = usePost(Number(postId));
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
     post?.author as string
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
-  const { data: isPinned, isLoading } = useIsPostPinned(
+  const { data: isPinned, setPinned } = useIsPostPinned(
     postId,
     userId as string
   );
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
   const { mutate: unpinPost } = useUnpinPost(userId as string);
-  const shareNotifications = useCountShareNotifications(
-    userId as string,
-    postId
-  );
+  const { shareCount: shareNotifications } = useCountShareNotifications(postId);
 
   console.log(shareNotifications);
   const togglePostPin = () => {
-    if (isPinned) {
-      unpinPost(postId);
+    if (!userId) return;
+
+    // Optimistically update the UI
+    const newPinnedState = !isPinned;
+
+    // Update the isPinned state
+    setPinned(newPinnedState);
+
+    // Also update the post data to reflect the pin status
+    updatePostOptimistically({
+      isPinned: newPinnedState,
+    });
+
+    // Call the appropriate mutation
+    if (newPinnedState) {
+      pinPost(postId, {
+        onError: (error) => {
+          // If the mutation fails, revert the optimistic updates
+          setPinned(false);
+          updatePostOptimistically({
+            isPinned: false,
+          });
+          toast.error(`Failed to pin post: ${error.message}`);
+        },
+      });
     } else {
-      pinPost(postId);
+      unpinPost(postId, {
+        onError: (error) => {
+          // If the mutation fails, revert the optimistic updates
+          setPinned(true);
+          updatePostOptimistically({
+            isPinned: true,
+          });
+          toast.error(`Failed to unpin post: ${error.message}`);
+        },
+      });
     }
   };
 

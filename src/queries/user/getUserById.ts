@@ -30,6 +30,7 @@ export const getUserById = async (id: string, client: Client) => {
       full_name: profileData.full_name,
       avatar_url: profileData.avatar_url,
       username: profileData.display_name || profileData.full_name,
+      display_name: profileData.display_name,
     };
   } catch (error) {
     console.error("Unexpected error:", error);

@@ -7,7 +7,7 @@ import {
   OptionMenuIcon,
 } from "@/app/components/icons";
 import { Photo, RenderPhotoContext } from "react-photo-album";
-import { truncateText } from "$/utils";
+import { truncateText } from "@/utils";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { supabase } from "$/supabase/client";
 import { useLikePost } from "@/hooks/useLikePost";
@@ -48,10 +48,12 @@ export default function PhotoOverlay({
   const [hover, setHover] = useState(false);
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
-  const { data: likes, isLoading: loadingLikes } = usePostLikes(
-    Number(context.photo.id),
-    supabase
-  );
+  const {
+    likes,
+    likesCount,
+    isLoading: loadingLikes,
+    hasUserLiked,
+  } = usePostLikes(Number(context.photo.id), supabase);
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,

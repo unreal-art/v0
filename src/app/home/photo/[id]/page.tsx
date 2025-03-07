@@ -9,13 +9,13 @@ import CaptionInput from "../components/captionInput";
 import Interactions from "../components/interactions";
 import PostingActions from "../components/postingActions";
 import { BackIcon, OptionMenuIcon } from "@/app/components/icons";
-import { usePost, useUpdatePost } from "@/hooks/usePost";
+import { usePost, useUpdatePost, prefetchPost } from "@/hooks/usePost";
 import { useUser } from "@/hooks/useUser";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
-import { formatDate, getImageResolution, truncateText } from "$/utils";
+import { formatDate, getImageResolution, truncateText } from "@/utils";
 import { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -24,6 +24,8 @@ import Link from "next/link";
 import Head from "next/head";
 import { toast } from "sonner";
 import ImageOptionMenu from "../../components/imageOptionMenu";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "$/supabase/client";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -38,6 +40,8 @@ export default function Generation() {
   const a = searchParams.get("a");
   const { id } = useParams();
 
+  const queryClient = useQueryClient();
+
   // Ensure id is valid before making API call
   const postId = id ? parseInt(id as string) : null;
 
@@ -45,6 +49,7 @@ export default function Generation() {
     data: post,
     isLoading: loadingPost,
     error: postError,
+    updatePostOptimistically,
   } = usePost(postId);
 
   const {
@@ -110,37 +115,79 @@ export default function Generation() {
     }
   }, [a, userId, post?.author, postError, router]);
 
-  //save post as draft
+  // Prefetch related posts by the same author
+  useEffect(() => {
+    if (post?.author && postId !== null) {
+      // This is a placeholder - you would need to implement a function to get other posts by author
+      const fetchRelatedPosts = async () => {
+        try {
+          const { data: otherPosts } = await supabase
+            .from("posts")
+            .select("id")
+            .eq("author", post.author)
+            .neq("id", postId)
+            .limit(5);
+
+          // Prefetch the first few posts by the same author
+          otherPosts?.forEach((relatedPost: { id: number }) => {
+            prefetchPost(queryClient, relatedPost.id);
+          });
+        } catch (error) {
+          console.error("Error prefetching related posts:", error);
+        }
+      };
+
+      fetchRelatedPosts();
+    }
+  }, [post?.author, postId, queryClient]);
+
+  //save post as draft with optimistic updates
   const saveAsDraft = async () => {
+    if (!post?.id) return;
+
     const data = {
       caption,
-      isPrivate: privatePost, // still depends on the user's choice
-      isDraft: true, //marked  to hide the post
+      isPrivate: privatePost,
+      isDraft: true,
     };
 
-    const success = await updatePost(post?.id as number, data);
-    if (success) {
-      toast("Post saved to draft");
+    // Optimistically update the UI
+    updatePostOptimistically(data);
+
+    try {
+      const success = await updatePost(post.id, data);
+      if (success) {
+        toast("Post saved to draft");
+      } else {
+        toast.error("Failed to save post to draft");
+      }
+    } catch (error) {
+      toast.error(`Error saving draft: ${(error as Error).message}`);
     }
   };
 
-  //post image to db
+  //post image to db with optimistic updates
   const postImage = async () => {
-    console.log("post image");
-    // if (!caption) {
-    //   toast.error("Please provide a caption.");
-    //   return;
-    // }
+    if (!post?.id) return;
 
     const data = {
       caption,
-      isPrivate: privatePost, // still depends on the user's choice
-      isDraft: false, //marked  to expose the post
+      isPrivate: privatePost,
+      isDraft: false,
     };
 
-    const success = await updatePost(post?.id as number, data);
-    if (success) {
-      toast.success("Post published successfully!");
+    // Optimistically update the UI
+    updatePostOptimistically(data);
+
+    try {
+      const success = await updatePost(post.id, data);
+      if (success) {
+        toast.success("Post published successfully!");
+      } else {
+        toast.error("Failed to publish post");
+      }
+    } catch (error) {
+      toast.error(`Error publishing post: ${(error as Error).message}`);
     }
   };
 

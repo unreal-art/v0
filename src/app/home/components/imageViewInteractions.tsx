@@ -1,5 +1,5 @@
 import { supabase } from "$/supabase/client";
-import { downloadImage } from "$/utils";
+import { downloadImage } from "@/utils";
 import {
   DownloadIcon,
   HeartFillIcon,
@@ -35,8 +35,7 @@ export default function ImageViewInteractions({
     userId,
     post?.author as string
   );
-  const shareNotifications = useCountShareNotifications(
-    userId as string,
+  const { shareCount: shareNotifications } = useCountShareNotifications(
     Number(postId)
   );
   const userHasLiked = likes?.some((like) => like.author === userId);

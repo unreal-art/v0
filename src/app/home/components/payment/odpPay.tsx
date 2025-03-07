@@ -1,5 +1,5 @@
 import { torusTestnet } from "$/constants/chains";
-import { getContractInstance } from "$/utils";
+import { getContractInstance } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { parseEther } from "ethers";
@@ -95,9 +95,8 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
   return (
     <>
       <div className="bg-[#232323] p-4 rounded-lg">
-
-        { true &&
-            <div className="flex flex-col gap-1 text-primary-8">
+        {true && (
+          <div className="flex flex-col gap-1 text-primary-8">
             {/* <label>Connected Wallet Address</label>
 
             <input
@@ -106,35 +105,33 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
                 value={"0xA1b2C3d4E5F6g7H8i9J0K1L2M3N4O5P6Q7R8S9T0"}
                 className="text-sm text-primary-7 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-primary-10 border-[1px]"
             /> */}
-            
-                <WalletButton />
 
-                <label>Token type</label>
+            <WalletButton />
 
-                <input
-                    type="text"
-                    placeholder="0"
-                    value={"ODP"}
-                    disabled
-                    className="text-sm text-primary-1 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-primary-10 border-[1px] outline-none"
-                />
+            <label>Token type</label>
 
-                <label>Amount</label>
+            <input
+              type="text"
+              placeholder="0"
+              value={"ODP"}
+              disabled
+              className="text-sm text-primary-1 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-primary-10 border-[1px] outline-none"
+            />
 
-                <input
-                    type="text"
-                    placeholder="0"
-                    disabled
-                    readOnly
-                    value={amount}
-                    className="text-sm text-primary-7 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-primary-10 border-[1px] outline-none"
-                />
-            
-            </div>
-        }
+            <label>Amount</label>
 
-        { false && <PaymentStatus isLoading={false} handleClose={handleClose} />}
+            <input
+              type="text"
+              placeholder="0"
+              disabled
+              readOnly
+              value={amount}
+              className="text-sm text-primary-7 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-primary-10 border-[1px] outline-none"
+            />
+          </div>
+        )}
 
+        {false && <PaymentStatus isLoading={false} handleClose={handleClose} />}
       </div>
 
       <div className="flex justify-end h-12 my-4 text-primary-6 gap-4">

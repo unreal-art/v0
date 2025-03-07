@@ -8,6 +8,8 @@ import {
   TwitterShareButton,
 } from "react-share";
 import { toast } from "sonner";
+import { useCountShareNotifications } from "@/hooks/useNotifications";
+
 interface ShareModalProps {
   link: string;
   open: boolean;
@@ -25,6 +27,10 @@ export default function ShareModal({
   userId,
   isProfile,
 }: ShareModalProps) {
+  const { incrementShareCount } = post?.id
+    ? useCountShareNotifications(post.id)
+    : { incrementShareCount: () => {} };
+
   const copyToClipboard = () => {
     navigator.clipboard
       .writeText(link)
@@ -53,13 +59,15 @@ export default function ShareModal({
 
   const shareOnDiscord = () => {
     //no notification for profile share
-    if (!isProfile) {
+    if (!isProfile && post?.id) {
       addNotification({
         userId: post?.author as string,
         senderId: userId as string,
         postId: post?.id as number,
         type: "share",
       });
+      // Immediately increment the share count for better UX
+      incrementShareCount();
     }
     const url = `https://discord.com/channels/@me?url=${encodeURIComponent(
       link
@@ -129,13 +137,15 @@ export default function ShareModal({
               image="x.png"
               text="Xapp"
               onClick={() => {
-                if (!isProfile) {
+                if (!isProfile && post?.id) {
                   addNotification({
                     userId: post?.author as string,
                     senderId: userId as string,
                     postId: post?.id as number,
                     type: "share",
                   });
+                  // Immediately increment the share count
+                  incrementShareCount();
                 }
               }}
             />
@@ -145,13 +155,15 @@ export default function ShareModal({
               image="facebook.png"
               text="Facebook"
               onClick={() => {
-                if (!isProfile) {
+                if (!isProfile && post?.id) {
                   addNotification({
                     userId: post?.author as string,
                     senderId: userId as string,
                     postId: post?.id as number,
                     type: "share",
                   });
+                  // Immediately increment the share count
+                  incrementShareCount();
                 }
               }}
             />
@@ -161,13 +173,15 @@ export default function ShareModal({
               image="linkedin.png"
               text="LinkedIn"
               onClick={() => {
-                if (!isProfile) {
+                if (!isProfile && post?.id) {
                   addNotification({
                     userId: post?.author as string,
                     senderId: userId as string,
                     postId: post?.id as number,
                     type: "share",
                   });
+                  // Immediately increment the share count
+                  incrementShareCount();
                 }
               }}
             />
