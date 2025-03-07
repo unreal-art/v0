@@ -1,46 +1,58 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
 import { Notification } from "$/types/data.types";
+import { useUser } from "@/hooks/useUser";
 
 export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
+  const { userId } = useUser();
 
-  return useMutation<void, Error, string, { previousCount?: number }>({
+  return useMutation<void, Error, string>({
     mutationFn: async (notificationId) => {
+      console.log(
+        "[useMarkNotificationAsRead] Marking notification as read:",
+        notificationId
+      );
+
       const { error } = await supabase
         .from("notifications")
         .update({ is_read: true })
         .eq("id", notificationId);
 
-      if (error) throw error;
-    },
-    onMutate: async (notificationId) => {
-      // Cancel ongoing queries to avoid race conditions
-      await queryClient.cancelQueries({ queryKey: ["unread-notifications"] });
-
-      // Snapshot the previous count before modifying
-      const previousCount = queryClient.getQueryData<number>([
-        "unread-notifications",
-      ]);
-
-      // Optimistically update the count to 0 immediately
-      queryClient.setQueryData(["unread-notifications"], 0);
-
-      return { previousCount };
-    },
-    onError: (error, _, context) => {
-      // Rollback to previous count if mutation fails
-      if (context?.previousCount !== undefined) {
-        queryClient.setQueryData(
-          ["unread-notifications"],
-          context.previousCount,
-        );
+      if (error) {
+        console.error("[useMarkNotificationAsRead] Error:", error);
+        throw error;
       }
-      console.error("Failed to mark notification as read:", error);
+
+      console.log("[useMarkNotificationAsRead] Successfully marked as read");
     },
-    onSettled: () => {
-      // Refetch to ensure data consistency
-      queryClient.invalidateQueries({ queryKey: ["unread-notifications"] });
+
+    onSuccess: () => {
+      console.log("[useMarkNotificationAsRead] Mutation succeeded");
+
+      // IMPORTANT: Invalidate the notifications count for the current user
+      if (userId) {
+        // Use the correct query key to match the one in useUnreadNotificationsCount
+        console.log(
+          "[useMarkNotificationAsRead] Invalidating count for userId:",
+          userId
+        );
+        queryClient.invalidateQueries({
+          queryKey: ["notificationsCount", userId],
+        });
+      }
+
+      // Also invalidate the main notifications list
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", userId],
+      });
+    },
+
+    onError: (error) => {
+      console.error(
+        "[useMarkNotificationAsRead] Failed to mark notification as read:",
+        error
+      );
     },
   });
 };
