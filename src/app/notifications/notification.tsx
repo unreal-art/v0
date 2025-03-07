@@ -21,11 +21,20 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
 
   const markAsReadMutation = useMarkNotificationAsRead();
 
+  // Mark notification as read once it's fully loaded and all data is available
   useEffect(() => {
-    if (notification.id && !notification.is_read && post && image && username) {
-      markAsReadMutation.mutate(notification.id);
+    if (notification.id && !notification.is_read) {
+      console.log(
+        `[Notification ${notification.id}] Checking if should mark as read`
+      );
+
+      // Only mark as read when all data is loaded and visible to user
+      if (post && image && username) {
+        console.log(`[Notification ${notification.id}] Marking as read`);
+        markAsReadMutation.mutate(notification.id);
+      }
     }
-  }, [notification, image, username, post]);
+  }, [notification, image, username, post, markAsReadMutation]);
 
   if (!post || !image || !username) return <NotificationSkeleton />;
   return (
