@@ -19,7 +19,7 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
 );
 
 export default function Menu({ children }: INotificationProps) {
@@ -71,6 +71,7 @@ export default function Menu({ children }: INotificationProps) {
             <Link
               href={`/home/profile/${userId}`}
               className="flex items-center gap-2 text-primary-6 h-16 p-3 border-primary-8 border-b-[1px]"
+              onClick={handleClose}
             >
               <div>
                 <Image
