@@ -34,7 +34,7 @@ export default function CommentArea({
   // console.log(comments);
   const [replyTo, setReplyTo] = useState<CommentWithUser | null>(null);
   const [comentToReply, setCommentToReply] = useState<CommentWithUser | null>(
-    null,
+    null
   );
   const handleCloseReply = () => {
     setReplyTo(null);
@@ -98,7 +98,10 @@ export default function CommentArea({
       </div>
 
       <div className="flex py-2 px-6 border-y-[1px] border-primary-6">
-        <ImageViewInteractions commentCount={comments.length} postId={postId} />
+        <ImageViewInteractions
+          commentCount={comments?.length || 0}
+          postId={postId}
+        />
       </div>
 
       <div>

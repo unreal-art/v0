@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { FlashIcon, ShareModernIcon } from "@/app/components/icons";
 import ProfileInfo from "./profileInfo";
@@ -8,9 +10,8 @@ import { useFollowStats } from "@/hooks/useFollowStats";
 import { useLikeStat } from "@/hooks/useLikeStat";
 import { useParams } from "next/navigation";
 // import { useUser } from "@/hooks/useUser";
-import useUserData from "@/hooks/useUserData";
+import useUserData, { prefetchUserData } from "@/hooks/useUserData";
 import ProfileSkeleton from "./profileSkeleton";
-import { useState } from "react";
 import ModalWrapper from "../../components/modals/modalWrapper";
 import EditModal from "./modals/editModal";
 import DeleteModal from "./modals/deleteModal";
@@ -31,17 +32,32 @@ const dartContract = getContractInstance(
   process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
+// Add this placeholder function at the top of the file, outside the component
+// This is a placeholder - you would need to implement the actual function
+const getFollowerIds = async (userId: string): Promise<string[]> => {
+  // In a real implementation, you would fetch follower IDs from your API
+  console.log(`Fetching followers for user ${userId}`);
+  return []; // Return empty array for now
+};
+
 export default function UserData() {
   const [open, setOpen] = useState(false);
   const [topup, setTopup] = useState(false);
   const [openShare, setOpenShare] = useState(false);
   const [title, setTitle] = useState<TitleType>("");
 
+  const queryClient = useQueryClient();
+
   const params = useParams();
 
   const userId = params.id as string;
   //fetch user details
-  const { data: user, isLoading } = useUserData(userId);
+  const {
+    data: user,
+    isLoading,
+    error,
+    updateUserDataOptimistically,
+  } = useUserData(userId);
   const {
     userId: authUserId,
     user: authUser,
@@ -49,7 +65,7 @@ export default function UserData() {
   } = useUser();
 
   //fetch follow stats
-  const { data: followStats } = useFollowStats(userId);
+  const { followeeCount, followerCount } = useFollowStats(userId);
 
   //fetch like stat
   const { data: likeCount } = useLikeStat(userId);
@@ -61,8 +77,45 @@ export default function UserData() {
     params: [authUser?.wallet?.address || ""],
   });
 
+  // Prefetch related users when this profile is viewed
+  useEffect(() => {
+    if (user && followeeCount && followeeCount > 0) {
+      // Prefetch followers data when available
+      const prefetchFollowers = async () => {
+        try {
+          // Get follower IDs
+          const followerIds = await getFollowerIds(userId);
+          // Prefetch the first 3-5 followers for better UX
+          followerIds.slice(0, 5).forEach((followerId: string) => {
+            prefetchUserData(queryClient, followerId);
+          });
+        } catch (error) {
+          console.error("Error prefetching followers:", error);
+        }
+      };
+
+      prefetchFollowers();
+    }
+  }, [userId, followeeCount, queryClient, user]);
+
+  // Example of how to use optimistic updates
+  const updateUserBio = (newBio: string) => {
+    if (!userId) return;
+
+    // Optimistically update the UI
+    updateUserDataOptimistically({
+      bio: newBio,
+    });
+
+    // Then perform the actual update (this would call your API)
+    // updateUserBioAPI(userId, newBio).catch(error => {
+    //   console.error("Failed to update bio:", error);
+    //   // The UI will automatically revert if the query is invalidated
+    // });
+  };
+
   if (isLoading || authUserLoading || !authUser) return <ProfileSkeleton />;
-  // if (error) return <p>Error loading user data.</p>;
+  if (error) return <p>Error loading user data: {error.message}</p>;
 
   const showEditAccount = () => {
     setOpen(true);
@@ -133,16 +186,12 @@ export default function UserData() {
 
           <div className="flex gap-x-4 my-4">
             <ProfileInfo
-              value={followStats?.followeeCount?.toString() || "0"}
-              title={
-                followStats?.followeeCount === 1 ? "Follower" : "Followers"
-              } // Adjusts title dynamically
+              value={followeeCount?.toString() || "0"}
+              title={followeeCount === 1 ? "Follower" : "Followers"} // Adjusts title dynamically
             />
             <ProfileInfo
-              value={followStats?.followerCount?.toString() || "0"}
-              title={
-                followStats?.followerCount === 1 ? "Following" : "Following"
-              } // Stays the same
+              value={followerCount?.toString() || "0"}
+              title={followerCount === 1 ? "Following" : "Following"} // Stays the same
               leftBorder={true}
             />
             <ProfileInfo

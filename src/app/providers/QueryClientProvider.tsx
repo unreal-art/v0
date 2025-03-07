@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { createOptimizedQueryClient } from "@/utils/queryOptimizer";
 
 // const queryClient = new QueryClient();
 
@@ -9,16 +10,8 @@ interface QueryProviderProps {
 }
 
 const QueryProvider = ({ children }: QueryProviderProps) => {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60 * 1000,
-          },
-        },
-      }),
-  );
+  // Use optimized query client with better defaults
+  const [queryClient] = useState(() => createOptimizedQueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>

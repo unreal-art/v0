@@ -26,6 +26,7 @@ import Link from "next/link";
 import { set } from "nprogress";
 import { usePost } from "@/hooks/usePost";
 import ShareModal from "./modals/shareModal";
+import { toast } from "sonner";
 
 interface ImageOptionMenuProps {
   children: ReactNode;
@@ -45,13 +46,13 @@ export default function ImageOptionMenu({
 
   const router = useRouter();
 
-  const { data: isPinned, isLoading } = useIsPostPinned(
+  const { isPinned, setPinned } = useIsPostPinned(
     Number(postId),
     userId as string
   );
   const { data: post } = usePost(Number(postId));
-  const { mutate: pinPost } = usePinPost(userId as string);
-  const { mutate: unpinPost } = useUnpinPost(userId as string);
+  const pinPostMutation = usePinPost(userId as string);
+  const unpinPostMutation = useUnpinPost(userId as string);
 
   const handleClose = () => {
     setOpen(false);
@@ -68,13 +69,25 @@ export default function ImageOptionMenu({
   };
 
   const togglePostPin = () => {
-    if (isPinned) {
-      unpinPost(Number(postId));
-    } else {
-      pinPost(Number(postId));
-    }
+    if (!userId || !postId) return;
 
-    handleClose();
+    setPinned(!isPinned);
+
+    if (!isPinned) {
+      pinPostMutation.mutate(Number(postId), {
+        onError: (error) => {
+          setPinned(false);
+          toast.error(`Failed to pin post: ${error.message}`);
+        },
+      });
+    } else {
+      unpinPostMutation.mutate(Number(postId), {
+        onError: (error) => {
+          setPinned(true);
+          toast.error(`Failed to unpin post: ${error.message}`);
+        },
+      });
+    }
   };
   return (
     <div className="relative flex">

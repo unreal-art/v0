@@ -1,7 +1,13 @@
 import { splitName } from "@/utils";
-import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
+import { useUpdateUserDetails } from "../../../../../hooks/useUpdateUserDetails";
 import Image from "next/image";
-import { FormEvent, ReactEventHandler, useEffect, useState } from "react";
+import {
+  FormEvent,
+  ReactEventHandler,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { toast } from "sonner";
 
 export default function EditProfileModal({
@@ -29,9 +35,20 @@ export default function EditProfileModal({
     else setFullName("");
   }, [firstname, lastname]);
 
+  // Add throttled update for input fields
+  const handleFieldChange = useCallback(
+    (field: string, value: string) => {
+      // Use throttled update when typing in fields
+      if (user?.id) {
+        updateUser.throttledUpdateUser(user.id, { [field]: value });
+      }
+    },
+    [updateUser, user?.id]
+  );
+
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
-    console.log(full_name, bio, displayName);
+
     if (!full_name || !displayName) {
       toast.error("Please fill in all fields.");
       return;
@@ -42,6 +59,8 @@ export default function EditProfileModal({
       bio,
       display_name: displayName,
     };
+
+    // For the final save, use the regular mutate
     updateUser.mutate(
       { user: data, id: user.id },
       {
@@ -49,8 +68,9 @@ export default function EditProfileModal({
           toast.success("Profile updated successfully.");
           close();
         },
-        onError: (error) =>
-          toast.error("Opps an error occured during profile update."),
+        onError: (error: Error) => {
+          toast.error(`Failed to update profile: ${error.message}`);
+        },
       }
     );
   };
@@ -81,7 +101,10 @@ export default function EditProfileModal({
             type="text"
             placeholder="Jon"
             value={firstname}
-            onChange={(e) => setFirstName(e.target.value)}
+            onChange={(e) => {
+              setFirstName(e.target.value);
+              handleFieldChange("firstname", e.target.value);
+            }}
           />
         </div>
 
@@ -93,7 +116,10 @@ export default function EditProfileModal({
             type="text"
             placeholder="Doe"
             value={lastname}
-            onChange={(e) => setLastName(e.target.value)}
+            onChange={(e) => {
+              setLastName(e.target.value);
+              handleFieldChange("lastname", e.target.value);
+            }}
           />
         </div>
 
@@ -105,7 +131,10 @@ export default function EditProfileModal({
             type="text"
             placeholder="Jon Doe"
             value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            onChange={(e) => {
+              setDisplayName(e.target.value);
+              handleFieldChange("display_name", e.target.value);
+            }}
           />
         </div>
 
@@ -129,7 +158,10 @@ export default function EditProfileModal({
             type="text"
             placeholder="Write about yourself"
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            onChange={(e) => {
+              setBio(e.target.value);
+              handleFieldChange("bio", e.target.value);
+            }}
           />
         </div>
 

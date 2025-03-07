@@ -48,10 +48,12 @@ export default function PhotoOverlay({
   const [hover, setHover] = useState(false);
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
-  const { data: likes, isLoading: loadingLikes } = usePostLikes(
-    Number(context.photo.id),
-    supabase
-  );
+  const {
+    likes,
+    likesCount,
+    isLoading: loadingLikes,
+    hasUserLiked,
+  } = usePostLikes(Number(context.photo.id), supabase);
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
