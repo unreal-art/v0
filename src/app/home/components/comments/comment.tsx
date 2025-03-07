@@ -10,6 +10,7 @@ import {
   useUnlikeComment,
 } from "@/hooks/useComments";
 import Reply from "./Reply";
+import { useState } from "react";
 
 export default function Comment({
   data,
@@ -23,6 +24,7 @@ export default function Comment({
   const { data: user } = useAuthorUsername(data.user_id);
   const likeComment = useLikeComment(data.post_id.toString());
   const unlikeComment = useUnlikeComment(data.post_id.toString());
+  const [seeMore, setSeeMore] = useState(false);
 
   const { data: replies } = useReplies(data.id);
   useRealtimeReplies(data.id);
@@ -47,17 +49,17 @@ export default function Comment({
             <p className="text-xs">{timeAgo(data.created_at)}</p>
           </div>
 
-          <div className="flex gap-2 w-full pt-2">
+          <div className="flex gap-2 w-full py-2">
             <div className="flex-grow space-y-4 gap-4">
               <p className="text-primary-6 text-sm flex-grow">{data.content}</p>
               <button
-                className="text-primary-4 "
+                className="text-primary-9  text-xs"
                 onClick={() => {
                   data.username = user as string;
                   setReplyTo(data);
                 }}
               >
-                reply
+                reply ({replies ? replies.length : ""})
               </button>
             </div>
             <div className="justify-end">
@@ -82,14 +84,23 @@ export default function Comment({
       </div>
 
       {/* Reply list */}
-      {replies?.map((reply: CommentWithUser, idx: number) => (
-        <Reply
-          key={idx}
-          data={reply}
 
-          // setCommentToReply={setCommentToReply}
-        />
-      ))}
+      {replies
+        ?.slice(0, seeMore ? replies.length : 2)
+        .map((reply: CommentWithUser, idx: number) => (
+          <Reply key={idx} data={reply} />
+        ))}
+
+      {replies?.length > 2 && (
+        <p className="text-right">
+          <button
+            onClick={() => setSeeMore(!seeMore)}
+            className="text-xs hover:underline"
+          >
+            {seeMore ? "Show Less" : "See More"}
+          </button>
+        </p>
+      )}
     </div>
   );
 }
