@@ -29,6 +29,7 @@ import { useSearchParams } from "next/navigation";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
+import { useGalleryStore } from "@/stores/galleryStore";
 
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
@@ -70,51 +71,16 @@ export default function SearchPhotoGallary({
   const [columns, setColumns] = useState(
     window?.innerWidth < MD_BREAKPOINT ? 2 : 4
   );
+
+  // Use Zustand store for tab state
+  const { initFromUrl } = useGalleryStore();
+
+  // Sync with URL on initial load
   const searchParams = useSearchParams();
-  const s = searchParams.get("s");
-
-  // const {
-  //   isLoading,
-  //   isError,
-  //   error,
-  //   data,
-  //   isFetchingNextPage,
-  //   // isFetching,
-  //   hasNextPage,
-  //   fetchNextPage,
-  // } = useInfiniteQuery({
-  //   queryKey: ["posts", s || "explore"],
-  //   queryFn: async ({ pageParam = 0 }) => {
-  //     let result: Post[] = [];
-  //     if (s?.toUpperCase() === "EXPLORE") {
-  //       result = await getPosts(supabase, pageParam);
-  //     } else if (s?.toUpperCase() === "FOLLOWING") {
-  //       result = await getFollowingPosts(supabase, pageParam);
-  //     } else if (s?.toUpperCase() === "TOP") {
-  //       result = await getTopPosts(supabase, pageParam);
-  //     } else {
-  //       result = await getPosts(supabase, pageParam);
-  //     }
-
-  //     return {
-  //       data: result ?? [],
-  //       nextCursor: result.length > 0 ? pageParam + 1 : undefined, // ✅ Stop pagination if no data
-  //     };
-  //   },
-  //   initialPageParam: 0,
-
-  //   getNextPageParam: (lastPage) => {
-  //     if (!lastPage?.data || !Array.isArray(lastPage.data)) {
-  //       return undefined;
-  //     }
-
-  //     if (lastPage.data.length === 0) {
-  //       return undefined;
-  //     }
-
-  //     return lastPage.nextCursor; // ✅ Correctly use the cursor for pagination
-  //   },
-  // });
+  useEffect(() => {
+    const urlParam = searchParams.get("s");
+    initFromUrl(urlParam);
+  }, [searchParams, initFromUrl]);
 
   const {
     data,

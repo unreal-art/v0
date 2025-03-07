@@ -60,14 +60,18 @@ export const useNotifications = (userId: string | null) => {
 
           const totalCount = countResponse.count || 0;
 
-          // Get paginated notifications
+          // Get  notifications
           const { data, error } = await supabase
             .from("notifications")
             .select("*, sender:profiles!sender_id(*)")
             .eq("user_id", userId)
             .neq("sender_id", userId)
-            .order("created_at", { ascending: false })
-            .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
+            .order("created_at", { ascending: false });
+
+          console.log("Supabase notifications data:", data);
+          console.log("Supabase error:", error);
+
+          // .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
 
           if (error) throw error;
 
@@ -102,7 +106,7 @@ export const useNotifications = (userId: string | null) => {
               if (notificationData.id) {
                 normalizeEntity(
                   "comments",
-                  notificationData as { id: string | number }
+                  notificationData as { id: string | number },
                 );
               }
 
@@ -118,7 +122,7 @@ export const useNotifications = (userId: string | null) => {
             hasMore,
             totalCount,
           };
-        }
+        },
       );
     },
     getNextPageParam: (lastPage, pages) => {
@@ -126,8 +130,8 @@ export const useNotifications = (userId: string | null) => {
     },
     initialPageParam: 0,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes
-    refetchOnWindowFocus: false,
+    // gcTime: 1000 * 60 * 30, // 30 minutes
+    // refetchOnWindowFocus: false,
     enabled: !!userId,
   });
 
@@ -179,7 +183,7 @@ export const useNotifications = (userId: string | null) => {
               queryKey: ["notifications", userId],
             });
           }
-        }
+        },
       )
       .subscribe();
 
@@ -275,7 +279,7 @@ export const useCountShareNotifications = (post_id: number | null) => {
 
           if (error) throw error;
           return count || 0;
-        }
+        },
       );
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
@@ -302,14 +306,14 @@ export const useCountShareNotifications = (post_id: number | null) => {
           // Optimistic increment for better UX
           queryClient.setQueryData(
             ["shareNotificationsCount", post_id],
-            (oldCount: number | undefined) => (oldCount || 0) + 1
+            (oldCount: number | undefined) => (oldCount || 0) + 1,
           );
 
           // Still invalidate to get actual data
           queryClient.invalidateQueries({
             queryKey: ["shareNotificationsCount", post_id],
           });
-        }
+        },
       )
       .subscribe();
 
@@ -324,7 +328,7 @@ export const useCountShareNotifications = (post_id: number | null) => {
 
     queryClient.setQueryData(
       ["shareNotificationsCount", post_id],
-      (oldCount: number | undefined) => (oldCount || 0) + 1
+      (oldCount: number | undefined) => (oldCount || 0) + 1,
     );
   }, [post_id, queryClient]);
 

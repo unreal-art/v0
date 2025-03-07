@@ -30,6 +30,7 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
+import { useGalleryStore } from "@/stores/galleryStore";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
@@ -65,8 +66,15 @@ export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState<number | null>(null);
 
+  // Use Zustand store for tab state
+  const { activeTab, initFromUrl } = useGalleryStore();
+
+  // Sync with URL on initial load (for direct URL access)
   const searchParams = useSearchParams();
-  const s = searchParams.get("s");
+  useEffect(() => {
+    const urlParam = searchParams.get("s");
+    initFromUrl(urlParam);
+  }, [searchParams, initFromUrl]);
 
   const {
     isLoading,
@@ -77,14 +85,15 @@ export default function PhotoGallary({}) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", s || "explore"],
+    queryKey: ["posts", activeTab.toLowerCase()],
     queryFn: async ({ pageParam = 0 }) => {
       let result: Post[] = [];
-      if (s?.toUpperCase() === "EXPLORE") {
+      // Use activeTab from Zustand instead of URL param
+      if (activeTab === "EXPLORE") {
         result = await getPosts(supabase, pageParam);
-      } else if (s?.toUpperCase() === "FOLLOWING") {
+      } else if (activeTab === "FOLLOWING") {
         result = await getFollowingPosts(supabase, pageParam);
-      } else if (s?.toUpperCase() === "TOP") {
+      } else if (activeTab === "TOP") {
         result = await getTopPosts(supabase, pageParam);
       } else {
         result = await getPosts(supabase, pageParam);
@@ -155,7 +164,7 @@ export default function PhotoGallary({}) {
       <div className="flex flex-col items-center justify-center w-full min-h-[200px]">
         <p className="text-center text-lg text-primary-6">No posts found</p>
         <p className="text-center text-sm text-primary-7 mt-2">
-          {s?.toUpperCase() === "FOLLOWING"
+          {activeTab === "FOLLOWING"
             ? "Follow some creators to see their posts here"
             : "Be the first to share something amazing"}
         </p>

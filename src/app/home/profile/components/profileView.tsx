@@ -92,7 +92,7 @@ export default function ProfileView() {
         subContent: "Create something you love to post later",
       },
     }),
-    [],
+    []
   );
 
   const renderContent = useCallback(() => {
