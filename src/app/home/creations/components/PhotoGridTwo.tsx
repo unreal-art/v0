@@ -5,7 +5,7 @@ import Image from "next/image";
 import { truncateText } from "@/utils";
 import { timeAgo } from "@/app/libs/timeAgo";
 import { OptionMenuIcon } from "@/app/components/icons";
-import { TabText } from "./Tabs";
+
 import NoItemFound from "./NoItemFound";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import dynamic from "next/dynamic";
@@ -14,6 +14,7 @@ import PhotoOverlay, {
 } from "../../components/photoOverlay";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { TabText } from "@/stores/creationAndProfileStore";
 
 // Constants for breakpoints and grid sizing
 const BREAKPOINTS = {
@@ -131,7 +132,7 @@ export default function PhotoGridTwo({
     (context: ExtendedRenderPhotoContext) => {
       setImageIndex(context.index);
     },
-    [],
+    []
   );
 
   const loadMore = useCallback(() => {
@@ -156,27 +157,27 @@ export default function PhotoGridTwo({
           ))}
       </div>
     ),
-    [size],
+    [size]
   );
 
   // Memoized loading more skeleton
-  const loadingMoreSkeleton = useMemo(
-    () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
-        {Array(12)
-          .fill(null)
-          .map((_, index) => (
-            <Skeleton
-              key={index}
-              height={200}
-              baseColor="#1a1a1a"
-              highlightColor="#333"
-            />
-          ))}
-      </div>
-    ),
-    [size],
-  );
+  // const loadingMoreSkeleton = useMemo(
+  //   () => (
+  //     <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full ">
+  //       {Array(4)
+  //         .fill(null)
+  //         .map((_, index) => (
+  //           <Skeleton
+  //             key={index}
+  //             height={200}
+  //             baseColor="#1a1a1a" // Dark background
+  //             highlightColor="#333" // Slightly lighter shimmer effect
+  //           />
+  //         ))}
+  //     </div>
+  //   ),
+  //   [size]
+  // );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -281,7 +282,7 @@ export default function PhotoGridTwo({
 
                     <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
                       {truncateText(
-                        context.photo.caption || context.photo.prompt,
+                        context.photo.caption || context.photo.prompt
                       )}
                     </p>
                   </>
@@ -291,11 +292,11 @@ export default function PhotoGridTwo({
           })}
         </div>
 
-        {isFetchingNextPage && (
-          <div className="w-full py-4 flex justify-center">
-            {loadingMoreSkeleton}
-          </div>
-        )}
+        {/* {isFetchingNextPage && ( */}
+        {/* <div className="w-full py-4 flex justify-center">
+          {loadingMoreSkeleton}
+        </div> */}
+        {/* )} */}
       </InfiniteScroll>
 
       {imageIndex > -1 && (

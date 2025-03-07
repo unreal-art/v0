@@ -17,7 +17,7 @@ export default function AppBase({ children }: { children: React.ReactNode }) {
     >
       <Toaster />
       <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full">
-        <Link href={"/"} className="hidden md:block m-6">
+        <Link href={"/home"} className="hidden md:block m-6">
           <Image src={"/icons/logo.png"} alt="logo" width={38} height={38} />
         </Link>
 
