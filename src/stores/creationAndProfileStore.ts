@@ -1,7 +1,14 @@
 import { create } from "zustand";
 
 // Use the existing TabText type from the Tabs component
-export type TabText = "Public" | "Private" | "Liked" | "Pinned" | "Draft";
+export type TabText =
+  | "Public"
+  | "Private"
+  | "Liked"
+  | "Pinned"
+  | "Draft"
+  | "User"
+  | "Image";
 
 interface CreationAndProfileState {
   // Tab states
@@ -15,7 +22,7 @@ interface CreationAndProfileState {
   // Initializers from URL
   initFromUrl: (
     section: "creation" | "profile",
-    urlParam: string | null
+    urlParam: string | null,
   ) => void;
 }
 
@@ -57,5 +64,5 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
         set({ profileTab: formattedTab });
       }
     },
-  })
+  }),
 );
