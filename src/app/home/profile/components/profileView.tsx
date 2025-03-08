@@ -93,10 +93,10 @@ export default function ProfileView() {
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: 0,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60, // 1 minute - good balance between freshness and performance
+    gcTime: 1000 * 60 * 10, // Keep unused data for 10 minutes
+    refetchOnMount: "always", // Always check for updates but use stale data while fetching
+    refetchOnWindowFocus: false, // Disable automatic refetch on window focus to prevent flickering
   });
 
   const contentConfig = useMemo(
