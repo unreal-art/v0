@@ -88,9 +88,9 @@ export const useNotifications = (userId: string | null) => {
           }
 
           if (!data || !Array.isArray(data)) {
-            console.warn(
-              "No data received from notifications query or data is not an array"
-            );
+            // console.warn(
+            //   "No data received from notifications query or data is not an array"
+            // );
             return {
               notifications: [],
               hasMore: false,
@@ -141,7 +141,7 @@ export const useNotifications = (userId: string | null) => {
                   } else {
                     console.warn(
                       "Could not fetch sender profile:",
-                      senderError
+                      senderError,
                     );
                   }
                 } catch (err) {
@@ -154,7 +154,7 @@ export const useNotifications = (userId: string | null) => {
               if (notificationData.id) {
                 normalizeEntity(
                   "comments",
-                  notificationData as { id: string | number }
+                  notificationData as { id: string | number },
                 );
               }
 
@@ -171,7 +171,7 @@ export const useNotifications = (userId: string | null) => {
             hasMore,
             totalCount,
           };
-        }
+        },
       );
     },
     getNextPageParam: (lastPage, pages) => {
@@ -242,7 +242,7 @@ export const useNotifications = (userId: string | null) => {
               queryKey: ["notifications", userId],
             });
           }
-        }
+        },
       )
       .subscribe();
 
@@ -297,10 +297,10 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
     queryFn: async (): Promise<number> => {
       if (!userId) return 0;
 
-      console.log(
-        "[useUnreadNotificationsCount] Fetching count for userId:",
-        userId
-      );
+      // console.log(
+      //   "[useUnreadNotificationsCount] Fetching count for userId:",
+      //   userId,
+      // );
 
       // Use deduplication for count queries
       return dedupedRequest(`notifications-count-${userId}`, async () => {
@@ -315,12 +315,12 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
         if (error) {
           console.error(
             "[useUnreadNotificationsCount] Error fetching count:",
-            error
+            error,
           );
           throw error;
         }
 
-        console.log("[useUnreadNotificationsCount] Count result:", count);
+        // console.log("[useUnreadNotificationsCount] Count result:", count);
         return count || 0;
       });
     },
@@ -333,9 +333,9 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
   useEffect(() => {
     if (!userId) return;
 
-    console.log(
-      "[useUnreadNotificationsCount] Setting up real-time subscription"
-    );
+    // console.log(
+    //   "[useUnreadNotificationsCount] Setting up real-time subscription"
+    // );
 
     // Create a channel specifically for this hook to avoid conflicts
     const channel = supabase
@@ -349,26 +349,26 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          console.log(
-            "[useUnreadNotificationsCount] Received change:",
-            payload
-          );
+          // console.log(
+          //   "[useUnreadNotificationsCount] Received change:",
+          //   payload
+          // );
 
           // For any change to notifications table, immediately refetch the count
           // This ensures the count is always accurate after any operation
           queryClient.invalidateQueries({
             queryKey: ["notificationsCount", userId],
           });
-        }
+        },
       )
       .subscribe((status) => {
-        console.log(
-          `[useUnreadNotificationsCount] Subscription status: ${status}`
-        );
+        // console.log(
+        //   `[useUnreadNotificationsCount] Subscription status: ${status}`
+        // );
       });
 
     return () => {
-      console.log("[useUnreadNotificationsCount] Removing channel");
+      //console.log("[useUnreadNotificationsCount] Removing channel");
       supabase.removeChannel(channel);
     };
   }, [userId, queryClient]);
@@ -376,9 +376,9 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
   const count = query.data || 0;
 
   // Log every time the count changes
-  useEffect(() => {
-    console.log("[useUnreadNotificationsCount] Current count:", count);
-  }, [count]);
+  // useEffect(() => {
+  //  // console.log("[useUnreadNotificationsCount] Current count:", count);
+  // }, [count]);
 
   return count;
 };
@@ -404,7 +404,7 @@ export const useCountShareNotifications = (post_id: number | null) => {
 
           if (error) throw error;
           return count || 0;
-        }
+        },
       );
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
@@ -431,14 +431,14 @@ export const useCountShareNotifications = (post_id: number | null) => {
           // Optimistic increment for better UX
           queryClient.setQueryData(
             ["shareNotificationsCount", post_id],
-            (oldCount: number | undefined) => (oldCount || 0) + 1
+            (oldCount: number | undefined) => (oldCount || 0) + 1,
           );
 
           // Still invalidate to get actual data
           queryClient.invalidateQueries({
             queryKey: ["shareNotificationsCount", post_id],
           });
-        }
+        },
       )
       .subscribe();
 
@@ -453,7 +453,7 @@ export const useCountShareNotifications = (post_id: number | null) => {
 
     queryClient.setQueryData(
       ["shareNotificationsCount", post_id],
-      (oldCount: number | undefined) => (oldCount || 0) + 1
+      (oldCount: number | undefined) => (oldCount || 0) + 1,
     );
   }, [post_id, queryClient]);
 

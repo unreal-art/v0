@@ -144,8 +144,8 @@ export default function TabBtn({ text }: NavBtnProps) {
       {iconSvg}
       <span
         className={`${
-          isActive ? "text-primary-8" : "text-primary-5"
-        } font-poppins hidden md:block text-sm transition select-none`}
+          isActive ? "text-primary-7" : "text-primary-5"
+        } font-poppins text-sm transition select-none`}
       >
         {text}
       </span>

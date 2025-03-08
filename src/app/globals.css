@@ -73,26 +73,27 @@ For our carousel, we will need to add some custom CSS to our global styles.
     transition: display ring;
 }
 
-.home-carousel div,.home-carousel div img {
-  position: absolute;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+.home-carousel div,
+.home-carousel div img {
+    position: absolute;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 .home-carousel .stage {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .home-carousel .container {
-  perspective: 1000px;
-  width: 300px;
-  height: 400px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+    perspective: 1000px;
+    width: 300px;
+    height: 400px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .shadow-bg {
@@ -125,8 +126,6 @@ For our carousel, we will need to add some custom CSS to our global styles.
 *::-webkit-scrollbar {
     display: none;
 }
-
-
 
 @media screen and (max-width: 746px) {
     .bottom-nav {
