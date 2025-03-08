@@ -101,13 +101,14 @@ export default function PhotoGridTwo({
 
   // Transform and stabilize data updates to prevent flashing
   useEffect(() => {
-    // Don't reset loading state when we already have data
-    if (!photos.length) {
+    // During transitions, we keep the previous data and just overlay loading indicators
+    // Only reset data when we have a real loading state (not a transition)
+    if (isLoading && !photos.length) {
       setStableLoading(true);
     }
 
     // If we have data, process it
-    if (data?.pages && data.pages.length > 0 && data.pages[0].data.length > 0) {
+    if (data?.pages) {
       const allPosts = data.pages.flatMap((page: any) => page.data || []);
 
       // Transform the posts into photo format
@@ -138,22 +139,18 @@ export default function PhotoGridTwo({
 
       setTransformedPosts(newTransformedPosts);
 
-      // Use a short timeout before updating photos and turning off loading
-      // This helps prevent flickering between stale and fresh data
-      const timer = setTimeout(() => {
-        setPhotos(newTransformedPosts);
-        // Only turn off loading once we have data or we're sure the fetch is complete
+      // Turn off loading only when we have posts or we're sure we're done loading
+      if (newTransformedPosts.length > 0 || !isLoading) {
         setStableLoading(false);
-      }, 100);
-
-      return () => clearTimeout(timer);
+        setPhotos(newTransformedPosts);
+      }
     } else if (!isLoading && data) {
       // Only turn off loading and show empty state when we're completely done loading
       // AND we have a data object (even if it has no items)
       setStableLoading(false);
       setPhotos([]);
     }
-  }, [data, isLoading, size, photos.length]);
+  }, [data, isLoading, size]);
 
   const handleImageIndex = useCallback(
     (context: ExtendedRenderPhotoContext) => {
@@ -202,24 +199,6 @@ export default function PhotoGridTwo({
     };
   }, []);
 
-  // Handle showing loading state - always show loader when loading
-  if (stableLoading || isLoading) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full ">
-        {Array(12)
-          .fill(null)
-          .map((_, index) => (
-            <Skeleton
-              key={index}
-              height={200}
-              baseColor="#1a1a1a" // Dark background
-              highlightColor="#333" // Slightly lighter shimmer effect
-            />
-          ))}
-      </div>
-    );
-  }
-
   // Only show empty state when we're not loading and have no photos
   // We've already confirmed we have data object but it's empty
   if (!photos.length && !isLoading && !stableLoading && data) {
@@ -228,10 +207,11 @@ export default function PhotoGridTwo({
     );
   }
 
+  // Now let InfiniteScroll handle the loading states
   return (
     <>
       <InfiniteScroll
-        isLoadingInitial={false}
+        isLoadingInitial={isLoading || stableLoading}
         isLoadingMore={isFetchingNextPage}
         loadMore={loadMore}
         hasNextPage={hasNextPage}

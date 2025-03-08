@@ -1,5 +1,11 @@
 "use client";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  useTransition,
+} from "react";
 import Tabs from "../../creations/components/Tabs";
 import PhotoGridTwo from "../../creations/components/PhotoGridTwo";
 import { useParams, useSearchParams } from "next/navigation";
@@ -25,7 +31,11 @@ export default function ProfileView() {
   const s = searchParams.get("s");
   const { id } = useParams();
   const { userId } = useUser();
-  const { profileTab, initFromUrl } = useCreationAndProfileStore();
+  const { profileTab, initFromUrl, setProfileTab } =
+    useCreationAndProfileStore();
+
+  // Add isPending state with useTransition for smooth tab transitions
+  const [isPending, startTransition] = useTransition();
 
   // Local state for tab index
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -34,22 +44,45 @@ export default function ProfileView() {
   useEffect(() => {
     if (s) {
       console.log("ProfileView - Initializing from URL:", s);
-      initFromUrl("profile", s);
+      startTransition(() => {
+        initFromUrl("profile", s);
+      });
 
       // Set the local index state
       const index = indexOf(POST_GROUPS, s.toUpperCase());
       if (index >= 0) {
-        setCurrentIndex(index);
+        startTransition(() => {
+          setCurrentIndex(index);
+        });
       }
     }
   }, []);
+
+  // Create a wrapper function for tab changes that uses transitions
+  const handleTabChange = useCallback(
+    (index: number) => {
+      startTransition(() => {
+        setCurrentIndex(index);
+        // Get the tab text from the index
+        const tabText = POST_GROUPS[index]?.toLowerCase();
+        if (tabText) {
+          const tabKey =
+            tabText.charAt(0).toUpperCase() + tabText.slice(1).toLowerCase();
+          setProfileTab(tabKey as any);
+        }
+      });
+    },
+    [setProfileTab]
+  );
 
   // Sync with store changes
   useEffect(() => {
     if (profileTab) {
       const index = indexOf(POST_GROUPS, profileTab.toUpperCase());
       if (index >= 0 && index !== currentIndex) {
-        setCurrentIndex(index);
+        startTransition(() => {
+          setCurrentIndex(index);
+        });
       }
     }
   }, [profileTab, currentIndex]);
@@ -59,7 +92,7 @@ export default function ProfileView() {
   }, [s, profileTab]);
 
   const {
-    isLoading,
+    isLoading: queryIsLoading,
     isError,
     error,
     data,
@@ -99,6 +132,9 @@ export default function ProfileView() {
     refetchOnWindowFocus: false, // Disable automatic refetch on window focus to prevent flickering
   });
 
+  // Combine isPending with queryIsLoading for a comprehensive loading state
+  const isLoading = isPending || queryIsLoading;
+
   const contentConfig = useMemo(
     () => ({
       Public: {
@@ -131,7 +167,8 @@ export default function ProfileView() {
   );
 
   const renderContent = useCallback(() => {
-    if (isError) {
+    // Handle error cases but don't show errors during transitions
+    if (isError && !isPending) {
       return (
         <div className="text-center text-red-500">
           {"message" in error ? error.message : "An error occurred"}
@@ -144,6 +181,8 @@ export default function ProfileView() {
       contentConfig[configs[currentIndex] as keyof typeof contentConfig];
     if (!config) return null;
 
+    // During transitions or loading, show loading state in PhotoGridTwo
+    // Or when we have data, let PhotoGridTwo handle the display
     return (
       <PhotoGridTwo
         {...config}
@@ -156,6 +195,7 @@ export default function ProfileView() {
     );
   }, [
     isLoading,
+    isPending,
     isError,
     error,
     data,
@@ -171,7 +211,7 @@ export default function ProfileView() {
       <div className="w-full mb-4">
         <Tabs
           currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
+          setCurrentIndex={handleTabChange}
           hideDraft={userId !== id}
           section="profile"
         />
