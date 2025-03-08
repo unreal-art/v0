@@ -14,10 +14,9 @@ import { useUser } from "@/hooks/useUser";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import { getImage } from "../../formattedPhotos";
-import { Post, UploadResponse } from "$/types/data.types";
+import { UploadResponse } from "$/types/data.types";
 import { formatDate, getImageResolution, truncateText } from "@/utils";
 import { useEffect, useState } from "react";
-import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import ViewSkeleton from "../components/viewSkeleton";
 import Link from "next/link";
@@ -26,6 +25,8 @@ import { toast } from "sonner";
 import ImageOptionMenu from "../../components/imageOptionMenu";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
+import { IPhoto } from "@/app/libs/interfaces";
+
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -67,6 +68,7 @@ export default function Generation() {
   const [dynamicDescription, setDynamicDescription] = useState(
     "Default Description"
   );
+  const [commentPhoto, setCommentPhoto] = useState<IPhoto | boolean>(false)
   const [dynamicImage, setDynamicImage] = useState("/default-image.jpg");
 
   useEffect(() => {
@@ -91,6 +93,11 @@ export default function Generation() {
       setDynamicTitle(data.title);
       setDynamicDescription(data.description);
       setDynamicImage(data.image);
+      setCommentPhoto({
+        id: String(post?.id),
+        src: data.image,
+        author: post?.author
+      })
     };
 
     fetchData();
@@ -191,11 +198,15 @@ export default function Generation() {
     }
   };
 
-  //http://localhost:3000/home/photo/7451?a=2cacb756-9569-43d9-9143-6f12e7293c42
 
   if (isFetching) {
     return <ViewSkeleton />;
   }
+
+  const image = getImage(
+    (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
+    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+  )
 
   return (
     <>
@@ -263,10 +274,7 @@ export default function Generation() {
 
               <div className="flex justify-center  w-full">
                 <Image
-                  src={getImage(
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
-                  )}
+                  src={image}
                   width={306}
                   height={408}
                   alt="generated"
@@ -279,7 +287,7 @@ export default function Generation() {
                   setCaption={setCaption}
                   readOnly={userId !== post?.author}
                 />
-                {post && <Interactions postId={post?.id as number} />}
+                {post && <Interactions postId={post?.id as number} postDetails={commentPhoto as IPhoto} />}
                 {post && userId == post?.author && (
                   <PostingActions
                     privatePost={privatePost as boolean}
