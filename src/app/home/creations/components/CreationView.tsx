@@ -1,7 +1,13 @@
 "use client";
-import { useMemo, useCallback, useState, useEffect } from "react";
+import {
+  useMemo,
+  useCallback,
+  useState,
+  useEffect,
+  useTransition,
+} from "react";
 import Tabs from "./Tabs";
-import dynamic from "next/dynamic";
+import PhotoGridTwo from "./PhotoGridTwo";
 import { useSearchParams } from "next/navigation";
 import { indexOf } from "lodash";
 import { POST_GROUPS } from "@/app/libs/constants";
@@ -19,25 +25,6 @@ import { Post } from "$/types/data.types";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
-
-// Dynamically import PhotoGridTwo
-const PhotoGridTwo = dynamic(() => import("./PhotoGridTwo"), {
-  loading: () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
-      {Array(12)
-        .fill(null)
-        .map((_, index) => (
-          <div
-            key={index}
-            // style={{ width: size.width, height: size.height }}
-            className="relative grid-cols-1"
-          >
-            <Skeleton height="100%" baseColor="#1a1a1a" highlightColor="#333" />
-          </div>
-        ))}
-    </div>
-  ),
-});
 
 // Memoize tab configurations to prevent recreating on each render
 const TAB_CONFIGS = {
@@ -109,7 +96,11 @@ export default function CreationView() {
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
   const { userId } = useUser();
-  const { creationTab, initFromUrl } = useCreationAndProfileStore();
+  const { creationTab, initFromUrl, setCreationTab } =
+    useCreationAndProfileStore();
+
+  // Add isPending state with useTransition for smooth tab transitions
+  const [isPending, startTransition] = useTransition();
 
   // Local state for tab index
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -118,22 +109,45 @@ export default function CreationView() {
   useEffect(() => {
     if (s) {
       console.log("CreationView - Initializing from URL:", s);
-      initFromUrl("creation", s);
+      startTransition(() => {
+        initFromUrl("creation", s);
+      });
 
       // Set the local index state
       const index = indexOf(POST_GROUPS, s.toUpperCase());
       if (index >= 0) {
-        setCurrentIndex(index);
+        startTransition(() => {
+          setCurrentIndex(index);
+        });
       }
     }
   }, []);
+
+  // Create a wrapper function for tab changes that uses transitions
+  const handleTabChange = useCallback(
+    (index: number) => {
+      startTransition(() => {
+        setCurrentIndex(index);
+        // Get the tab text from the index
+        const tabText = POST_GROUPS[index]?.toLowerCase();
+        if (tabText) {
+          const tabKey =
+            tabText.charAt(0).toUpperCase() + tabText.slice(1).toLowerCase();
+          setCreationTab(tabKey as any);
+        }
+      });
+    },
+    [setCreationTab]
+  );
 
   // Sync with store changes
   useEffect(() => {
     if (creationTab) {
       const index = indexOf(POST_GROUPS, creationTab.toUpperCase());
       if (index >= 0 && index !== currentIndex) {
-        setCurrentIndex(index);
+        startTransition(() => {
+          setCurrentIndex(index);
+        });
       }
     }
   }, [creationTab, currentIndex]);
@@ -148,7 +162,7 @@ export default function CreationView() {
   // Single query that handles all types of posts
   const {
     data,
-    isLoading,
+    isLoading: queryIsLoading,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
@@ -168,6 +182,9 @@ export default function CreationView() {
     refetchOnWindowFocus: false, // Disable automatic refetch on window focus to prevent flickering
   });
 
+  // Combine isPending with queryIsLoading for a comprehensive loading state
+  const isLoading = isPending || queryIsLoading;
+
   // Get current tab config
   const currentConfig = useMemo(() => {
     const currentTab = s || creationTab || "Public";
@@ -178,8 +195,8 @@ export default function CreationView() {
 
   // Render content based on loading, error, and data states
   const renderContent = useCallback(() => {
-    // For error cases, show error message
-    if (isError) {
+    // Handle error cases
+    if (isError && !isPending) {
       return (
         <div className="w-full flex justify-center items-center min-h-[200px] text-red-500">
           {error instanceof Error
@@ -189,8 +206,8 @@ export default function CreationView() {
       );
     }
 
-    // For all cases (loading or not), pass responsibility to PhotoGridTwo
-    // which now has improved loading state handling
+    // During transitions or loading, show loading state in PhotoGridTwo
+    // Or when we have data, let PhotoGridTwo handle the display
     return (
       <PhotoGridTwo
         {...currentConfig}
@@ -203,6 +220,7 @@ export default function CreationView() {
     );
   }, [
     isLoading,
+    isPending,
     isError,
     error,
     data,
@@ -212,14 +230,14 @@ export default function CreationView() {
     isFetchingNextPage,
   ]);
 
-  // Memoize the error component
-  const ErrorComponent = useMemo(
-    () => (
+  // Handle error state
+  if (isError && !isPending)
+    return (
       <div className="w-full">
         <div className="w-full mb-4">
           <Tabs
             currentIndex={currentIndex}
-            setCurrentIndex={setCurrentIndex}
+            setCurrentIndex={handleTabChange}
             hideDraft={false}
             section="creation"
           />
@@ -230,19 +248,14 @@ export default function CreationView() {
             : "An error occurred while loading posts"}
         </div>
       </div>
-    ),
-    [error, currentIndex]
-  );
-
-  // Handle error state
-  if (isError) return ErrorComponent;
+    );
 
   return (
     <div className="w-full">
       <div className="w-full mb-4">
         <Tabs
           currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
+          setCurrentIndex={handleTabChange}
           hideDraft={false}
           section="creation"
         />
