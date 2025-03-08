@@ -34,7 +34,7 @@ import { useGalleryStore } from "@/stores/galleryStore";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -159,7 +159,7 @@ export default function PhotoGallary({}) {
   }
 
   // Only show no data message when we have data object but it's empty
-  if (data && data.pages.length === 0) {
+  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center w-full min-h-[200px]">
         <p className="text-center text-lg text-primary-6">No posts found</p>

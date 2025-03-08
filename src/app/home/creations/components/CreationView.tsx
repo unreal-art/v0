@@ -162,8 +162,10 @@ export default function CreationView() {
     enabled: !!userId,
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+    staleTime: 1000 * 60, // 1 minute - good balance between freshness and performance
     gcTime: 1000 * 60 * 10, // Keep unused data for 10 minutes
+    refetchOnMount: "always", // Always check for updates but use stale data while fetching
+    refetchOnWindowFocus: false, // Disable automatic refetch on window focus to prevent flickering
   });
 
   // Get current tab config
@@ -176,25 +178,7 @@ export default function CreationView() {
 
   // Render content based on loading, error, and data states
   const renderContent = useCallback(() => {
-    // Show loading skeleton on initial load or refresh
-    if (isLoading) {
-      console.log("CreationView - Loading");
-      return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full p-2 ">
-          {Array(12)
-            .fill(null)
-            .map((_, index) => (
-              <Skeleton
-                key={index}
-                height={200}
-                baseColor="#1a1a1a" // Dark background
-                highlightColor="#333" // Slightly lighter shimmer effect
-              />
-            ))}
-        </div>
-      );
-    }
-
+    // For error cases, show error message
     if (isError) {
       return (
         <div className="w-full flex justify-center items-center min-h-[200px] text-red-500">
@@ -205,6 +189,8 @@ export default function CreationView() {
       );
     }
 
+    // For all cases (loading or not), pass responsibility to PhotoGridTwo
+    // which now has improved loading state handling
     return (
       <PhotoGridTwo
         {...currentConfig}

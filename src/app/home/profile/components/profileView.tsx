@@ -93,14 +93,18 @@ export default function ProfileView() {
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: 0,
+    staleTime: 1000 * 60, // 1 minute - good balance between freshness and performance
+    gcTime: 1000 * 60 * 10, // Keep unused data for 10 minutes
+    refetchOnMount: "always", // Always check for updates but use stale data while fetching
+    refetchOnWindowFocus: false, // Disable automatic refetch on window focus to prevent flickering
   });
 
   const contentConfig = useMemo(
     () => ({
       Public: {
         title: "Public" as TabText,
-        content: "You haven't liked anything yet.",
-        subContent: "Find something you love and tap that 🤍!",
+        content: "You haven't created anything yet.",
+        subContent: "Tap your inner artist and create something amazing!",
       },
       Private: {
         title: "Private" as TabText,
@@ -127,23 +131,6 @@ export default function ProfileView() {
   );
 
   const renderContent = useCallback(() => {
-    if (isLoading) {
-      return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
-          {Array(12)
-            .fill(null)
-            .map((_, index) => (
-              <Skeleton
-                key={index}
-                height={200}
-                baseColor="#1a1a1a"
-                highlightColor="#333"
-              />
-            ))}
-        </div>
-      );
-    }
-
     if (isError) {
       return (
         <div className="text-center text-red-500">

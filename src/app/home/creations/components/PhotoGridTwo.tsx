@@ -1,11 +1,11 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import type { ReactElement } from "react";
 import Image from "next/image";
 import { truncateText } from "@/utils";
 import { timeAgo } from "@/app/libs/timeAgo";
 import { OptionMenuIcon } from "@/app/components/icons";
-
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import NoItemFound from "./NoItemFound";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import dynamic from "next/dynamic";
@@ -15,6 +15,7 @@ import PhotoOverlay, {
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { TabText } from "@/stores/creationAndProfileStore";
+import { Post } from "$/types/data.types";
 
 // Constants for breakpoints and grid sizing
 const BREAKPOINTS = {
@@ -67,7 +68,7 @@ interface TransformedPhoto {
   width: number;
   height: number;
   alt: string;
-  caption?: string;
+  caption?: string | null;
   prompt: string;
   createdAt: string;
   author: string;
@@ -89,50 +90,76 @@ export default function PhotoGridTwo({
   fetchNextPage = () => {},
   isFetchingNextPage = false,
 }: TabProps): ReactElement {
-  // State management
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [photos, setPhotos] = useState<TransformedPhoto[]>([]);
+  const [transformedPosts, setTransformedPosts] = useState<TransformedPhoto[]>(
+    []
+  );
+  const [stableLoading, setStableLoading] = useState(true); // Stable loading state to prevent flashing
   const [imageIndex, setImageIndex] = useState(-1);
   const [size, setSize] = useState<number>(GRID_SIZES.LG);
 
-  // Memoized values and callbacks
-  const photos = useMemo(() => {
-    if (!data?.pages) return [];
-    const transformedPhotos = new Map();
+  // Transform and stabilize data updates to prevent flashing
+  useEffect(() => {
+    // Don't reset loading state when we already have data
+    if (!photos.length) {
+      setStableLoading(true);
+    }
 
-    return data.pages
-      .flatMap((page: any) => page.data || [])
-      .reduce((acc: TransformedPhoto[], post: PhotoData) => {
-        if (transformedPhotos.has(post.id)) {
-          return acc;
-        }
+    // If we have data, process it
+    if (data?.pages && data.pages.length > 0 && data.pages[0].data.length > 0) {
+      const allPosts = data.pages.flatMap((page: any) => page.data || []);
 
-        const image = post.ipfsImages?.[0];
-        if (!image?.hash || !image?.fileNames?.[0]) return acc;
+      // Transform the posts into photo format
+      const newTransformedPosts = allPosts
+        .filter((post: Post) => {
+          const image = post.ipfsImages?.[0];
+          return image?.hash && image?.fileNames?.[0];
+        })
+        .map((post: Post): TransformedPhoto => {
+          const image = post.ipfsImages?.[0];
+          // We already filtered out null cases above
+          const imageUrl = `${
+            process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY || ""
+          }${image!.hash}/${image!.fileNames[0]}`;
 
-        const imageUrl = `${process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY}${image.hash}/${image.fileNames[0]}`;
+          return {
+            id: post.id.toString(),
+            src: imageUrl,
+            width: size,
+            height: size,
+            alt: post.caption || post.prompt || "",
+            caption: post.caption,
+            prompt: post.prompt || "",
+            createdAt: post.createdAt,
+            author: post.author,
+          };
+        });
 
-        const transformedPhoto = {
-          id: post.id.toString(),
-          src: imageUrl,
-          width: size,
-          height: size,
-          alt: post.caption || post.prompt || "",
-          caption: post.caption,
-          prompt: post.prompt || "",
-          createdAt: post.createdAt,
-          author: post.author,
-        } as TransformedPhoto;
+      setTransformedPosts(newTransformedPosts);
 
-        transformedPhotos.set(post.id, true);
-        acc.push(transformedPhoto);
-        return acc;
-      }, []);
-  }, [data?.pages, size]);
+      // Use a short timeout before updating photos and turning off loading
+      // This helps prevent flickering between stale and fresh data
+      const timer = setTimeout(() => {
+        setPhotos(newTransformedPosts);
+        // Only turn off loading once we have data or we're sure the fetch is complete
+        setStableLoading(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    } else if (!isLoading && data) {
+      // Only turn off loading and show empty state when we're completely done loading
+      // AND we have a data object (even if it has no items)
+      setStableLoading(false);
+      setPhotos([]);
+    }
+  }, [data, isLoading, size, photos.length]);
 
   const handleImageIndex = useCallback(
     (context: ExtendedRenderPhotoContext) => {
       setImageIndex(context.index);
     },
-    [],
+    []
   );
 
   const loadMore = useCallback(() => {
@@ -140,44 +167,6 @@ export default function PhotoGridTwo({
       fetchNextPage();
     }
   }, [hasNextPage, fetchNextPage]);
-
-  // Memoized loading skeleton
-  const loadingSkeleton = useMemo(
-    () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center max-w-[1536px]">
-        {Array(12)
-          .fill(null)
-          .map((_, index) => (
-            <Skeleton
-              key={index}
-              height={200}
-              baseColor="#1a1a1a"
-              highlightColor="#333"
-            />
-          ))}
-      </div>
-    ),
-    [size],
-  );
-
-  // Memoized loading more skeleton
-  const loadingMoreSkeleton = useMemo(
-    () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
-        {Array(12)
-          .fill(null)
-          .map((_, index) => (
-            <Skeleton
-              key={index}
-              height={200}
-              baseColor="#1a1a1a"
-              highlightColor="#333"
-            />
-          ))}
-      </div>
-    ),
-    [size],
-  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -213,11 +202,27 @@ export default function PhotoGridTwo({
     };
   }, []);
 
-  // Show initial loading state
-  if (isLoading) return loadingSkeleton;
+  // Handle showing loading state - always show loader when loading
+  if (stableLoading || isLoading) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full ">
+        {Array(12)
+          .fill(null)
+          .map((_, index) => (
+            <Skeleton
+              key={index}
+              height={200}
+              baseColor="#1a1a1a" // Dark background
+              highlightColor="#333" // Slightly lighter shimmer effect
+            />
+          ))}
+      </div>
+    );
+  }
 
-  // Show empty state
-  if (!data?.pages || !photos.length) {
+  // Only show empty state when we're not loading and have no photos
+  // We've already confirmed we have data object but it's empty
+  if (!photos.length && !isLoading && !stableLoading && data) {
     return (
       <NoItemFound title={title} content={content} subContent={subContent} />
     );
@@ -283,7 +288,7 @@ export default function PhotoGridTwo({
 
                     <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
                       {truncateText(
-                        context.photo.caption || context.photo.prompt,
+                        context.photo.caption || context.photo.prompt
                       )}
                     </p>
                   </>
@@ -292,12 +297,6 @@ export default function PhotoGridTwo({
             );
           })}
         </div>
-
-        {isFetchingNextPage && (
-          <div className="w-full py-4 flex justify-center">
-            {loadingMoreSkeleton}
-          </div>
-        )}
       </InfiniteScroll>
 
       {imageIndex > -1 && (
