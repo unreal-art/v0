@@ -1,12 +1,12 @@
 "use client";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo } from "react";
 import Tabs from "../../creations/components/Tabs";
 import PhotoGridTwo from "../../creations/components/PhotoGridTwo";
 import { useParams, useSearchParams } from "next/navigation";
 import { indexOf } from "lodash";
 import { POST_GROUPS } from "@/app/libs/constants";
 import { useUser } from "@/hooks/useUser";
-import { TabText } from "@/stores/creationAndProfileStore";
+import { TabText } from "../../creations/components/Tabs";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import Skeleton from "react-loading-skeleton";
 import { supabase } from "$/supabase/client";
@@ -18,45 +18,17 @@ import {
   getPrivatePostsByUser,
   getUserLikedPosts,
 } from "@/queries/post/getPostsByUser";
-import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
 
 export default function ProfileView() {
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
   const { id } = useParams();
   const { userId } = useUser();
-  const { profileTab, initFromUrl } = useCreationAndProfileStore();
 
-  // Local state for tab index
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Initialize from URL on component mount
-  useEffect(() => {
-    if (s) {
-      console.log("ProfileView - Initializing from URL:", s);
-      initFromUrl("profile", s);
-
-      // Set the local index state
-      const index = indexOf(POST_GROUPS, s.toUpperCase());
-      if (index >= 0) {
-        setCurrentIndex(index);
-      }
-    }
-  }, []);
-
-  // Sync with store changes
-  useEffect(() => {
-    if (profileTab) {
-      const index = indexOf(POST_GROUPS, profileTab.toUpperCase());
-      if (index >= 0 && index !== currentIndex) {
-        setCurrentIndex(index);
-      }
-    }
-  }, [profileTab, currentIndex]);
-
-  const currentTabName = useMemo(() => {
-    return s || profileTab || "Public";
-  }, [s, profileTab]);
+  const currentIndex = useMemo(() => {
+    if (!s) return 0;
+    return indexOf(POST_GROUPS, s?.toUpperCase());
+  }, [s]);
 
   const {
     isLoading,
@@ -67,25 +39,22 @@ export default function ProfileView() {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["profile_posts", currentTabName, id],
+    queryKey: ["creation_posts", s || "public"],
     queryFn: async ({ pageParam = 0 }) => {
       let result: Post[] = [];
-      const searchType = currentTabName.toUpperCase();
-
-      if (searchType === "PUBLIC") {
+      if (s?.toUpperCase() === "PUBLIC") {
         result = await getPostsByUser(supabase, pageParam, id as string);
-      } else if (searchType === "PRIVATE") {
+      } else if (s?.toUpperCase() === "PRIVATE") {
         result = await getPrivatePostsByUser(supabase, pageParam, id as string);
-      } else if (searchType === "LIKED") {
+      } else if (s?.toUpperCase() === "LIKED") {
         result = await getUserLikedPosts(supabase, pageParam, id as string);
-      } else if (searchType === "PINNED") {
+      } else if (s?.toUpperCase() === "PINNED") {
         result = await getPinnedPostsByUser(supabase, pageParam, id as string);
-      } else if (searchType === "DRAFT") {
+      } else if (s?.toUpperCase() === "DRAFT") {
         result = await getIsDraftPostsByUser(supabase, pageParam, id as string);
       } else {
         result = await getPostsByUser(supabase, pageParam, id as string);
       }
-
       return {
         data: result,
         nextCursor: result.length > 0 ? pageParam + 1 : undefined,
@@ -98,27 +67,27 @@ export default function ProfileView() {
   const contentConfig = useMemo(
     () => ({
       Public: {
-        title: "Public" as const,
-        content: "You haven't published any post.",
-        subContent: "Be creative and publish a great post!",
+        title: "Public" as TabText,
+        content: "You haven't liked anything yet.",
+        subContent: "Find something you love and tap that 🤍!",
       },
       Private: {
-        title: "Private" as const,
-        content: "You don't have any private posts.",
+        title: "Private" as TabText,
+        content: "You don't have any private post.",
         subContent: "You can go ahead and create one.",
       },
       Liked: {
-        title: "Liked" as const,
+        title: "Liked" as TabText,
         content: "You haven't liked anything yet.",
         subContent: "Find something you love and tap that 🤍!",
       },
       Pinned: {
-        title: "Pinned" as const,
+        title: "Pinned" as TabText,
         content: "You haven't pinned anything yet.",
         subContent: "Find something you love and pin it!",
       },
       Draft: {
-        title: "Draft" as const,
+        title: "Draft" as TabText,
         content: "You haven't saved anything yet.",
         subContent: "Create something you love to post later",
       },
@@ -184,9 +153,8 @@ export default function ProfileView() {
       <div className="w-full mb-4">
         <Tabs
           currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
+          setCurrentIndex={() => {}}
           hideDraft={userId !== id}
-          section="profile"
         />
       </div>
 
