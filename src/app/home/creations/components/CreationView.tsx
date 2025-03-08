@@ -30,8 +30,8 @@ import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
 const TAB_CONFIGS = {
   Public: {
     title: "Public" as const,
-    content: "You haven't liked anything yet.",
-    subContent: "Find something you love and tap that 🤍!",
+    content: "You have not published anything yet.",
+    subContent: "Tap your inner artist and create something amazing!",
   },
   Private: {
     title: "Private" as const,

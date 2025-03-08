@@ -139,7 +139,7 @@ export default function ProfileView() {
     () => ({
       Public: {
         title: "Public" as TabText,
-        content: "You haven't created anything yet.",
+        content: "You have not published anything yet.",
         subContent: "Tap your inner artist and create something amazing!",
       },
       Private: {
