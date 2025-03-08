@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import Tabs from "./Tabs";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
@@ -18,6 +18,7 @@ import { useUser } from "@/hooks/useUser";
 import { Post } from "$/types/data.types";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
 
 // Dynamically import PhotoGridTwo
 const PhotoGridTwo = dynamic(() => import("./PhotoGridTwo"), {
@@ -108,18 +109,40 @@ export default function CreationView() {
   const searchParams = useSearchParams();
   const s = searchParams.get("s");
   const { userId } = useUser();
+  const { creationTab, initFromUrl } = useCreationAndProfileStore();
 
-  // Memoize current index calculation
-  const currentIndex = useMemo(() => {
-    if (!s) return 0;
-    return indexOf(POST_GROUPS, s.toUpperCase());
-  }, [s]);
+  // Local state for tab index
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Initialize from URL on component mount
+  useEffect(() => {
+    if (s) {
+      console.log("CreationView - Initializing from URL:", s);
+      initFromUrl("creation", s);
+
+      // Set the local index state
+      const index = indexOf(POST_GROUPS, s.toUpperCase());
+      if (index >= 0) {
+        setCurrentIndex(index);
+      }
+    }
+  }, []);
+
+  // Sync with store changes
+  useEffect(() => {
+    if (creationTab) {
+      const index = indexOf(POST_GROUPS, creationTab.toUpperCase());
+      if (index >= 0 && index !== currentIndex) {
+        setCurrentIndex(index);
+      }
+    }
+  }, [creationTab, currentIndex]);
 
   // Memoize the query function
   const queryFn = useCallback(
     (context: { pageParam?: unknown }) =>
-      createQueryFn(userId, s || "")(context),
-    [userId, s]
+      createQueryFn(userId, s || creationTab || "")(context),
+    [userId, s, creationTab]
   );
 
   // Single query that handles all types of posts
@@ -132,7 +155,7 @@ export default function CreationView() {
     isError,
     error,
   } = useInfiniteQuery<QueryResult>({
-    queryKey: ["creation_posts", s || "public", userId],
+    queryKey: ["creation_posts", s || creationTab || "public", userId],
     queryFn,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: 0,
@@ -145,11 +168,63 @@ export default function CreationView() {
 
   // Get current tab config
   const currentConfig = useMemo(() => {
-    const configKey = (
-      s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "Public"
-    ) as TabConfigKey;
-    return TAB_CONFIGS[configKey];
-  }, [s]);
+    const currentTab = s || creationTab || "Public";
+    const configKey = (currentTab.charAt(0).toUpperCase() +
+      currentTab.slice(1).toLowerCase()) as TabConfigKey;
+    return TAB_CONFIGS[configKey] || TAB_CONFIGS.Public;
+  }, [s, creationTab]);
+
+  // Render content based on loading, error, and data states
+  const renderContent = useCallback(() => {
+    // Show loading skeleton on initial load or refresh
+    if (isLoading) {
+      console.log("CreationView - Loading");
+      return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full p-2 ">
+          {Array(12)
+            .fill(null)
+            .map((_, index) => (
+              <Skeleton
+                key={index}
+                height={200}
+                baseColor="#1a1a1a" // Dark background
+                highlightColor="#333" // Slightly lighter shimmer effect
+              />
+            ))}
+        </div>
+      );
+    }
+
+    if (isError) {
+      return (
+        <div className="w-full flex justify-center items-center min-h-[200px] text-red-500">
+          {error instanceof Error
+            ? error.message
+            : "An error occurred while loading posts"}
+        </div>
+      );
+    }
+
+    return (
+      <PhotoGridTwo
+        {...currentConfig}
+        data={data}
+        isLoading={isLoading}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+      />
+    );
+  }, [
+    isLoading,
+    isError,
+    error,
+    data,
+    currentConfig,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  ]);
 
   // Memoize the error component
   const ErrorComponent = useMemo(
@@ -158,8 +233,9 @@ export default function CreationView() {
         <div className="w-full mb-4">
           <Tabs
             currentIndex={currentIndex}
-            setCurrentIndex={() => {}}
+            setCurrentIndex={setCurrentIndex}
             hideDraft={false}
+            section="creation"
           />
         </div>
         <div className="w-full flex justify-center items-center min-h-[200px] text-red-500">
@@ -175,49 +251,18 @@ export default function CreationView() {
   // Handle error state
   if (isError) return ErrorComponent;
 
-  // Handle loading state when no data is available yet
-  if (isLoading && !data) {
-    return (
-      <div className="w-full">
-        <div className="w-full mb-4">
-          <Tabs
-            currentIndex={currentIndex}
-            setCurrentIndex={() => {}}
-            hideDraft={false}
-          />
-        </div>
-        <PhotoGridTwo
-          {...currentConfig}
-          data={undefined}
-          isLoading={true}
-          hasNextPage={false}
-          fetchNextPage={() => {}}
-          isFetchingNextPage={false}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="w-full">
       <div className="w-full mb-4">
         <Tabs
           currentIndex={currentIndex}
-          setCurrentIndex={() => {}}
+          setCurrentIndex={setCurrentIndex}
           hideDraft={false}
+          section="creation"
         />
       </div>
 
-      <div className="w-full">
-        <PhotoGridTwo
-          {...currentConfig}
-          data={data}
-          isLoading={isLoading}
-          hasNextPage={hasNextPage}
-          fetchNextPage={fetchNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-        />
-      </div>
+      <div className="w-full">{renderContent()}</div>
     </div>
   );
 }

@@ -32,15 +32,15 @@ export default function Notifications({ children }: INotificationProps) {
 
   // Enhanced debugging
   useEffect(() => {
-    console.log("[Notifications] userId:", userId);
-    console.log("[Notifications] unreadCount:", unreadCount);
-    console.log("[Notifications] notifications length:", notifications?.length);
+    // console.log("[Notifications] userId:", userId);
+    // console.log("[Notifications] unreadCount:", unreadCount);
+    // console.log("[Notifications] notifications length:", notifications?.length);
   }, [userId, notifications, unreadCount]);
 
   // Refetch notifications when panel opens
   useEffect(() => {
     if (open) {
-      console.log("[Notifications] Panel opened, refetching data");
+      // console.log("[Notifications] Panel opened, refetching data");
       refetch();
 
       // Also refetch the unread count after a delay to ensure it's up to date
@@ -54,7 +54,7 @@ export default function Notifications({ children }: INotificationProps) {
 
   // Function to manually invalidate the count
   const refreshCount = useCallback(() => {
-    console.log("[Notifications] Manually refreshing count");
+    // console.log("[Notifications] Manually refreshing count");
     queryClient.invalidateQueries({
       queryKey: ["notificationsCount", userId],
     });

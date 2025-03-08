@@ -37,12 +37,12 @@ export const useNotifications = (userId: string | null) => {
   const query = useInfiniteQuery<NotificationPage, Error>({
     queryKey: ["notifications", userId],
     queryFn: async ({ pageParam = 0 }) => {
-      console.log(
-        "Fetching notifications for userId:",
-        userId,
-        "page:",
-        pageParam
-      );
+      // console.log(
+      //   "Fetching notifications for userId:",
+      //   userId,
+      //   "page:",
+      //   pageParam
+      // );
       const currentPage = typeof pageParam === "number" ? pageParam : 0;
 
       if (!userId) {
@@ -64,9 +64,8 @@ export const useNotifications = (userId: string | null) => {
             .eq("user_id", userId)
             .neq("sender_id", userId);
 
-          console.log("Count response:", countResponse);
           const totalCount = countResponse.count || 0;
-          console.log("Total notification count:", totalCount);
+          // console.log("Total notification count:", totalCount);
 
           // Get notifications - without using the relationship
           const { data, error } = await supabase
@@ -76,12 +75,12 @@ export const useNotifications = (userId: string | null) => {
             .neq("sender_id", userId)
             .order("created_at", { ascending: false });
 
-          console.log("Notifications query:", {
-            userId,
-            range: [currentPage * pageSize, (currentPage + 1) * pageSize - 1],
-          });
-          console.log("Supabase notifications data:", data);
-          console.log("Supabase error:", error);
+          // console.log("Notifications query:", {
+          //   userId,
+          //   range: [currentPage * pageSize, (currentPage + 1) * pageSize - 1],
+          // });
+          // console.log("Supabase notifications data:", data);
+          // console.log("Supabase error:", error);
 
           if (error) {
             console.error("Supabase error fetching notifications:", error);
@@ -99,7 +98,7 @@ export const useNotifications = (userId: string | null) => {
             };
           }
 
-          console.log("Received", data.length, "notifications");
+          //console.log("Received", data.length, "notifications");
 
           // Handle data safely
           const notificationsWithSenders: NotificationWithSender[] = [];
@@ -164,7 +163,7 @@ export const useNotifications = (userId: string | null) => {
             }
           }
 
-          console.log("Processed notifications:", notificationsWithSenders);
+          //  console.log("Processed notifications:", notificationsWithSenders);
           const hasMore = (currentPage + 1) * pageSize < totalCount;
 
           return {
@@ -185,14 +184,14 @@ export const useNotifications = (userId: string | null) => {
 
   // For debugging: log when the component mounts and when data changes
   useEffect(() => {
-    console.log("Notifications hook mounted for userId:", userId);
+    // console.log("Notifications hook mounted for userId:", userId);
     return () => {
-      console.log("Notifications hook unmounted for userId:", userId);
+      // console.log("Notifications hook unmounted for userId:", userId);
     };
   }, [userId]);
 
   useEffect(() => {
-    console.log("Current notification data:", query.data);
+    // console.log("Current notification data:", query.data);
   }, [query.data]);
 
   // Set up real-time subscription
