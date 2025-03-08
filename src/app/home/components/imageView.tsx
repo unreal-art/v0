@@ -43,7 +43,7 @@ export default function ImageView({
             <div className="grid grid-cols-1 h-full md:grid-cols-2">
               <div className="h-full col-span-1 hidden md:block">
                 <div className="relative w-full md:h-full">
-                  <Image src={currentImage.src} fill={true} alt="" />
+                  <Image src={currentImage.src} fill={true} alt=""  placeholder="blur" blurDataURL="L6PZfSi_.AyE_3t7t7R**0o#DgR4"/>
                 </div>
               </div>
 

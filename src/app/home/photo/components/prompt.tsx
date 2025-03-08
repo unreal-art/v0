@@ -13,9 +13,9 @@ export default function Prompt({ title, fullText, children }: PromptProps) {
       <div className="flex justify-between mb-1">
         <p className="text-lg text-primary-5"> {title} </p>
         <div className="flex gap-x-4">
-          <button>
+          {/* <button>
             <PlusIcon color="#5D5D5D" />
-          </button>
+          </button> */}
           <CopyToClipboard text={fullText} />
         </div>
       </div>

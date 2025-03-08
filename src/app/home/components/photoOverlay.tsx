@@ -81,10 +81,10 @@ export default function PhotoOverlay({
       <div
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        className="absolute top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm hover:bg-gray-900/50"
+        className="absolute top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm md:hover:bg-gray-900/50"
       >
         {hover && (
-          <div className="relative flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
+          <div className="relative hidden md:flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
             {/* <Link href={`/home/photo/${context.photo.id}`}> */}
             <div
               onClick={handleView}
@@ -117,8 +117,7 @@ export default function PhotoOverlay({
             <div className="flex justify-center gap-4 z-10">
               <button
                 className="flex gap-1 items-center"
-                onClick={() => toggleLike()}
-              >
+                onClick={() => toggleLike()}>
                 {userHasLiked ? (
                   <HeartFillIcon color="#FFFFFF" />
                 ) : (
@@ -151,8 +150,63 @@ export default function PhotoOverlay({
           </div>
         )}
 
-        {!hover && children}
+        <div className="flex flex-col md:hidden h-full w-full justify-between items-end p-3">
+
+          <div className="relative block mr-4">
+            <div className="absolute">
+              <div className="absolute z-20">
+                <ImageOptionMenu
+                  image={context.photo}
+                  postId={context.photo.id}>
+                    <OptionMenuIcon color="#FFFFFF" />
+                </ImageOptionMenu>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="flex flex-col gap-2">
+
+            <div className="relative flex flex-col items-center">
+
+              <button
+                className="absolute flex flex-col items-center z-10"
+                onClick={() => toggleLike()}>
+                {userHasLiked ? (
+                  <HeartFillIcon color="#FFFFFF" />
+                ) : (
+                  <HeartIcon color="#FFFFFF" />
+                )}
+              </button>
+
+              <p className="mt-6 z-10">{likes ? likes?.length : ""}</p>
+            
+            </div>
+
+            <div className="relative flex flex-col items-center">
+
+              <button
+                className="absolute flex gap-1 items-center z-10"
+                onClick={handleCommentClick}>
+                <ChatIcon color="#FFFFFF" />
+              </button>
+
+              <p className="mt-6 z-10">{comments ? comments?.length : ""}</p>
+
+            </div>
+
+          </div>
+
+          <div></div>
+
+        </div>
+
+        <div onClick={handleView} className="absolute hidden md:block w-full h-full">{!hover && children} </div>
+
+        <div onClick={handleView} className="absolute  md:hidden w-full h-full">{children} </div>
+
       </div>
+
     </>
   );
 }

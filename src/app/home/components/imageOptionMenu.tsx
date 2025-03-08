@@ -33,7 +33,7 @@ export default function ImageOptionMenu({
   image,
   postId,
 }: ImageOptionMenuProps) {
-  // const dummy = [1, 2, 3, 4, 5, 6, 8, 1, 2, 3, 4, 5, 6, 8];
+
   const { userId } = useUser();
   const [open, setOpen] = useState(false);
   const [openShare, setOpenShare] = useState(false);
@@ -84,8 +84,9 @@ export default function ImageOptionMenu({
     }
   };
   return (
-    <div className="relative flex">
-      <button className=" self-end" onClick={() => setOpen(true)}>
+    <div className="relative">
+
+      <button className="" onClick={() => setOpen(true)}>
         {children}
       </button>
 
@@ -96,7 +97,7 @@ export default function ImageOptionMenu({
             className="fixed z-50  top-0 left-0 h-screen w-full"
           ></div>
 
-          <div className="absolute w-[180px] xl:w-[240px] z-50 top-2 md:top-6 -right-4 xl:right-0 border-primary-8 border-[1px] bg-[#191919] bg-primary-12 rounded-lg">
+          <div className="absolute w-[180px] xl:w-[240px] z-50 top-2 md:top-6 right-1 xl:right-0 border-primary-8 border-[1px] bg-[#191919] bg-primary-12 rounded-lg">
             {/* <MenuItem onClick={handlePrompt} icon={<PromptIcon width={16} height={16} color="#8F8F8F" />} text="Prompt" underlineOff={true} /> */}
 
             {/* <MenuItem onClick={handleClose} icon={<NoteIcon width={16} height={16} color="#8F8F8F" />} text="Upscale" /> */}
