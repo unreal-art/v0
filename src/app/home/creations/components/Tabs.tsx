@@ -37,7 +37,7 @@ export default function Tabs({
   // Memoize the filtered tabs
   const tabs = useMemo(
     () => TAB_CONFIG.filter((tab) => !(hideDraft && tab.text === "Draft")),
-    [hideDraft]
+    [hideDraft],
   );
 
   // Sync with URL on initial load
@@ -49,7 +49,7 @@ export default function Tabs({
 
       // Also update the currentIndex to match the URL
       const tabIndex = tabs.findIndex(
-        (tab) => tab.text.toLowerCase() === urlParam.toLowerCase()
+        (tab) => tab.text.toLowerCase() === urlParam.toLowerCase(),
       );
       if (tabIndex >= 0) {
         setCurrentIndex(tabIndex);
@@ -89,7 +89,7 @@ export function TabBtn({
   section,
 }: ITabBtn) {
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useRouter(); // router
 
   // Get the correct setter based on the section
   const { setCreationTab, setProfileTab } = useCreationAndProfileStore();
