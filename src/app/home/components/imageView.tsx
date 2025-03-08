@@ -14,35 +14,40 @@ export default function ImageView({
   photo,
   setImageIndex,
 }: GenerateTextFieldProps) {
+  
   const currentImage = photo as ExtendedPhoto;
   const authorId = currentImage.author || "";
   const { data: userName, isLoading } = useAuthorUsername(authorId);
   const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
+
+  const handleClose = () => {
+    setImageIndex(-1)
+  }
+
   if (!photo) return;
 
   return (
     <>
       <div
-        onClick={() => setImageIndex(-1)}
-        className="relative  top-0 left-0 h-screen w-full bg-gray-950/50 inset-0 "
-      ></div>
+        onClick={handleClose}
+        className="relative  top-0 left-0 h-screen w-full bg-gray-950/50 inset-0"></div>
 
       <div className="fixed z-50 flex justify-center items-center top-0 left-0 h-screen w-full ">
         <div
-          onClick={() => setImageIndex(-1)}
+          onClick={handleClose}
           className="absolute flex justify-center items-center top-0 left-0 h-screen w-full"
         ></div>
 
-        <div className="z-10 w-full md:w-11/12 xl:w-8/12 max-w-[968px] h-full md:h-[624px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
+        <div className="z-10 w-full md:w-11/12 xl:w-8/12 max-w-[968px] h-[100dvh] md:h-[624px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
           <div className="bg-primary-13 h-full w-full rounded-md">
             <div className="grid grid-cols-1 h-full md:grid-cols-2">
-              <div className="h-full col-span-1">
-                <div className="relative w-full h-[36vh] md:h-full">
+              <div className="h-full col-span-1 hidden md:block">
+                <div className="relative w-full md:h-full">
                   <Image src={currentImage.src} fill={true} alt="" />
                 </div>
               </div>
 
-              <div className="h-fit">
+              <div className="h-full">
                 <CommentArea
                   image={image as string}
                   imageLoading={imageLoading}
@@ -51,7 +56,7 @@ export default function ImageView({
                   authorId={authorId}
                   postId={currentImage.id}
                   imageDetails={currentImage}
-                />
+                  handleClose={handleClose} />
               </div>
             </div>
           </div>

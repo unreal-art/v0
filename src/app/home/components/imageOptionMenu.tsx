@@ -2,11 +2,8 @@
 import { ReactNode, useState } from "react";
 import {
   DownloadIcon,
-  FlagIcon,
-  NoteIcon,
   PinFillIcon,
   PinIcon,
-  PromptIcon,
   ShareIcon,
   UserIcon,
 } from "../../components/icons";
@@ -18,12 +15,9 @@ import {
   usePinPost,
   useUnpinPost,
 } from "@/hooks/usePinnedPosts";
-import { getImage } from "../formattedPhotos";
 import { downloadImage } from "@/utils";
 import { Post } from "$/types/data.types";
-import { ExtendedRenderPhotoContext } from "./photoOverlay";
 import Link from "next/link";
-import { set } from "nprogress";
 import { usePost } from "@/hooks/usePost";
 import ShareModal from "./modals/shareModal";
 import { toast } from "sonner";
@@ -146,6 +140,7 @@ export default function ImageOptionMenu({
                 onClick={handleCreator}
                 icon={<UserIcon width={16} height={16} color="#8F8F8F" />}
                 text="Go to creator profile"
+                underlineOff={true}
               />
             </Link>
             {/* <MenuItem
@@ -269,7 +264,7 @@ export function MenuItem({
         !underlineOff ? "border-b-[1px]" : ""
       }`}
     >
-      <div className="flex gap-2 items-center justify-center">
+      <div className="flex gap-2 items-center justify-center text-sm md:text-base">
         <div>{icon}</div>
         <p>{text}</p>
       </div>
