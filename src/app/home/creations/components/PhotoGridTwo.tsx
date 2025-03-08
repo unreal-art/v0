@@ -5,7 +5,7 @@ import Image from "next/image";
 import { truncateText } from "@/utils";
 import { timeAgo } from "@/app/libs/timeAgo";
 import { OptionMenuIcon } from "@/app/components/icons";
-import { TabText } from "./Tabs";
+
 import NoItemFound from "./NoItemFound";
 import InfiniteScroll from "../../components/InfiniteScroll";
 import dynamic from "next/dynamic";
@@ -14,6 +14,7 @@ import PhotoOverlay, {
 } from "../../components/photoOverlay";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { TabText } from "@/stores/creationAndProfileStore";
 
 // Constants for breakpoints and grid sizing
 const BREAKPOINTS = {
@@ -22,7 +23,7 @@ const BREAKPOINTS = {
   XL: 1280,
   LG: 1024,
   MD: 768,
-  SM: 640
+  SM: 640,
 } as const;
 
 const GRID_SIZES = {
@@ -228,7 +229,8 @@ export default function PhotoGridTwo({
         isLoadingInitial={false}
         isLoadingMore={isFetchingNextPage}
         loadMore={loadMore}
-        hasNextPage={hasNextPage}>
+        hasNextPage={hasNextPage}
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
           {photos.map((photo: TransformedPhoto, index: number) => {
             const context = {
