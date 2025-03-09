@@ -11,6 +11,7 @@ import {
 } from "@/hooks/useComments";
 import Reply from "./Reply";
 import { useState } from "react";
+import { formatNumber } from "@/utils";
 
 export default function Comment({
   data,
@@ -59,7 +60,7 @@ export default function Comment({
                   setReplyTo(data);
                 }}
               >
-                reply ({replies ? replies.length : ""})
+                reply ({replies ? formatNumber(replies.length) : ""})
               </button>
             </div>
             <div className="justify-end">
@@ -77,7 +78,7 @@ export default function Comment({
                   <HeartIcon color="#FFFFFF" />
                 )}
               </button>
-              <p className="text-center">{data.like_count}</p>
+              <p className="text-center">{formatNumber(data.like_count)}</p>
             </div>
           </div>
         </div>

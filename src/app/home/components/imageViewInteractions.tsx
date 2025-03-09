@@ -1,5 +1,5 @@
 import { supabase } from "$/supabase/client";
-import { downloadImage } from "@/utils";
+import { downloadImage, formatNumber } from "@/utils";
 import {
   DownloadIcon,
   HeartFillIcon,
@@ -33,10 +33,10 @@ export default function ImageViewInteractions({
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string
+    post?.author as string,
   );
   const { shareCount: shareNotifications } = useCountShareNotifications(
-    Number(postId)
+    Number(postId),
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
 
@@ -51,12 +51,14 @@ export default function ImageViewInteractions({
         ) : (
           <HeartIcon color="#FFFFFF" />
         )}
-        <p className="text-xs text-primary-3">{likes?.length}</p>
+        <p className="text-xs text-primary-3">
+          {formatNumber(likes?.length as number)}
+        </p>
       </button>
 
       <button className="flex items-center gap-[2px] justify-center">
         <MessageIcon color="#F0F0F0" />
-        <p className="text-xs text-primary-3">{commentCount}</p>
+        <p className="text-xs text-primary-3">{formatNumber(commentCount)}</p>
       </button>
 
       <button
@@ -85,9 +87,9 @@ export default function ImageViewInteractions({
           downloadImage(
             getImage(
               (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+              (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
             ),
-            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
           )
         }
       >
