@@ -1,11 +1,11 @@
 "use client";
 import {
-  ColumnsPhotoAlbum,
+  MasonryPhotoAlbum,
   RenderImageContext,
   RenderImageProps,
   RenderPhotoContext,
 } from "react-photo-album";
-import "react-photo-album/columns.css";
+import "react-photo-album/masonry.css";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
@@ -161,7 +161,7 @@ export default function PhotoGallaryTwo({}) {
         loadMore={() => hasNextPage && fetchNextPage()}
         hasNextPage={hasNextPage}
       >
-        <ColumnsPhotoAlbum
+        <MasonryPhotoAlbum
           photos={formattedPhotos(data?.pages ?? [])}
           columns={columns}
           spacing={4}
