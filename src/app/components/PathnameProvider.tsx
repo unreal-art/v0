@@ -26,7 +26,7 @@ export default function PathnameProvider({
         error &&
         protectedRoutes.some((route) => pathname.startsWith(route))
       ) {
-        router.replace("/"); // Redirect if not authenticated
+        router.replace("/auth"); // Redirect if not authenticated
       } else {
         setLoading(false); // Auth check is done, allow rendering
       }
