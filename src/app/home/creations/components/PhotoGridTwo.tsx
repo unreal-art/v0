@@ -93,7 +93,7 @@ export default function PhotoGridTwo({
   const containerRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<TransformedPhoto[]>([]);
   const [transformedPosts, setTransformedPosts] = useState<TransformedPhoto[]>(
-    []
+    [],
   );
   const [stableLoading, setStableLoading] = useState(true); // Stable loading state to prevent flashing
   const [imageIndex, setImageIndex] = useState(-1);
@@ -156,7 +156,7 @@ export default function PhotoGridTwo({
     (context: ExtendedRenderPhotoContext) => {
       setImageIndex(context.index);
     },
-    []
+    [],
   );
 
   const loadMore = useCallback(() => {
@@ -247,6 +247,7 @@ export default function PhotoGridTwo({
                       sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
                     />
                   }
+                  section="photoGridTwo"
                 >
                   <>
                     <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
@@ -268,7 +269,7 @@ export default function PhotoGridTwo({
 
                     <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
                       {truncateText(
-                        context.photo.caption || context.photo.prompt
+                        context.photo.caption || context.photo.prompt,
                       )}
                     </p>
                   </>
