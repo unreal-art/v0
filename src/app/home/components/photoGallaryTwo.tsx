@@ -34,7 +34,7 @@ import { usePost } from "@/hooks/usePost";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -97,14 +97,14 @@ export default function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          post?.author
+          post?.author,
         );
       } else {
         result = await getOtherPostsByUser(
           supabase,
           pageParam,
           Number(postId),
-          post?.author
+          post?.author,
         );
       }
 
@@ -147,7 +147,10 @@ export default function PhotoGallaryTwo({}) {
     );
   }
 
-  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
+  if (
+    !isLoading &&
+    (!data || data.pages.length === 0 || data.pages[0].data.length === 0)
+  ) {
     return <p className="text-center">No Data found.</p>;
   }
 

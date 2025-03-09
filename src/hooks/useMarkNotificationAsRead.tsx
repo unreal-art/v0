@@ -9,10 +9,10 @@ export const useMarkNotificationAsRead = () => {
 
   return useMutation<void, Error, string>({
     mutationFn: async (notificationId) => {
-      console.log(
-        "[useMarkNotificationAsRead] Marking notification as read:",
-        notificationId
-      );
+      // console.log(
+      //   "[useMarkNotificationAsRead] Marking notification as read:",
+      //   notificationId
+      // );
 
       const { error } = await supabase
         .from("notifications")
@@ -20,23 +20,23 @@ export const useMarkNotificationAsRead = () => {
         .eq("id", notificationId);
 
       if (error) {
-        console.error("[useMarkNotificationAsRead] Error:", error);
+        // console.error("[useMarkNotificationAsRead] Error:", error);
         throw error;
       }
 
-      console.log("[useMarkNotificationAsRead] Successfully marked as read");
+      // console.log("[useMarkNotificationAsRead] Successfully marked as read");
     },
 
     onSuccess: () => {
-      console.log("[useMarkNotificationAsRead] Mutation succeeded");
+      // console.log("[useMarkNotificationAsRead] Mutation succeeded");
 
       // IMPORTANT: Invalidate the notifications count for the current user
       if (userId) {
         // Use the correct query key to match the one in useUnreadNotificationsCount
-        console.log(
-          "[useMarkNotificationAsRead] Invalidating count for userId:",
-          userId
-        );
+        // console.log(
+        //   "[useMarkNotificationAsRead] Invalidating count for userId:",
+        //   userId
+        // );
         queryClient.invalidateQueries({
           queryKey: ["notificationsCount", userId],
         });
@@ -49,10 +49,10 @@ export const useMarkNotificationAsRead = () => {
     },
 
     onError: (error) => {
-      console.error(
-        "[useMarkNotificationAsRead] Failed to mark notification as read:",
-        error
-      );
+      // console.error(
+      //   "[useMarkNotificationAsRead] Failed to mark notification as read:",
+      //   error,
+      // );
     },
   });
 };

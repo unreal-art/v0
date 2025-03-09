@@ -9,6 +9,7 @@ import { getImage } from "../home/formattedPhotos";
 import { useMarkNotificationAsRead } from "@/hooks/useMarkNotificationAsRead";
 import { useEffect } from "react";
 import NotificationSkeleton from "./components/notificationSkeleton";
+import Link from "next/link";
 
 interface NotificationProps {
   notification: NotificationType;
@@ -25,7 +26,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
   useEffect(() => {
     if (notification.id && !notification.is_read) {
       console.log(
-        `[Notification ${notification.id}] Checking if should mark as read`
+        `[Notification ${notification.id}] Checking if should mark as read`,
       );
 
       // Only mark as read when all data is loaded and visible to user
@@ -38,7 +39,10 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
 
   if (!post || !image || !username) return <NotificationSkeleton />;
   return (
-    <div className="border-primary-8 border-[1px] flex items-center bg-primary-12 h-28 my-4 rounded-[20px] p-3">
+    <Link
+      href={`/home/photo/${post.id}`}
+      className="border-primary-8 border-[1px] flex items-center bg-primary-12 h-28 my-4 rounded-[20px] p-3"
+    >
       <div className="flex gap-2 justify-between items-center  w-full">
         <div className="w-[80%] ">
           <p className="text-[10px] text-primary-7">
@@ -78,7 +82,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
               post.ipfsImages[0].fileNames.length > 0
                 ? getImage(
                     post.ipfsImages[0].hash as string,
-                    post.ipfsImages[0].fileNames[0] as string
+                    post.ipfsImages[0].fileNames[0] as string,
                   )
                 : "/profile.jpg"
             }
@@ -88,7 +92,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
           />
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

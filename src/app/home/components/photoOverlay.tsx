@@ -7,7 +7,7 @@ import {
   OptionMenuIcon,
 } from "@/app/components/icons";
 import { Photo, RenderPhotoContext } from "react-photo-album";
-import { truncateText } from "@/utils";
+import { formatNumber, truncateText } from "@/utils";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { supabase } from "$/supabase/client";
 import { useLikePost } from "@/hooks/useLikePost";
@@ -44,7 +44,7 @@ export default function PhotoOverlay({
   photo,
 }: PhotoOverlayProps) {
   const router = useRouter();
-
+  // console.log(context.photo.createdAt);
   const [hover, setHover] = useState(false);
   // const [like, setLike] = useState(false);
   const { userId } = useUser();
@@ -57,7 +57,7 @@ export default function PhotoOverlay({
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author
+    context.photo.author,
   );
 
   const userHasLiked = likes?.some((like) => like.author === userId);
@@ -68,7 +68,7 @@ export default function PhotoOverlay({
   };
 
   const { data: comments, isLoading: loadingComments } = useComments(
-    context.photo.id
+    context.photo.id,
   );
   useRealtimeComments(context.photo.id);
 
@@ -117,13 +117,14 @@ export default function PhotoOverlay({
             <div className="flex justify-center gap-4 z-10">
               <button
                 className="flex gap-1 items-center"
-                onClick={() => toggleLike()}>
+                onClick={() => toggleLike()}
+              >
                 {userHasLiked ? (
                   <HeartFillIcon color="#FFFFFF" />
                 ) : (
                   <HeartIcon color="#FFFFFF" />
                 )}
-                <p>{likes ? likes?.length : ""}</p>
+                <p>{likes ? formatNumber(likes?.length) : ""}</p>
               </button>
 
               <button
@@ -131,7 +132,7 @@ export default function PhotoOverlay({
                 onClick={() => handleCommentClick()}
               >
                 <ChatIcon color="#FFFFFF" />{" "}
-                <p>{comments ? comments?.length : ""}</p>
+                <p>{comments ? formatNumber(comments?.length) : ""}</p>
               </button>
             </div>
             {/* )} */}
@@ -151,27 +152,25 @@ export default function PhotoOverlay({
         )}
 
         <div className="flex flex-col md:hidden h-full w-full justify-between items-end p-3">
-
           <div className="relative block mr-4">
             <div className="absolute">
               <div className="absolute z-20">
                 <ImageOptionMenu
                   image={context.photo}
-                  postId={context.photo.id}>
-                    <OptionMenuIcon color="#FFFFFF" />
+                  postId={context.photo.id}
+                >
+                  <OptionMenuIcon color="#FFFFFF" />
                 </ImageOptionMenu>
               </div>
             </div>
-
           </div>
 
-          <div className="flex flex-col gap-2">
-
+          <div className="flex flex-col mb-8 ">
             <div className="relative flex flex-col items-center">
-
               <button
                 className="absolute flex flex-col items-center z-10"
-                onClick={() => toggleLike()}>
+                onClick={() => toggleLike()}
+              >
                 {userHasLiked ? (
                   <HeartFillIcon color="#FFFFFF" />
                 ) : (
@@ -179,34 +178,37 @@ export default function PhotoOverlay({
                 )}
               </button>
 
-              <p className="mt-6 z-10">{likes ? likes?.length : ""}</p>
-            
+              <p className="mt-6 z-10">
+                {likes ? formatNumber(likes?.length) : ""}
+              </p>
             </div>
 
             <div className="relative flex flex-col items-center">
-
               <button
                 className="absolute flex gap-1 items-center z-10"
-                onClick={handleCommentClick}>
+                onClick={handleCommentClick}
+              >
                 <ChatIcon color="#FFFFFF" />
               </button>
 
-              <p className="mt-6 z-10">{comments ? comments?.length : ""}</p>
-
+              <p className="mt-6 z-10">
+                {comments ? formatNumber(comments?.length) : ""}
+              </p>
             </div>
-
           </div>
-
-          <div></div>
-
         </div>
 
-        <div onClick={handleView} className="absolute hidden md:block w-full h-full">{!hover && children} </div>
+        <div
+          onClick={handleView}
+          className="absolute hidden md:block w-full h-full"
+        >
+          {!hover && children}{" "}
+        </div>
 
-        <div onClick={handleView} className="absolute  md:hidden w-full h-full">{children} </div>
-
+        <div onClick={handleView} className="absolute  md:hidden w-full h-full">
+          {children}{" "}
+        </div>
       </div>
-
     </>
   );
 }
