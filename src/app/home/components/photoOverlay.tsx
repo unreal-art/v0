@@ -34,6 +34,7 @@ interface PhotoOverlayProps {
   setImageIndex: () => void;
   context: ExtendedRenderPhotoContext;
   photo?: ReactNode;
+  section?: string;
 }
 
 export default function PhotoOverlay({
@@ -42,6 +43,7 @@ export default function PhotoOverlay({
   setImageIndex,
   context,
   photo,
+  section,
 }: PhotoOverlayProps) {
   const router = useRouter();
   // console.log(context.photo.createdAt);
@@ -165,7 +167,9 @@ export default function PhotoOverlay({
             </div>
           </div>
 
-          <div className="flex flex-col mb-8 ">
+          <div
+            className={`flex flex-col ${section == "photoGridTwo" ? " mb-12" : "mb-6"}`}
+          >
             <div className="relative flex flex-col items-center">
               <button
                 className="absolute flex flex-col items-center z-10"
