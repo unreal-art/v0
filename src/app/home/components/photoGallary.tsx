@@ -1,11 +1,11 @@
 "use client";
 import {
-  ColumnsPhotoAlbum,
+  MasonryPhotoAlbum,
   RenderImageContext,
   RenderImageProps,
   RenderPhotoContext,
 } from "react-photo-album";
-import "react-photo-album/columns.css";
+import "react-photo-album/masonry.css";
 import { useEffect, useState } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
@@ -34,7 +34,7 @@ import { useGalleryStore } from "@/stores/galleryStore";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -182,7 +182,7 @@ export default function PhotoGallary({}) {
         loadMore={() => hasNextPage && fetchNextPage()}
         hasNextPage={hasNextPage}
       >
-        <ColumnsPhotoAlbum
+        <MasonryPhotoAlbum
           photos={photos}
           columns={columns}
           spacing={4}
