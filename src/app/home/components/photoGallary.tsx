@@ -37,7 +37,7 @@ function renderNextImage(
   { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
-  // This provides fast initial rendering for visible contentmy
+  // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 4;
 
   return (
