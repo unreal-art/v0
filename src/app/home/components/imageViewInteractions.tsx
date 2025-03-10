@@ -41,7 +41,7 @@ export default function ImageViewInteractions({
   const userHasLiked = likes?.some((like) => like.author === userId);
 
   return (
-    <div className="flex justify-between w-full relative">
+    <div className="flex justify-between w-full relative h-8">
       <button
         onClick={() => toggleLike()}
         className="flex items-center gap-[2px] justify-center"

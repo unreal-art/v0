@@ -32,7 +32,7 @@ export default function ImageView({
         onClick={handleClose}
         className="relative  top-0 left-0 h-screen w-full bg-gray-950/50 inset-0"></div>
 
-      <div className="fixed z-50 flex justify-center items-center top-0 left-0 h-screen w-full ">
+      <div className="fixed z-50 flex justify-center items-center top-0 left-0 h-screen w-full">
         <div
           onClick={handleClose}
           className="absolute flex justify-center items-center top-0 left-0 h-screen w-full"
@@ -41,6 +41,7 @@ export default function ImageView({
         <div className="z-10 w-full md:w-11/12 xl:w-8/12 max-w-[968px] h-[100dvh] md:h-[624px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
           <div className="bg-primary-13 h-full w-full rounded-md">
             <div className="grid grid-cols-1 h-full md:grid-cols-2">
+              
               <div className="h-full col-span-1 hidden md:block">
                 <div className="relative w-full md:h-full">
                   <Image src={currentImage.src} fill={true} alt=""  placeholder="blur" blurDataURL="L6PZfSi_.AyE_3t7t7R**0o#DgR4"/>
