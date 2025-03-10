@@ -1,19 +1,28 @@
 import { redirect } from "next/navigation";
-import Image from "next/image"
-export default function Home() {
-  // Redirect root path to auth page
-  redirect("/auth");
+import Image from "next/image";
+import { createClient } from "$/supabase/server";
+export default async function Home() {
+  //check load condition and redirect to proper page
+  const supabaseSSR = await createClient();
+  const {
+    data: { user },
+  } = await supabaseSSR.auth.getUser(); // ✅ Get user session
 
-  
-  return (
-    <div className="h-screen w-screen  flex items-center justify-center bg-primary-13">
-      <Image
-        src="/Icon-White.png"
-        alt="unreal"
-        height={50}
-        width={50}
-        priority
-      />
-    </div>
-  );
+  if (user) {
+    redirect("/home"); // ✅ Redirect if authenticated
+  } else {
+    redirect("/auth");
+  }
+
+  // return (
+  //   <div className="h-screen w-screen  flex items-center justify-center bg-primary-13">
+  //     <Image
+  //       src="/Icon-White.png"
+  //       alt="unreal"
+  //       height={50}
+  //       width={50}
+  //       priority
+  //     />
+  //   </div>
+  // );
 }

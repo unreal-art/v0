@@ -20,7 +20,7 @@ export default function PathnameProvider({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data, error } = await supabase.auth.getUser();
+      const { error } = await supabase.auth.getUser();
 
       if (
         error &&
