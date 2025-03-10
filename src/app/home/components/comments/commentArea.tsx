@@ -40,7 +40,7 @@ export default function CommentArea({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="md:flex md:flex-col">
       <div className="md:p-[2px]">
         <div className="flex justify-between h-18 py-2 px-2 md:px-5 gap-5 w-full text-sm lg:text-base">
           <div className="flex gap-1 items-center">
@@ -83,12 +83,11 @@ export default function CommentArea({
       </div>
 
       <div
-        className={`flex-grow py-2 px-6 overflow-y-auto ${
+        className={`py-2 px-6 overflow-y-auto ${
           replyTo
-            ? "h-[calc(81vh_-_118px)] md:h-[346px]"
-            : "h-[calc(81vh_-_64px)] md:h-[400px]"
-        }`}
-      >
+            ? "h-[calc(100dvh_-_285px)] md:h-[346px]"
+            : "h-[calc(100dvh_-_235px)] md:h-[400px]"
+        }`}>
         {comments?.map((comment: CommentWithUser, index: number) => (
           <Comment
             key={index}
@@ -113,6 +112,7 @@ export default function CommentArea({
           authorId={authorId}
         />
       </div> 
+      
     </div>
   );
 }
