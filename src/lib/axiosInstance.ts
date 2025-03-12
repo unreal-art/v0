@@ -40,6 +40,6 @@ export const axiosInstance = axios.create({
 
 export const axiosInstanceLocal = axios.create({
   baseURL: "/",
-  headers: { "Content-Type": "application/json" },
+  // headers: { "Content-Type": "application/json" },
   // httpsAgent: agent, // Allow self-signed SSL
 });

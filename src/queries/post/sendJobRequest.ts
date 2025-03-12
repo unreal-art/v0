@@ -1,5 +1,5 @@
 import { ExtendedUser, JobSpec } from "$/types/data.types";
-import { axiosInstance } from "@/lib/axiosInstance";
+import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance";
 import axios from "axios";
 import random from "random";
 import { toast } from "sonner";
@@ -50,15 +50,15 @@ export const sendJobRequest = ({
   }
 
   // 🚀 Fire-and-Forget: No need to `await`, just send the request
-  axiosInstance.post("/darts", dto, { headers }).catch((error) => {
+  axiosInstanceLocal.post("/api/darts", dto, { headers }).catch((error) => {
     stopGeneration();
     toast.error(
       "Error sending job request:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     console.error(
       "Error sending job request:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
   });
 };
