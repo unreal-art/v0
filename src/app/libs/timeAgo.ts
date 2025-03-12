@@ -20,7 +20,7 @@ export const timeAgo = (timestamp: string | null | undefined): string => {
 
   // Get user's local timezone
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log("User Time Zone:", userTimeZone);
+  // console.log("User Time Zone:", userTimeZone);
 
   // Convert UTC timestamp to the user's local timezone
   const localDate = toZonedTime(utcDate, userTimeZone);
