@@ -64,7 +64,6 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
   };
 
   const completePayment = () => {
-    //hide form modal
     const transaction = prepareContractCall({
       contract: odpContract,
       method:

@@ -19,7 +19,7 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 export default function Menu({ children }: INotificationProps) {
@@ -92,10 +92,14 @@ export default function Menu({ children }: INotificationProps) {
               onClick={handleClose}
               icon={<FlashIcon width={16} height={16} color="#C1C1C1" />}
               text={(() => {
-                const balance =
-                  (user?.creditBalance ?? 0) +
-                  Number(formatEther(dartBalance ?? BigInt(0)));
-                return `${balance} Credit${balance !== 1 ? "s" : ""}`; //accounting for plural cases
+                const userBalance = user?.creditBalance ?? 0;
+                const dartConvertedBalance = dartBalance
+                  ? Number(formatEther(dartBalance)) / 3 // divide by 3 cos 1 credit == 3 darts
+                  : 0;
+                const totalBalance = userBalance + dartConvertedBalance;
+                return `${totalBalance.toFixed(2)} Credit${
+                  totalBalance !== 1 ? "s" : ""
+                }`;
               })()}
               action={
                 <button onClick={handleTopup} className="underline">
