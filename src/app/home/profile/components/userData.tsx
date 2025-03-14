@@ -106,23 +106,23 @@ export default function UserData() {
   }, [profileId, followeeCount, queryClient, profileData]);
 
   // Example of how to use profile updates when it's the user's own profile
-  const updateProfileBio = async (newBio: string) => {
-    if (!isOwnProfile || !profileId) return;
+  // const updateProfileBio = async (newBio: string) => {
+  //   if (!isOwnProfile || !profileId) return;
 
-    // Optimistically update the UI
-    updateUserDataOptimistically({
-      bio: newBio,
-    });
+  //   // Optimistically update the UI
+  //   updateUserDataOptimistically({
+  //     bio: newBio,
+  //   });
 
-    // Then perform the actual update
-    try {
-      await updateViewedProfile(profileId, { bio: newBio });
-    } catch (error) {
-      const err = error as Error;
-      console.error("Failed to update bio:", err.message);
-      // The UI will automatically revert if the mutation fails
-    }
-  };
+  //   // Then perform the actual update
+  //   try {
+  //     await updateViewedProfile(profileId, { bio: newBio });
+  //   } catch (error) {
+  //     const err = error as Error;
+  //     console.error("Failed to update bio:", err.message);
+  //     // The UI will automatically revert if the mutation fails
+  //   }
+  // };
 
   if (profileLoading || authUserLoading || !authUser)
     return <ProfileSkeleton />;
@@ -233,10 +233,14 @@ export default function UserData() {
               </div>
               <p>
                 {(() => {
-                  const balance =
-                    (profileData?.creditBalance ?? 0) +
-                    Number(formatEther(dartBalance ?? BigInt(0)));
-                  return `${balance} Credit${balance !== 1 ? "s" : ""}`; //accounting for plural cases
+                  const profileBalance = profileData?.creditBalance ?? 0;
+                  const dartConvertedBalance = dartBalance
+                    ? Number(formatEther(dartBalance)) / 3 // divide by 3 cos 1 credit == 3 darts
+                    : 0;
+                  const totalBalance = profileBalance + dartConvertedBalance;
+                  return `${totalBalance.toFixed(2)} Credit${
+                    totalBalance !== 1 ? "s" : ""
+                  }`;
                 })()}
               </p>
             </button>

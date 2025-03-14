@@ -13,9 +13,13 @@ import Link from "next/link";
 
 interface NotificationProps {
   notification: NotificationType;
+  onClick: () => void;
 }
 
-const Notification: React.FC<NotificationProps> = ({ notification }) => {
+const Notification: React.FC<NotificationProps> = ({
+  notification,
+  onClick,
+}) => {
   const { data: image } = useAuthorImage(notification?.sender_id);
   const { data: username } = useAuthorUsername(notification?.sender_id);
   const { data: post } = usePost(notification?.post_id);
@@ -41,6 +45,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
   return (
     <Link
       href={`/home/photo/${post.id}`}
+      onClick={onClick}
       className="border-primary-8 border-[1px] flex items-center bg-primary-12 h-28 my-4 rounded-[20px] p-3"
     >
       <div className="flex gap-2 justify-between items-center  w-full">

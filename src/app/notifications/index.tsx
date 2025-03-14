@@ -136,10 +136,13 @@ export default function Notifications({ children }: INotificationProps) {
               {notifications.map(
                 (notification: NotificationType, index: number) => (
                   <Notification
+                    onClick={() => {
+                      setOpen(false);
+                    }}
                     key={notification.id || index}
                     notification={notification}
                   />
-                )
+                ),
               )}
             </div>
           </div>

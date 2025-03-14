@@ -38,7 +38,7 @@ export default function Topup({ open, setOpen }: TopupProps) {
   useEffect(() => {
     // const price = Number(credit) || 0;
     // setAmount(price);
-    setCost(Number(credit) * rate);
+    setCost(Number(credit) * rate * 3); // 1 credit == 3 dart == odp per dart * 3
     setAmount(Number(credit));
   }, [credit]);
 

@@ -111,7 +111,7 @@ export default function GenerateTextField({
               <Topup open={topup} setOpen={setTopup} />
 
               {(user?.creditBalance ?? 0) +
-                Number(formatEther(dartBalance ?? BigInt(0))) <
+                (dartBalance ? Number(formatEther(dartBalance)) / 3 : 0) <
                 1 && (
                 <button
                   onClick={() => setTopup(true)}
@@ -120,8 +120,9 @@ export default function GenerateTextField({
                   Top Up
                 </button>
               )}
+
               {(user?.creditBalance ?? 0) +
-                Number(formatEther(dartBalance ?? BigInt(0))) >=
+                (dartBalance ? Number(formatEther(dartBalance)) / 3 : 0) >=
                 1 && (
                 <button
                   onClick={generate}
