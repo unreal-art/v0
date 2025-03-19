@@ -1,3 +1,4 @@
+"use client";
 import { BackIcon, CloseIcon, OptionMenuIcon } from "@/app/components/icons";
 import Image from "next/image";
 import ImageViewInteractions from "../imageViewInteractions";
@@ -29,7 +30,7 @@ export default function CommentArea({
   authorId,
   postId,
   imageDetails,
-  handleClose
+  handleClose,
 }: CommentAreaProps) {
   const { data: comments } = useComments(postId);
   useRealtimeComments(postId);
@@ -87,13 +88,10 @@ export default function CommentArea({
           replyTo
             ? "h-[calc(100dvh_-_285px)] md:h-[346px]"
             : "h-[calc(100dvh_-_235px)] md:h-[400px]"
-        }`}>
+        }`}
+      >
         {comments?.map((comment: CommentWithUser, index: number) => (
-          <Comment
-            key={index}
-            data={comment}
-            setReplyTo={setReplyTo}
-          />
+          <Comment key={index} data={comment} setReplyTo={setReplyTo} />
         ))}
       </div>
 
@@ -111,8 +109,7 @@ export default function CommentArea({
           closeReply={handleCloseReply}
           authorId={authorId}
         />
-      </div> 
-      
+      </div>
     </div>
   );
 }

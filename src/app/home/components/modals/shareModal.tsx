@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import ModalWrapper from "./modalWrapper";
 import { Post } from "$/types/data.types";
@@ -70,7 +71,7 @@ export default function ShareModal({
       incrementShareCount();
     }
     const url = `https://discord.com/channels/@me?url=${encodeURIComponent(
-      link
+      link,
     )}`;
     window.open(url, "_blank");
   };

@@ -1,3 +1,4 @@
+"use client";
 import { ReactNode, useState } from "react";
 import { createClient } from "$/supabase/client";
 import config from "$/config";

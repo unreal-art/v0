@@ -1,8 +1,13 @@
+"use client";
 import useDeleteAccount from "@/hooks/useDeleteAccount";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 
-export default function DeleteModal({ close }: { close: () => void }) {
+export default function DeleteModal({
+  closeAction,
+}: {
+  closeAction: () => void;
+}) {
   const { deleteAccount, loading, error } = useDeleteAccount();
   const [confirmation, setConfirmation] = useState("");
   const handleDelete = async (e: FormEvent) => {
@@ -43,7 +48,7 @@ export default function DeleteModal({ close }: { close: () => void }) {
 
         <div className="flex justify-end h-12 mb-4 mt-8 text-primary-6 gap-4">
           <button
-            onClick={close}
+            onClick={closeAction}
             className="border-primary-10 w-40 border-[1px] rounded-full"
           >
             Cancel

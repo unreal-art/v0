@@ -1,3 +1,4 @@
+"use client";
 import { CommentWithUser } from "$/types/data.types";
 import { CloseIcon, EmojiIcon } from "@/app/components/icons";
 import { usePostComment } from "@/hooks/useComments";

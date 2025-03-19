@@ -1,3 +1,4 @@
+"use client";
 import { CopyIcon } from "@/app/components/icons";
 import { useState } from "react";
 

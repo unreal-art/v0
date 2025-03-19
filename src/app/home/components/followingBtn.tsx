@@ -1,3 +1,4 @@
+"use client";
 import { useDoesUserFollow } from "@/hooks/useDoesUserFollow";
 import { useUser } from "@/hooks/useUser";
 import { useToggleFollow } from "@/hooks/useToggleFollow";

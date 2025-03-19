@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 //import PhotoOverlay from "../photoOverlay"
 import { OptionMenuIcon } from "@/app/components/icons";
@@ -33,7 +34,7 @@ export default function UserSearch({ searchTerm }: { searchTerm: string }) {
       {data?.pages?.flatMap((page) =>
         page.data.map((details: ProfileWithPosts) => (
           <User key={details.id} data={details} posts={details.posts} />
-        ))
+        )),
       )}
     </div>
   );
@@ -51,7 +52,7 @@ export function User({
   const { userId } = useUser();
   const { data: isFollowing, isLoading } = useDoesUserFollow(
     userId as string,
-    data.id
+    data.id,
   );
   const toggleFollowMutation = useToggleFollow();
 
@@ -147,7 +148,7 @@ export function UserImage({ post }: { post: Post }) {
       <Image
         src={getImage(
           post.ipfsImages?.[0].hash as string,
-          post.ipfsImages?.[0].fileNames?.[0] as string
+          post.ipfsImages?.[0].fileNames?.[0] as string,
         )}
         width={306}
         height={408}

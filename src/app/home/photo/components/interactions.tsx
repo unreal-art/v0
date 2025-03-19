@@ -1,3 +1,4 @@
+"use client";
 import { supabase } from "$/supabase/client";
 import {
   DownloadIcon,
@@ -24,14 +25,18 @@ import { Post, UploadResponse } from "$/types/data.types";
 import { downloadImage } from "@/utils";
 import ShareModal from "../../components/modals/shareModal";
 import { useState } from "react";
-import {
-  useCountShareNotifications,
-} from "@/hooks/useNotifications";
+import { useCountShareNotifications } from "@/hooks/useNotifications";
 import { toast } from "sonner";
 import ImageView from "../../components/imageView";
 import { IPhoto } from "@/app/libs/interfaces";
 
-export default function Interactions({ postId, postDetails }: { postId: number, postDetails: IPhoto }) {
+export default function Interactions({
+  postId,
+  postDetails,
+}: {
+  postId: number;
+  postDetails: IPhoto;
+}) {
   const [openShare, setOpenShare] = useState(false);
   const [openComment, setOpenComment] = useState(false);
   const { data: likes } = usePostLikes(Number(postId), supabase);
@@ -42,12 +47,12 @@ export default function Interactions({ postId, postDetails }: { postId: number, 
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string
+    post?.author as string,
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
   const { data: isPinned, setPinned } = useIsPostPinned(
     postId,
-    userId as string
+    userId as string,
   );
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
@@ -110,14 +115,18 @@ export default function Interactions({ postId, postDetails }: { postId: number, 
             <p className="text-xs text-primary-3">{likes?.length}</p>
           </button>
 
-          <button onClick={() => setOpenComment(true)} className="flex items-center gap-[2px] justify-center">
+          <button
+            onClick={() => setOpenComment(true)}
+            className="flex items-center gap-[2px] justify-center"
+          >
             <MessageIcon color="#F0F0F0" />
             <p className="text-xs text-primary-3">{comments?.length}</p>
           </button>
 
           <button
             onClick={() => setOpenShare(true)}
-            className="flex items-center gap-[2px] justify-center">
+            className="flex items-center gap-[2px] justify-center"
+          >
             <ShareIcon color="#F0F0F0" />
             <p className="text-xs text-primary-3">{shareNotifications}</p>
           </button>
@@ -137,9 +146,9 @@ export default function Interactions({ postId, postDetails }: { postId: number, 
               downloadImage(
                 getImage(
                   (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
                 ),
-                (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
               )
             }
           >
@@ -155,7 +164,10 @@ export default function Interactions({ postId, postDetails }: { postId: number, 
             link={"https://unreal.art/home/photo/" + postId}
           />
         )}
-        <ImageView photo={openComment && postDetails} setImageIndex={() => setOpenComment(false)} />
+        <ImageView
+          photo={openComment && postDetails}
+          setImageIndex={() => setOpenComment(false)}
+        />
       </div>
     </>
   );

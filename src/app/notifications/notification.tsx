@@ -1,3 +1,4 @@
+"use client";
 import { Notification as NotificationType } from "$/types/data.types";
 import Image from "next/image";
 import { timeAgo } from "../libs/timeAgo";

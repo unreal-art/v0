@@ -1,3 +1,4 @@
+"use client";
 import { supabase } from "$/supabase/client";
 import { downloadImage, formatNumber } from "@/utils";
 import {

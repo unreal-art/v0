@@ -1,3 +1,4 @@
+"use client";
 import { torusTestnet } from "$/constants/chains";
 import { getContractInstance } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
