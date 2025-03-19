@@ -3,10 +3,12 @@ import { getContractInstance } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { parseEther } from "ethers";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { prepareContractCall } from "thirdweb";
 import { useActiveAccount, useSendAndConfirmTransaction } from "thirdweb/react";
 import PaymentStatus from "./status";
+import { toast } from "sonner";
+import { setMaxListeners } from "stream";
 
 interface OdpPayProps {
   amount: number;
@@ -14,16 +16,18 @@ interface OdpPayProps {
 }
 const odpContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_ODP_ADDRESS as string
+  process.env.NEXT_PUBLIC_ODP_ADDRESS as string,
 );
 
 const exchangeContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string
+  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
 );
 
 export default function OdpPay({ amount, handleClose }: OdpPayProps) {
   const activeAccount = useActiveAccount();
+  const [mainLoadingState, setMainLoadingState] = useState(false);
+  const [mainTransaction, setMainTransaction] = useState<boolean>(false);
 
   const { user } = useUser();
   const { mutate: approveTransaction, isPending: approveLoading } =
@@ -52,18 +56,25 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
       swapTransaction(transaction, {
         onSuccess: () => {
           console.log("Swap successful");
+          setMainLoadingState(false);
           // show success modal
         },
         onError: (error) => {
-          console.error("Swap failed:", error);
+          toast.error("Swap failed:");
+          setMainLoadingState(false);
+          setMainTransaction(false);
         },
       });
     } catch (error) {
-      console.error("Swap failed:", error);
+      toast.error("Swap failed:");
+      setMainLoadingState(false);
+      setMainTransaction(false);
     }
   };
 
   const completePayment = () => {
+    setMainLoadingState(true);
+    setMainTransaction(true);
     const transaction = prepareContractCall({
       contract: odpContract,
       method:
@@ -79,7 +90,9 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
         swapTokens();
       },
       onError: (error) => {
-        console.error("Approve failed:", error);
+        toast.error("Approval failed:");
+        setMainLoadingState(false);
+        setMainTransaction(false);
       },
     });
   };
@@ -130,10 +143,15 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
           </div>
         )}
 
-        {false && <PaymentStatus isLoading={false} handleClose={handleClose} />}
+        {mainTransaction && (
+          <PaymentStatus
+            isLoading={mainLoadingState}
+            handleClose={handleClose}
+          />
+        )}
       </div>
 
-      <div className="flex justify-end h-12 my-4 text-primary-6 gap-4">
+      <div className="flex justify-between h-12 my-4 text-primary-6 gap-4">
         <button
           onClick={handleClose}
           className="border-primary-10 w-40 border-[1px] rounded-full"
