@@ -1,3 +1,4 @@
+"use client";
 import { useCreateJob } from "@/hooks/useCreateJob";
 //import { useRouter } from "next/navigation";
 import { supabase } from "$/supabase/client";
@@ -16,7 +17,7 @@ interface GenerateTextFieldProps {
 }
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
 );
 
 export default function GenerateTextField({
@@ -63,7 +64,7 @@ export default function GenerateTextField({
           setShowProgress(false);
           toast.error(`Error generating image: ${error.message}`);
         },
-      }
+      },
     );
   };
 

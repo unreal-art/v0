@@ -1,3 +1,4 @@
+"use client";
 import { splitName } from "@/utils";
 import { useUpdateUserDetails } from "../../../../../hooks/useUpdateUserDetails";
 import Image from "next/image";
@@ -15,12 +16,12 @@ import useUserData from "@/hooks/useUserData";
 // Update the types to be more specific
 interface EditProfileModalProps {
   profileId: string; // ID of the profile being edited
-  close: () => void;
+  closeAction: () => void;
 }
 
 export default function EditProfileModal({
   profileId,
-  close,
+  closeAction,
 }: EditProfileModalProps) {
   // Get both the authenticated user and the profile data
   const { user: authUser } = useUser();
@@ -32,17 +33,17 @@ export default function EditProfileModal({
 
   // State for form fields - using the original UI's state structure
   const [firstname, setFirstName] = useState<string>(
-    splitName(profileData?.full_name || "").firstName
+    splitName(profileData?.full_name || "").firstName,
   );
   const [lastname, setLastName] = useState<string>(
-    splitName(profileData?.full_name || "").lastName
+    splitName(profileData?.full_name || "").lastName,
   );
   const [full_name, setFullName] = useState<string>(
-    profileData?.full_name || ""
+    profileData?.full_name || "",
   );
   const [bio, setBio] = useState<string>(profileData?.bio || "");
   const [displayName, setDisplayName] = useState<string>(
-    profileData?.username || profileData?.display_name || ""
+    profileData?.username || profileData?.display_name || "",
   );
   const [email] = useState<string>(authUser?.email || "");
 
@@ -57,7 +58,7 @@ export default function EditProfileModal({
       setDisplayName(profileData.display_name || profileData.username || "");
       console.log(
         "Updated display name from profile data:",
-        profileData.display_name || profileData.username || ""
+        profileData.display_name || profileData.username || "",
       );
     }
   }, [profileData]);
@@ -163,7 +164,7 @@ export default function EditProfileModal({
     // Update the profile with only the changed fields
     updateViewedProfile(profileId, updates);
 
-    close();
+    closeAction();
   };
 
   return (
@@ -259,7 +260,7 @@ export default function EditProfileModal({
 
         <div className="flex justify-end h-12 mb-4 mt-8 text-primary-6 gap-4 col-span-2">
           <button
-            onClick={close}
+            onClick={closeAction}
             className="border-primary-10 w-40 border-[1px] rounded-full"
             type="button"
           >

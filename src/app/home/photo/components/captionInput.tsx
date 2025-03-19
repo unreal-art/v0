@@ -1,5 +1,4 @@
 import { TickIcon } from "@/app/components/icons";
-import { useState } from "react";
 
 export default function CaptionInput({
   caption,

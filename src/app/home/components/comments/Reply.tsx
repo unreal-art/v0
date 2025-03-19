@@ -1,3 +1,4 @@
+"use client";
 import { HeartFillIcon, HeartIcon } from "@/app/components/icons";
 import { CommentWithUser } from "$/types/data.types";
 import { timeAgo } from "@/app/libs/timeAgo";
