@@ -13,7 +13,7 @@ interface TopupProps {
 
 const exchangeContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string
+  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
 );
 
 export default function Topup({ open, setOpen }: TopupProps) {
@@ -51,6 +51,8 @@ export default function Topup({ open, setOpen }: TopupProps) {
     let value = Math.floor(Number(e.target.value)); // Ensure it's a whole number
     if (value >= 1) {
       setCredit(value);
+    } else {
+      setCredit(0);
     }
   };
 

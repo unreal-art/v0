@@ -3,49 +3,52 @@ import { BackIcon, CloseIcon, FlashIcon } from "../../../components/icons";
 import OdpPay from "./odpPay";
 
 interface TopupProps {
-    amount: number;
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    close: () => void;
+  amount: number;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  close: () => void;
 }
 
-export default function Payment({open, amount, setOpen, close }: TopupProps) {
+export default function Payment({ open, amount, setOpen, close }: TopupProps) {
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    const handleClose = () => {
-        setOpen(false)
-    }
+  if (!open) return;
 
-    if (!open) return;
+  return (
+    <>
+      <div
+        onClick={handleClose}
+        className={"fixed z-30 top-0 left-0 h-screen w-full shadow-bg"}
+      ></div>
 
-    return (
-        <>
+      <div className="absolute flex justify-center items-center z-30 top-0 left-0 h-screen w-full">
+        <div
+          onClick={handleClose}
+          className="absolute z-30 top-0 left-0 h-screen w-full"
+        ></div>
 
-            <div onClick={handleClose} className={"fixed z-30 top-0 left-0 h-screen w-full shadow-bg"}></div>
+        <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 w-[98%] max-w-[460px] flex flex-col">
+          <div className="flex justify-between">
+            <button onClick={handleClose}>
+              <BackIcon width={24} height={24} color="#F5F5F5" />
+            </button>
 
-            <div className="absolute flex justify-center items-center z-30 top-0 left-0 h-screen w-full">
+            <p className="text-2xl text-primary-3 nasalization">
+              Payment method
+            </p>
 
-                <div onClick={handleClose} className="absolute z-30 top-0 left-0 h-screen w-full"></div>
+            <button onClick={close}>
+              <CloseIcon width={24} height={24} color="#F5F5F5" />
+            </button>
+          </div>
 
-                <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 w-[98%] max-w-[460px] flex flex-col">
-                
-                    <div className="flex justify-between">
-                        
-                        <button onClick={handleClose}><BackIcon width={24} height={24} color="#F5F5F5" /></button>
-                       
-                        <p className="text-2xl text-primary-3 nasalization">Payment method</p>
-                        
-                        <button onClick={close}><CloseIcon width={24} height={24} color="#F5F5F5" /></button>
-                    
-                    </div>
-
-                    <div className="mt-6 h-full">
-                        <OdpPay amount={amount} handleClose={handleClose} />
-                    </div>
-                
-                </div>
-
-            </div>
-
-        </>
-    );
+          <div className="mt-6 h-full">
+            <OdpPay amount={amount} handleClose={handleClose} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
