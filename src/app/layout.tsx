@@ -75,7 +75,7 @@ export default function RootLayout({
     <>
       <HighlightInit
         projectId={process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID as string}
-        serviceName="my-nextjs-frontend"
+        serviceName="Unreal-app"
         tracingOrigins
         networkRecording={{
           enabled: true,
