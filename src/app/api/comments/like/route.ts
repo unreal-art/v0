@@ -1,8 +1,9 @@
 import { createClient } from "$/supabase/server";
+import { withAppRouterHighlight } from "@/utils/app-router-highlight.config";
 import { NextResponse } from "next/server";
 
 // ✅ Like a comment
-export async function POST(req: Request) {
+export const POST = withAppRouterHighlight(async function POST(req: Request) {
   const supabase = await createClient();
   const { comment_id } = await req.json();
   const user = await supabase.auth.getUser();
@@ -25,10 +26,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ message: "Liked successfully", data });
-}
+});
 
 // ✅ Unlike a comment
-export async function DELETE(req: Request) {
+export const DELETE = withAppRouterHighlight(async function DELETE(
+  req: Request,
+) {
   const supabase = await createClient();
   const { comment_id } = await req.json();
   const user = await supabase.auth.getUser();
@@ -53,4 +56,4 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ message: "Unliked successfully" });
-}
+});

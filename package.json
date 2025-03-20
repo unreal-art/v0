@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@highlight-run/next": "^7.9.3",
     "@react-three/drei": "^9.121.4",
     "@react-three/fiber": "^8.17.14",
     "@supabase/ssr": "^0.5.2",

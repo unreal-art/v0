@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ServiceWorker from "./components/serviceWorker";
 import ProgressBar from "./components/progressBar";
+import { HighlightInit } from "@highlight-run/next/client";
 
 const nasalization = localFont({
   src: "./fonts/nasalization/Nasalization Rg.otf",
@@ -71,14 +72,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
-      >
-        <ProgressBar />
-        {children}
-        <ServiceWorker />
-      </body>
-    </html>
+    <>
+      <HighlightInit
+        projectId={process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID as string}
+        serviceName="my-nextjs-frontend"
+        tracingOrigins
+        networkRecording={{
+          enabled: true,
+          recordHeadersAndBody: true,
+          urlBlocklist: [],
+        }}
+      />
+
+      <html lang="en">
+        <body
+          className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
+        >
+          <ProgressBar />
+          {children}
+          <ServiceWorker />
+        </body>
+      </html>
+    </>
   );
 }
