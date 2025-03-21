@@ -43,7 +43,7 @@ export default async function Auth() {
           Continue with Apple
         </AuthBtn>
       </div>
-      <div className="flex justify-center w-full absolute bottom-10  ">
+      <div className="flex justify-center w-full absolute bottom-10  borderColor-primary-10/50 border-t pt-3  ">
         <div className="flex gap-9 justify-center py-3 px-6 borderColor-primary-10/50 border-[1px] rounded-[20px]">
           {/* <SocialLink icon="/icons/discord.png" url="" /> */}
           <SocialLink
