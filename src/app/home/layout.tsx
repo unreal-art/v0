@@ -7,7 +7,6 @@ import PathnameProvider from "../components/PathnameProvider";
 import { ThirdwebProvider } from "thirdweb/react";
 import { GenerationStoreProvider } from "../providers/GenerationStoreProvider";
 import AppBase from "../components/appBase";
-import { ErrorBoundary } from "../components/errorBoundary";
 
 const GenerationProgress = dynamic(
   () => import("./components/generationProgress"),
@@ -20,19 +19,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ErrorBoundary>
-      <QueryProvider>
-        <PathnameProvider>
-          <ThirdwebProvider>
-            <GenerationStoreProvider>
-              <>
-                <AppBase>{children}</AppBase>
-                <GenerationProgress />
-              </>
-            </GenerationStoreProvider>
-          </ThirdwebProvider>
-        </PathnameProvider>
-      </QueryProvider>
-    </ErrorBoundary>
+    <QueryProvider>
+      <PathnameProvider>
+        <ThirdwebProvider>
+          <GenerationStoreProvider>
+            <>
+              <AppBase>{children}</AppBase>
+              <GenerationProgress />
+            </>
+          </GenerationStoreProvider>
+        </ThirdwebProvider>
+      </PathnameProvider>
+    </QueryProvider>
   );
 }

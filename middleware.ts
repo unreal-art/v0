@@ -1,9 +1,9 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "$/supabase/middleware";
-import { highlightMiddleware } from "@highlight-run/next/server";
+//import { highlightMiddleware } from "@highlight-run/next/server";
 
 export async function middleware(request: NextRequest) {
-  await highlightMiddleware(request);
+  //await highlightMiddleware(request);
   // update user's auth session
   return await updateSession(request);
 }

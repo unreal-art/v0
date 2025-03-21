@@ -72,27 +72,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <HighlightInit
-        projectId={process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID as string}
-        serviceName="Unreal-app"
-        tracingOrigins
-        networkRecording={{
-          enabled: true,
-          recordHeadersAndBody: true,
-          urlBlocklist: [],
-        }}
-      />
-
-      <html lang="en">
-        <body
-          className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
-        >
-          <ProgressBar />
-          {children}
-          <ServiceWorker />
-        </body>
-      </html>
-    </>
+    <html lang="en">
+      <body
+        className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
+      >
+        <ProgressBar />
+        {children}
+        <ServiceWorker />
+      </body>
+    </html>
   );
 }

@@ -33,7 +33,6 @@ export default function ImageOptionMenu({
   image,
   postId,
 }: ImageOptionMenuProps) {
-
   const { userId } = useUser();
   const [open, setOpen] = useState(false);
   const [openShare, setOpenShare] = useState(false);
@@ -42,7 +41,7 @@ export default function ImageOptionMenu({
 
   const { isPinned, setPinned } = useIsPostPinned(
     Number(postId),
-    userId as string
+    userId as string,
   );
   const { data: post } = usePost(Number(postId));
   const pinPostMutation = usePinPost(userId as string);
@@ -85,7 +84,6 @@ export default function ImageOptionMenu({
   };
   return (
     <div className="relative">
-
       <button className="" onClick={() => setOpen(true)}>
         {children}
       </button>
@@ -117,8 +115,12 @@ export default function ImageOptionMenu({
 
             <MenuItem
               onClick={() => {
-                if (!image.src) return;
+                if (!image.src) {
+                  handleClose();
+                  return;
+                }
                 downloadImage(image.src);
+                handleClose();
               }}
               icon={<DownloadIcon width={16} height={16} color="#8F8F8F" />}
               text="Download JPEG"

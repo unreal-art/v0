@@ -1,9 +1,8 @@
 import { createClient } from "$/supabase/server";
-import { withAppRouterHighlight } from "@/utils/app-router-highlight.config";
 import { NextResponse } from "next/server";
 
 // ✅ Fetch replies for a specific comment
-export const GET = withAppRouterHighlight(async function GET(req: Request) {
+export async function GET(req: Request) {
   const supabase = await createClient();
   const { searchParams } = new URL(req.url);
   const parentId = searchParams.get("parentId");
@@ -22,7 +21,7 @@ export const GET = withAppRouterHighlight(async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json(data);
-});
+}
 
 // ✅ Post a reply to a comment
 // export async function POST(req: Request) {
