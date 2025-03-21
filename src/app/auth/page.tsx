@@ -2,6 +2,9 @@ import SocialLink from "../components/social-link";
 import LandingCarousel from "../components/landingCarousel";
 import { createClient } from "$/supabase/server";
 import { redirect } from "next/navigation";
+import LandingCarouselTwo from "../components/landingCarouselTwo";
+import { AppleIcon, GoogleIcon } from "../components/icons";
+import AuthBtn from "../components/authBtn";
 
 export default async function Auth() {
   const supabaseSSR = await createClient();
@@ -14,12 +17,33 @@ export default async function Auth() {
   }
 
   return (
-    <main className="bg-[#050505] h-screen overflow-clip">
-      <div className="absolute w-full overflow-clip top-[16vh] md:top-[6vh] h-[50vh] md:h-[80vh] z-10">
-        <LandingCarousel />
+    <main className="bg-[#050505] h-screen overflow-hidden">
+      <div className="absolute w-full overflow-clip  top-[13vh] md:top-[6vh] h-[50vh] md:h-[80vh] z-10">
+        <LandingCarouselTwo />
       </div>
 
-      <div className="flex justify-center w-full absolute bottom-10">
+      <div
+        style={{ zIndex: 1000 }}
+        className=" absolute bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center
+                   border-primary-10 border-x-[1px] border-b-[1px]
+                   w-[350px] max-w-[90%] sm:max-w-[80%]
+                   rounded-b-xl gap-4 py-12 bg-black shadow-lg"
+      >
+        <AuthBtn
+          icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />}
+          provider="google"
+        >
+          Continue with Google
+        </AuthBtn>
+
+        <AuthBtn
+          icon={<AppleIcon color="#C1C1C1" width={21} height={20} />}
+          provider="apple"
+        >
+          Continue with Apple
+        </AuthBtn>
+      </div>
+      <div className="flex justify-center w-full absolute bottom-10  ">
         <div className="flex gap-9 justify-center py-3 px-6 borderColor-primary-10/50 border-[1px] rounded-[20px]">
           {/* <SocialLink icon="/icons/discord.png" url="" /> */}
           <SocialLink
