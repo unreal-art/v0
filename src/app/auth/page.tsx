@@ -18,16 +18,16 @@ export default async function Auth() {
 
   return (
     <main className="bg-[#050505] h-screen overflow-hidden">
-      <div className="absolute w-full overflow-clip  top-[13vh] md:top-[6vh] h-[50vh] md:h-[80vh] z-10">
+      <div className="absolute w-full overflow-clip  top-[8vh] md:top-[6vh] h-[50vh] md:h-[80vh] z-50">
         <LandingCarouselTwo />
       </div>
 
       <div
         style={{ zIndex: 1000 }}
-        className=" absolute bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center
+        className=" absolute bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center z-10
                    border-primary-10 border-x-[1px] border-b-[1px]
                    w-[350px] max-w-[90%] sm:max-w-[80%]
-                   rounded-b-xl gap-4 py-12 bg-black shadow-lg"
+                   rounded-b-xl gap-4 py-12  shadow-lg"
       >
         <AuthBtn
           icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />}
