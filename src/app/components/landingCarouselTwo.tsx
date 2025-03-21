@@ -59,7 +59,7 @@ export default function LandingCarouselTwo() {
           {[...images, ...images].map((src, index) => (
             <div
               key={index}
-              className="w-[350px] h-[350px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] relative shrink-0"
+              className="w-[300px] h-[300px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] relative shrink-0"
             >
               <Image
                 src={src}

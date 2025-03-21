@@ -18,13 +18,13 @@ export default async function Auth() {
 
   return (
     <main className="bg-[#050505] h-screen overflow-hidden">
-      <div className=" w-full overflow-clip  h-[60%]  z-50">
+      <div className=" w-full overflow-clip  h-[60vh]  z-50">
         <LandingCarouselTwo />
       </div>
 
       <div
         style={{ zIndex: 1000 }}
-        className=" h-[30%]  bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center z-10
+        className="  bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center z-10
 
                    w-[350px] max-w-[90%] sm:max-w-[80%]
                    rounded-b-xl gap-4   shadow-lg"
@@ -43,8 +43,8 @@ export default async function Auth() {
           Continue with Apple
         </AuthBtn>
       </div>
-      <div className="flex h-[10%]  items-center justify-center w-full absolute bottom-10  border-primary-8 border-t   ">
-        <div className="flex gap-9 justify-center py-3 px-6 borderColor-primary-10/50 border-[1px] rounded-[20px] h-12">
+      <div className="flex flex-grow justify-center w-full absolute bottom-10  borderColor-primary-10/50    ">
+        <div className="flex gap-9 justify-center py-3 px-6 borderColor-primary-10/50 border-[1px] rounded-[20px]">
           {/* <SocialLink icon="/icons/discord.png" url="" /> */}
           <SocialLink
             icon="/icons/linkedin.png"
