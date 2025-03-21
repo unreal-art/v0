@@ -30,8 +30,8 @@ export const sendJobRequest = ({
     version: "v1.6.0",
     inputs: {
       Prompt: prompt,
-      cpu: 30,
-      ram: "34gb",
+      cpu: 34,
+      ram: "70gb",
       Device: "xpu",
       Seed: random.int(1e3, 1e8),
       N: 1,
