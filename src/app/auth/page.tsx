@@ -25,7 +25,7 @@ export default async function Auth() {
       <div
         style={{ zIndex: 1000 }}
         className=" absolute bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center z-10
-                   border-primary-10 border-x-[1px] border-b-[1px]
+
                    w-[350px] max-w-[90%] sm:max-w-[80%]
                    rounded-b-xl gap-4 py-12  shadow-lg"
       >
@@ -43,7 +43,7 @@ export default async function Auth() {
           Continue with Apple
         </AuthBtn>
       </div>
-      <div className="flex justify-center w-full absolute bottom-10  ">
+      <div className="flex justify-center w-full absolute bottom-10  borderColor-primary-10/50 border-t pt-3  ">
         <div className="flex gap-9 justify-center py-3 px-6 borderColor-primary-10/50 border-[1px] rounded-[20px]">
           {/* <SocialLink icon="/icons/discord.png" url="" /> */}
           <SocialLink
