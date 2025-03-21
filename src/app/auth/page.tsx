@@ -24,7 +24,7 @@ export default async function Auth() {
 
       <div
         style={{ zIndex: 1000 }}
-        className="  bottom-28 sm:bottom-32 md:bottom-28  inset-x-0 mx-auto flex flex-col justify-center items-center z-10
+        className="absolute   bottom-28 sm:bottom-32 md:bottom-28 xl:bottom-40 inset-x-0 mx-auto flex flex-col justify-center items-center z-10
 
                    w-[350px] max-w-[90%] sm:max-w-[80%]
                    rounded-b-xl gap-4   shadow-lg"
