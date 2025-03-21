@@ -1,4 +1,3 @@
-import { withAppRouterHighlight } from "@/utils/app-router-highlight.config";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,9 +6,7 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || "", // Service role key (used ONLY in backend)
 );
 
-export const DELETE = withAppRouterHighlight(async function DELETE(
-  req: Request,
-) {
+export async function DELETE(req: Request) {
   try {
     const { userId, token } = await req.json();
 
@@ -63,4 +60,4 @@ export const DELETE = withAppRouterHighlight(async function DELETE(
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-});
+}

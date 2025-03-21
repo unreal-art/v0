@@ -1,12 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: [
-      "@highlight-run/node",
-      "require-in-the-middle",
-    ],
-  },
   images: {
     remotePatterns: [
       {

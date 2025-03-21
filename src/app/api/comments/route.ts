@@ -1,5 +1,4 @@
 import { createClient } from "$/supabase/server";
-import { withAppRouterHighlight } from "@/utils/app-router-highlight.config";
 import { NextResponse } from "next/server";
 
 // ✅ Fetch all comments for a post
@@ -23,7 +22,7 @@ import { NextResponse } from "next/server";
 // }
 
 // ✅ Fetch comments with like count
-export const GET = withAppRouterHighlight(async function GET(req: Request) {
+export async function GET(req: Request) {
   const supabase = await createClient();
   const { searchParams } = new URL(req.url);
   const postId = searchParams.get("postId");
@@ -44,10 +43,10 @@ export const GET = withAppRouterHighlight(async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json(data);
-});
+}
 
 // ✅ Post a new comment
-export const POST = withAppRouterHighlight(async function POST(req: Request) {
+export async function POST(req: Request) {
   const supabase = await createClient();
 
   const { post_id, content, parent_id } = await req.json();
@@ -65,4 +64,4 @@ export const POST = withAppRouterHighlight(async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json(data);
-});
+}
