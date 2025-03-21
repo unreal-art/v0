@@ -59,6 +59,15 @@ export default {
           13: "var(--color-text-primary-13)",
         },
       },
+      animation: {
+        "infinite-scroll": "infinite-scroll 70s linear infinite",
+      },
+      keyframes: {
+        "infinite-scroll": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-100%)" },
+        },
+      },
     },
   },
   plugins: [],
