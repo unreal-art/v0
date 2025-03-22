@@ -37,7 +37,7 @@ export default function LandingCarouselTwo() {
   const handleMouseLeave = () => animationRef.current?.resume();
 
   return (
-    <div className="w-full h-full flex flex-col justify-end ">
+    <div className="w-full h-full flex flex-col justify-end overflow-hidden">
       {/* Logo */}
       <div className="top-0 z-10 flex justify-center w-full scale-100">
         <Image src={"/logo.png"} alt="logo" width={200} height={12} />
