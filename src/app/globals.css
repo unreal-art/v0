@@ -23,6 +23,8 @@
 
 body {
     font-family: Archivo;
+    overflow: hidden;
+    height: 100%;
 }
 
 * {
