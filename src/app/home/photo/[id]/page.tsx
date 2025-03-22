@@ -27,12 +27,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
 import { IPhoto } from "@/app/libs/interfaces";
 
-
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
   {
     ssr: false,
-  }
+  },
 );
 
 export default function Generation() {
@@ -66,9 +65,9 @@ export default function Generation() {
   const [isFetching, setIsFetching] = useState(true);
   const [dynamicTitle, setDynamicTitle] = useState("Default Title");
   const [dynamicDescription, setDynamicDescription] = useState(
-    "Default Description"
+    "Default Description",
   );
-  const [commentPhoto, setCommentPhoto] = useState<IPhoto | boolean>(false)
+  const [commentPhoto, setCommentPhoto] = useState<IPhoto | boolean>(false);
   const [dynamicImage, setDynamicImage] = useState("/default-image.jpg");
 
   useEffect(() => {
@@ -86,7 +85,7 @@ export default function Generation() {
         description: truncateText(post?.prompt, 100),
         image: getImage(
           (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-          (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+          (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
         ),
       };
 
@@ -96,8 +95,8 @@ export default function Generation() {
       setCommentPhoto({
         id: String(post?.id),
         src: data.image,
-        author: post?.author
-      })
+        author: post?.author,
+      });
     };
 
     fetchData();
@@ -190,6 +189,8 @@ export default function Generation() {
       const success = await updatePost(post.id, data);
       if (success) {
         toast.success("Post published successfully!");
+        //redirect to post page
+        router.replace(`/home/creations?s=public`);
       } else {
         toast.error("Failed to publish post");
       }
@@ -198,15 +199,14 @@ export default function Generation() {
     }
   };
 
-
   if (isFetching) {
     return <ViewSkeleton />;
   }
 
   const image = getImage(
     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
-  )
+    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+  );
 
   return (
     <>
@@ -273,12 +273,7 @@ export default function Generation() {
               </div>
 
               <div className="flex justify-center  w-full">
-                <Image
-                  src={image}
-                  width={306}
-                  height={408}
-                  alt="generated"
-                />
+                <Image src={image} width={306} height={408} alt="generated" />
               </div>
 
               <div className="flex flex-col w-full px-1 mt-8 md:mt-0 md:px-6 gap-y-4">
@@ -287,7 +282,12 @@ export default function Generation() {
                   setCaption={setCaption}
                   readOnly={userId !== post?.author}
                 />
-                {post && <Interactions postId={post?.id as number} postDetails={commentPhoto as IPhoto} />}
+                {post && (
+                  <Interactions
+                    postId={post?.id as number}
+                    postDetails={commentPhoto as IPhoto}
+                  />
+                )}
                 {post && userId == post?.author && (
                   <PostingActions
                     privatePost={privatePost as boolean}
@@ -308,7 +308,7 @@ export default function Generation() {
                   <Image
                     src={getImage(
                       (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
                     )}
                     width={98}
                     height={128}
@@ -335,7 +335,7 @@ export default function Generation() {
                 <ImageResolutionFeature
                   imageUrl={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
                   )}
                 />
 
