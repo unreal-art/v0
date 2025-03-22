@@ -30,7 +30,7 @@ export default function GenerateTextField({
   const [topup, setTopup] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
 
-  const { data: dartBalance } = useReadContract({
+  const { data: dartBalance, refetch } = useReadContract({
     contract: dartContract,
     method: "function balanceOf(address account) returns (uint256)",
     params: [user?.wallet?.address || ""],
@@ -109,7 +109,7 @@ export default function GenerateTextField({
                 Close
               </button>
 
-              <Topup open={topup} setOpen={setTopup} />
+              <Topup open={topup} setOpen={setTopup} refetch={refetch} />
 
               {(user?.creditBalance ?? 0) +
                 (dartBalance ? Number(formatEther(dartBalance)) / 3 : 0) <

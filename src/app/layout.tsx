@@ -37,6 +37,12 @@ const archivo = localFont({
 export const metadata: Metadata = {
   title: "Unreal Art",
   description: "A place to let your unreal imagination come alive.",
+  manifest: "/manifest.webmanifest", // Dynamically generated from `manifest.ts`
+  icons: [
+    { rel: "icon", url: "/icons/android-chrome-192x192.png" },
+    { rel: "icon", url: "/icons/android-chrome-512x512.png" },
+    { rel: "apple-touch-icon", url: "/icons/apple-touch-icon.png" },
+  ],
   openGraph: {
     type: "website",
     url: "https://unreal.art",

@@ -14,6 +14,7 @@ import { setMaxListeners } from "stream";
 interface OdpPayProps {
   amount: number;
   handleClose: () => void;
+  refetch: () => void;
 }
 const odpContract = getContractInstance(
   torusTestnet,
@@ -25,7 +26,7 @@ const exchangeContract = getContractInstance(
   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
 );
 
-export default function OdpPay({ amount, handleClose }: OdpPayProps) {
+export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const activeAccount = useActiveAccount();
   const [mainLoadingState, setMainLoadingState] = useState(false);
   const [mainTransaction, setMainTransaction] = useState<boolean>(false);
@@ -57,6 +58,7 @@ export default function OdpPay({ amount, handleClose }: OdpPayProps) {
       swapTransaction(transaction, {
         onSuccess: () => {
           console.log("Swap successful");
+          refetch(); //refetch dart balance
           setMainLoadingState(false);
           // show success modal
         },

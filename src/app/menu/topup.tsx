@@ -9,6 +9,7 @@ import { formatEther } from "ethers";
 interface TopupProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  refetch: () => void;
 }
 
 const exchangeContract = getContractInstance(
@@ -16,7 +17,7 @@ const exchangeContract = getContractInstance(
   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
 );
 
-export default function Topup({ open, setOpen }: TopupProps) {
+export default function Topup({ open, setOpen, refetch }: TopupProps) {
   const [credit, setCredit] = useState<number>(0);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
@@ -140,6 +141,7 @@ export default function Topup({ open, setOpen }: TopupProps) {
         open={openPayment}
         close={handleClose}
         setOpen={setOpenPayment}
+        refetch={refetch}
       />
     </>
   );

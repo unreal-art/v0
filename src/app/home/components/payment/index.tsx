@@ -7,9 +7,16 @@ interface TopupProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   close: () => void;
+  refetch: () => void;
 }
 
-export default function Payment({ open, amount, setOpen, close }: TopupProps) {
+export default function Payment({
+  open,
+  amount,
+  setOpen,
+  close,
+  refetch,
+}: TopupProps) {
   const handleClose = () => {
     setOpen(false);
   };
@@ -45,7 +52,11 @@ export default function Payment({ open, amount, setOpen, close }: TopupProps) {
           </div>
 
           <div className="mt-6 h-full">
-            <OdpPay amount={amount} handleClose={handleClose} />
+            <OdpPay
+              amount={amount}
+              handleClose={handleClose}
+              refetch={refetch}
+            />
           </div>
         </div>
       </div>

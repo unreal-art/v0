@@ -78,7 +78,7 @@ export default function UserData() {
   const { data: likeCount } = useLikeStat(profileId);
 
   // credit
-  const { data: dartBalance } = useReadContract({
+  const { data: dartBalance, refetch } = useReadContract({
     contract: dartContract,
     method: "function balanceOf(address account) returns (uint256)",
     params: [authUser?.wallet?.address || ""],
@@ -220,7 +220,7 @@ export default function UserData() {
           <p className="text-primary-7 my-4"> {profileData?.bio} </p>
         </div>
 
-        <Topup open={topup} setOpen={setTopup} />
+        <Topup open={topup} setOpen={setTopup} refetch={refetch} />
 
         <div className="hidden md:block">
           {isOwnProfile && (

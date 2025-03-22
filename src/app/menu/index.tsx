@@ -28,7 +28,7 @@ export default function Menu({ children }: INotificationProps) {
   const [open, setOpen] = useState(false);
   const [topup, setTopup] = useState(false);
 
-  const { data: dartBalance } = useReadContract({
+  const { data: dartBalance, refetch } = useReadContract({
     contract: dartContract,
     method: "function balanceOf(address account) returns (uint256)",
     params: [user?.wallet?.address || ""],
@@ -173,7 +173,7 @@ export default function Menu({ children }: INotificationProps) {
         </>
       )}
 
-      <Topup open={topup} setOpen={setTopup} />
+      <Topup open={topup} setOpen={setTopup} refetch={refetch} />
     </>
   );
 }
