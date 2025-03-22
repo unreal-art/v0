@@ -17,7 +17,7 @@ export default async function Auth() {
   }
 
   return (
-    <main className="bg-primary-13 min-h-[100dvh] flex flex-col ">
+    <main className="bg-primary-13 h-[100dvh] flex flex-col ">
       <div className="w-full h-[65%]  overflow-clip">
         <LandingCarouselTwo />
       </div>

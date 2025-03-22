@@ -23,8 +23,8 @@
 
 body {
     font-family: Archivo;
-    overflow: hidden;
-    height: 100%;
+    /* overflow: hidden;
+    height: 100%; */
 }
 
 * {
