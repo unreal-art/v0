@@ -17,14 +17,14 @@ export default async function Auth() {
   }
 
   return (
-    <main className="bg-primary-13 h-screen flex flex-col">
-      <div className="w-full h-[55%] md:h-[65%]  overflow-clip">
+    <main className="bg-primary-13 h-screen flex flex-col ">
+      <div className="w-full h-[40%] sm:h-[65%]  overflow-clip">
         <LandingCarouselTwo />
       </div>
 
       <div
         style={{ zIndex: 1000 }}
-        className="flex-1  inset-x-0 mx-auto flex flex-col justify-center items-center w-[350px] max-w-[90%] sm:max-w-[80%] rounded-b-xl gap-4 shadow-lg"
+        className="h-[20%]  inset-x-0 mx-auto flex flex-col justify-center items-center w-[350px] max-w-[90%] sm:max-w-[80%] rounded-b-xl gap-4 shadow-lg"
       >
         <AuthBtn
           icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />}
