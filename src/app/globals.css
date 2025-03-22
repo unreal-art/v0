@@ -23,9 +23,11 @@
 
 body {
     font-family: Archivo;
-    box-sizing: border-box;
 }
 
+* {
+    box-sizing: border-box;
+}
 .nasalization {
     font-family: nasalization;
 }
