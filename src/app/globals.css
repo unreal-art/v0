@@ -23,6 +23,7 @@
 
 body {
     font-family: Archivo;
+    box-sizing: border-box;
 }
 
 .nasalization {
