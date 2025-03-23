@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.discordapp.com",
       },
+      {
+        protocol: "https",
+        hostname:
+          "unreal01.61bc404fed98028e594de8e8bed90315.r2.cloudflarestorage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "pub-bc2d2d9bc6fb490dbb380efd5781048d.r2.dev",
+      },
     ],
   },
   env: {

@@ -16,6 +16,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { TabText } from "@/stores/creationAndProfileStore";
 import { Post } from "$/types/data.types";
+import { getImage } from "../../formattedPhotos";
 
 // Constants for breakpoints and grid sizing
 const BREAKPOINTS = {
@@ -120,10 +121,15 @@ export default function PhotoGridTwo({
         .map((post: Post): TransformedPhoto => {
           const image = post.ipfsImages?.[0];
           // We already filtered out null cases above
-          const imageUrl = `${
-            process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY || ""
-          }${image!.hash}/${image!.fileNames[0]}`;
+          // const imageUrl = `${
+          //   process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY || ""
+          // }${image!.hash}/${image!.fileNames[0]}`;
 
+          const imageUrl = getImage(
+            image!.hash,
+            image!.fileNames?.[0],
+            post.author,
+          );
           return {
             id: post.id.toString(),
             src: imageUrl,
