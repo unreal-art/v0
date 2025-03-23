@@ -89,6 +89,7 @@ const Notification: React.FC<NotificationProps> = ({
                 ? getImage(
                     post.ipfsImages[0].hash as string,
                     post.ipfsImages[0].fileNames[0] as string,
+                    post.author,
                   )
                 : "/profile.jpg"
             }

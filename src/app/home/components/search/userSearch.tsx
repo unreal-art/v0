@@ -149,6 +149,7 @@ export function UserImage({ post }: { post: Post }) {
         src={getImage(
           post.ipfsImages?.[0].hash as string,
           post.ipfsImages?.[0].fileNames?.[0] as string,
+          post.author,
         )}
         width={306}
         height={408}
