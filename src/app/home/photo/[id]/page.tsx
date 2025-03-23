@@ -86,6 +86,7 @@ export default function Generation() {
         image: getImage(
           (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
           (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+          post?.author as string,
         ),
       };
 
@@ -206,6 +207,7 @@ export default function Generation() {
   const image = getImage(
     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
     (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+    post?.author as string,
   );
 
   return (
@@ -309,6 +311,7 @@ export default function Generation() {
                     src={getImage(
                       (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                       (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                      post?.author as string,
                     )}
                     width={98}
                     height={128}
@@ -336,6 +339,7 @@ export default function Generation() {
                   imageUrl={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                     (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                    post?.author as string,
                   )}
                 />
 

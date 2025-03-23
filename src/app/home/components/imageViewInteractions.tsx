@@ -89,6 +89,7 @@ export default function ImageViewInteractions({
             getImage(
               (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
               (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+              post?.author as string,
             ),
             (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
           )
