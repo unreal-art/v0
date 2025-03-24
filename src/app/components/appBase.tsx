@@ -8,21 +8,29 @@ import Menu from "../menu";
 import { useUser } from "@/hooks/useUser";
 import { Toaster } from "sonner";
 import { useUnreadNotificationsCount } from "@/hooks/useNotifications";
+import { memo } from "react";
 
-export default function AppBase({ children }: { children: React.ReactNode }) {
+function AppBase({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
 
   return (
     <main
-      className={`fixed z-10 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen`}
+      className="fixed z-10 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen will-change-transform"
     >
       <Toaster />
-      <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full">
+      <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full select-none">
         <Link href={"/"} className="hidden md:block m-6">
-          <Image src={"/icons/logo.png"} alt="logo" width={38} height={38} />
+          <Image 
+            src="/icons/logo.png" 
+            alt="logo" 
+            width={38} 
+            height={38}
+            priority
+            className="w-[38px] h-[38px]"
+          />
         </Link>
 
-        <div className="flex md:flex-col flex-grow justify-between gap-3">
+        <div className="flex md:flex-col flex-grow justify-between gap-3 will-change-contents">
           <div className="flex flex-grow justify-evenly md:flex-col md:justify-start">
             <NavLink href={"/home"} text="Home" icon="dashboard" />
             <NavLink
@@ -54,9 +62,12 @@ export default function AppBase({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <div className="flex   justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto">
+      <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto overscroll-none">
         {children}
       </div>
     </main>
   );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export default memo(AppBase);

@@ -1,42 +1,69 @@
 "use client";
 
-import { useEffect, memo } from "react";
+import { useEffect, memo, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import NProgress from "nprogress";
 
 // Configure NProgress for smoother experience
 NProgress.configure({
   showSpinner: false,
-  speed: 400,
-  minimum: 0.1,
-  trickleSpeed: 150,
-  easing: "ease",
+  speed: 300,
+  minimum: 0.15,
+  trickleSpeed: 120,
+  easing: "ease-out",
   parent: "body",
 });
 
 const ProgressBar = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const prevPathRef = useRef(pathname);
+  const prevSearchRef = useRef(searchParams?.toString());
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    let startFrame: number;
-    let finishFrame: number;
+    // Get current values
+    const currentPath = pathname;
+    const currentSearch = searchParams?.toString();
 
-    NProgress.start();
+    // Skip if only tab parameter changed
+    const isOnlyTabChange =
+      (prevPathRef.current === currentPath &&
+        prevSearchRef.current?.includes("tab=") &&
+        currentSearch?.includes("tab=")) ||
+      (prevSearchRef.current?.includes("s=") && currentSearch?.includes("s="));
 
-    startFrame = window.requestAnimationFrame(() => {
-      NProgress.set(0.3);
+    // Only show progress for actual page changes, not tab switches
+    if (!isOnlyTabChange) {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-      finishFrame = window.requestAnimationFrame(() => {
-        setTimeout(() => {
-          NProgress.done();
-        }, 100);
+      // Use requestAnimationFrame for smoother animation start
+      requestAnimationFrame(() => {
+        NProgress.start();
+
+        // Quickly move to 30% to give perception of speed
+        requestAnimationFrame(() => {
+          NProgress.set(0.3);
+        });
       });
-    });
+
+      // Set a delay to complete the progress
+      timeoutRef.current = setTimeout(() => {
+        NProgress.done(true); // Force complete
+      }, 300); // Slightly longer than transition time in PageTransitionProvider
+    }
+
+    // Update refs for next comparison
+    prevPathRef.current = currentPath;
+    prevSearchRef.current = currentSearch;
 
     return () => {
-      window.cancelAnimationFrame(startFrame);
-      window.cancelAnimationFrame(finishFrame);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, [pathname, searchParams]); // Only depend on route changes
 
@@ -54,7 +81,8 @@ const ProgressBar = () => {
           top: 0;
           left: 0;
           width: 100%;
-          height: 3px;
+          height: 2px;
+          opacity: 0.8;
         }
 
         #nprogress .peg {
@@ -63,8 +91,9 @@ const ProgressBar = () => {
           right: 0px;
           width: 100px;
           height: 100%;
-          box-shadow: 0 0 10px #fff, 0 0 5px #fff;
-          opacity: 1;
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+            0 0 5px rgba(255, 255, 255, 0.5);
+          opacity: 0.8;
           transform: rotate(3deg) translate(0px, -4px);
         }
       `}</style>
