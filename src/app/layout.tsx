@@ -111,7 +111,7 @@ export default function RootLayout({
         <link rel="prefetch" href="/home" />
       </head>
       <body
-        className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
+        className={`bg-primary-13 text-primary-11 ${archivo.className} ${nasalization.className}`}
       >
         <Suspense
           fallback={
@@ -122,7 +122,7 @@ export default function RootLayout({
         </Suspense>
         <Suspense
           fallback={
-            <div className="min-h-screen background-color-primary-1"></div>
+            <div className="min-h-screen bg-primary-1"></div>
           }
         >
           <PageTransitionProvider>{children}</PageTransitionProvider>

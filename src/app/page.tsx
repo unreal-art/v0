@@ -1,36 +1,30 @@
 import { redirect } from "next/navigation";
-import { createClient } from "$/supabase/server";
-import Image from "next/image";
+import { createClient as createServerClient } from "$/supabase/server";
+import ClientHome from "./components/clientHome";
 
-// Force static generation for faster loading
-export const dynamic = "force-static";
-export const revalidate = 0;
-
-// Use a loading component to show while checking auth
-const LoadingScreen = () => (
-  <div className="h-screen w-screen flex items-center justify-center bg-primary-13">
-    <Image src="/Icon-White.png" alt="unreal" height={50} width={50} priority />
-  </div>
-);
-
-export default async function Home() {
-  // Check if user is authenticated and redirect accordingly
+// Server-side auth check
+async function getSession() {
   try {
-    const supabaseSSR = await createClient();
+    const supabase = await createServerClient();
     const {
-      data: { user },
-    } = await supabaseSSR.auth.getUser();
-
-    // Use immediate redirects
-    if (user) {
-      redirect("/home");
-    } else {
-      redirect("/auth");
-    }
+      data: { session },
+    } = await supabase.auth.getSession();
+    return session;
   } catch (error) {
-    redirect("/auth");
+    console.error("Error checking session:", error);
+    return null;
+  }
+}
+
+// Server component for initial auth check
+export default async function Home() {
+  const session = await getSession();
+
+  // Server-side redirect if authenticated
+  if (session) {
+    redirect("/home");
   }
 
-  // This will never be rendered but provides a fallback
-  return <LoadingScreen />;
+  // If not authenticated, render client component for further checks
+  return <ClientHome />;
 }

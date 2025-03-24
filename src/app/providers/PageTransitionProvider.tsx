@@ -12,23 +12,23 @@ export const PageTransitionContext = React.createContext({
 // Animation variants for smoother transitions - ONLY used for actual page changes
 const pageVariants = {
   initial: {
-    opacity: 0.97,
-    scale: 0.995,
+    opacity: 0.98,
+    scale: 0.997,
   },
   animate: {
     opacity: 1,
     scale: 1,
     transition: {
-      duration: 0.18,
-      ease: [0.25, 0.1, 0.25, 1], // Custom easing function for smoother motion
+      duration: 0.15,
+      ease: [0.2, 0.0, 0.2, 1], // Improved easing function based on Material Design
     },
   },
   exit: {
-    opacity: 0.97,
-    scale: 0.995,
+    opacity: 0.98,
+    scale: 0.997,
     transition: {
-      duration: 0.12,
-      ease: [0.25, 0.1, 0.25, 1],
+      duration: 0.1,
+      ease: [0.2, 0.0, 0.2, 1],
     },
   },
 };
@@ -128,7 +128,7 @@ export default function PageTransitionProvider({
           pathname.includes("/creations") ||
           pathname.includes("/profile")
         ) {
-          const sections = ["public", "private", "liked", "pinned"];
+          const sections = ["public", "private", "liked", "pinned", "draft"];
           sections.forEach((section) => {
             const url = `${pathname}?s=${section}`;
             if (!existingPreloads.includes(url)) pathsToPreload.push(url);
@@ -177,8 +177,8 @@ export default function PageTransitionProvider({
 
       // Use requestAnimationFrame for smoother animations
       const startTime = performance.now();
-      // Even shorter duration for more subtlety
-      const duration = 180;
+      // Shorter duration for more subtlety - match with Framer transition
+      const duration = 150;
 
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTime;
@@ -261,10 +261,7 @@ export default function PageTransitionProvider({
 
   return (
     <PageTransitionContext.Provider value={{ isPageTransitioning }}>
-      <AnimatePresence 
-        mode="sync" 
-        initial={false}
-      >
+      <AnimatePresence mode="sync" initial={false}>
         <motion.div
           // Use stableKey which only changes on actual page changes
           key={stableKey}
