@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "$/supabase/client";
 import { AuthChangeEvent, Session } from "@supabase/supabase-js";
@@ -15,11 +15,44 @@ const LoadingScreen = () => (
 
 export default function ClientHome() {
   const router = useRouter();
+  const pathname = usePathname();
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    // Check current online status
+    setIsOffline(!navigator.onLine);
+
+    // Set up online/offline listeners
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
 
     const checkAuth = async () => {
+      // If user is offline, show offline page instead of auth page
+      if (isOffline) {
+        // Get current path without leading slash
+        const from = pathname?.replace(/^\/+|\/+$/g, "") || "";
+
+        // Add from parameter if we have a path and it's not already offline.html
+        if (from && !from.includes("offline")) {
+          router.replace(`/offline.html?from=${from}`);
+        } else {
+          router.replace("/offline.html");
+        }
+        return;
+      }
+
       try {
         const supabase = createClient();
         const {
@@ -36,7 +69,20 @@ export default function ClientHome() {
         }
       } catch (error) {
         if (mounted) {
-          router.replace("/auth");
+          // If offline or network error, show offline page
+          if (!navigator.onLine || error instanceof TypeError) {
+            // Get current path without leading slash
+            const from = pathname?.replace(/^\/+|\/+$/g, "") || "";
+
+            // Add from parameter if we have a path and it's not already offline.html
+            if (from && !from.includes("offline")) {
+              router.replace(`/offline.html?from=${from}`);
+            } else {
+              router.replace("/offline.html");
+            }
+          } else {
+            router.replace("/auth");
+          }
         }
       }
     };
@@ -48,7 +94,17 @@ export default function ClientHome() {
     } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, session: Session | null) => {
         if (mounted) {
-          if (session) {
+          if (isOffline) {
+            // Get current path without leading slash
+            const from = pathname?.replace(/^\/+|\/+$/g, "") || "";
+
+            // Add from parameter if we have a path and it's not already offline.html
+            if (from && !from.includes("offline")) {
+              router.replace(`/offline.html?from=${from}`);
+            } else {
+              router.replace("/offline.html");
+            }
+          } else if (session) {
             router.replace("/home");
           } else {
             router.replace("/auth");
@@ -64,7 +120,7 @@ export default function ClientHome() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, isOffline, pathname]);
 
   return <LoadingScreen />;
 }

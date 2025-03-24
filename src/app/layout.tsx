@@ -102,6 +102,16 @@ export default function RootLayout({
           href={process.env.NEXT_PUBLIC_LIGHTHOUSE_URL}
         />
 
+        {/* Preload critical assets for offline caching */}
+        <link rel="preload" href="/offline.html" as="document" />
+        <link rel="preload" href="/favicon.ico" as="image" />
+        <link
+          rel="preload"
+          href="/icons/android-chrome-192x192.png"
+          as="image"
+        />
+        <link rel="preload" href="/icons/apple-touch-icon.png" as="image" />
+
         {/* Preload key resources */}
         <link rel="preload" href="/Icon-White.png" as="image" />
         <link rel="preload" href="/logo.png" as="image" />
@@ -120,11 +130,7 @@ export default function RootLayout({
         >
           <ProgressBar />
         </Suspense>
-        <Suspense
-          fallback={
-            <div className="min-h-screen bg-primary-1"></div>
-          }
-        >
+        <Suspense fallback={<div className="min-h-screen bg-primary-1"></div>}>
           <PageTransitionProvider>{children}</PageTransitionProvider>
         </Suspense>
         <ServiceWorker />
