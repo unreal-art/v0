@@ -55,13 +55,11 @@ export default function OfflineAlert() {
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-primary-13 text-primary-6 transition-all duration-300 transform">
       <div className="max-w-md mx-auto rounded-lg bg-primary-13 border border-primary-12 shadow-lg p-4">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0">
-            <Image
+          <div className="flex-shrink-0 h-24">
+            <img
               src="/Icon-White.png"
               alt="Logo"
-              width={30}
-              height={30}
-              className="opacity-80"
+              className="opacity-80 w-24 h-24"
             />
           </div>
           <div className="flex-1">
