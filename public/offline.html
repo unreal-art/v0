@@ -1,401 +1,381 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Unreal - You're Offline</title>
-        <link rel="icon" href="/favicon.ico" />
-        <style>
-            :root {
-                --primary-bg: #050505; /* primary-13 */
-                --primary-text: #ffffff; /* primary-1 */
-                --secondary-bg: #191919; /* primary-12 */
-                --accent-color: #2b2b2b; /* primary-10 */
-                --button-color: #5d5d5d; /* primary-8 */
-                --button-hover: #494949; /* primary-9 */
-                --text-secondary: #c1c1c1; /* primary-6 */
-                --warning-color: #8f8f8f; /* primary-7 */
-                --success-color: #dadada; /* primary-5 */
-                --border-color: #232323; /* primary-11 */
-            }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unreal - You're Offline</title>
+    <link rel="icon" href="/favicon.ico" />
+    <style>
+      :root {
+        --primary-bg: #050505; /* primary-13 */
+        --primary-text: #ffffff; /* primary-1 */
+        --secondary-bg: #191919; /* primary-12 */
+        --accent-color: #2b2b2b; /* primary-10 */
+        --button-color: #5d5d5d; /* primary-8 */
+        --button-hover: #494949; /* primary-9 */
+        --text-secondary: #c1c1c1; /* primary-6 */
+        --warning-color: #8f8f8f; /* primary-7 */
+        --success-color: #dadada; /* primary-5 */
+        --border-color: #232323; /* primary-11 */
+      }
 
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-                font-family:
-                    "Archivo",
-                    -apple-system,
-                    BlinkMacSystemFont,
-                    "Segoe UI",
-                    Roboto,
-                    Helvetica,
-                    Arial,
-                    sans-serif;
-            }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Helvetica, Arial, sans-serif;
+      }
 
-            body {
-                background-color: var(--primary-bg);
-                color: var(--primary-text);
-                margin: 0;
-                padding: 0 16px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                text-align: center;
-                overflow-x: hidden;
-            }
+      body {
+        background-color: var(--primary-bg);
+        color: var(--primary-text);
+        margin: 0;
+        padding: 0 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+        overflow-x: hidden;
+      }
 
-            .container {
-                max-width: 90%;
-                width: 450px;
-                padding: 2.5rem;
-                background-color: var(--secondary-bg);
-                border-radius: 16px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-                border: 1px solid var(--border-color);
-                animation: fadeIn 0.8s ease-out;
-            }
+      .container {
+        max-width: 90%;
+        width: 450px;
+        padding: 2.5rem;
+        background-color: var(--secondary-bg);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--border-color);
+        animation: fadeIn 0.8s ease-out;
+      }
 
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-            .logo-container {
-                position: relative;
-                margin-bottom: 2rem;
-                display: flex;
-                justify-content: center;
-            }
+      .logo-container {
+        position: relative;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: center;
+      }
 
-            .logo {
-                width: 80px;
-                height: 80px;
-                object-fit: contain;
-                position: relative;
-                z-index: 2;
-            }
+      .logo {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        position: relative;
+        z-index: 2;
+      }
 
-            .logo-bg {
-                position: absolute;
-                width: 100px;
-                height: 100px;
-                border-radius: 50%;
-                background: radial-gradient(
-                    circle,
-                    rgba(89, 89, 89, 0.2) 0%,
-                    rgba(8, 8, 8, 0) 70%
-                );
-                animation: pulse 3s infinite ease-in-out;
-            }
+      .logo-bg {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(89, 89, 89, 0.2) 0%,
+          rgba(8, 8, 8, 0) 70%
+        );
+        animation: pulse 3s infinite ease-in-out;
+      }
 
-            @keyframes pulse {
-                0% {
-                    transform: scale(1);
-                    opacity: 0.5;
-                }
-                50% {
-                    transform: scale(1.2);
-                    opacity: 0.8;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 0.5;
-                }
-            }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+      }
 
-            h1 {
-                font-size: 1.75rem;
-                margin-bottom: 1rem;
-                font-weight: 600;
-            }
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
 
-            p {
-                margin-bottom: 2rem;
-                line-height: 1.6;
-                color: var(--text-secondary);
-                font-size: 1.05rem;
-            }
+      p {
+        margin-bottom: 2rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+      }
 
-            .buttons {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                width: 100%;
-            }
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
 
-            .button {
-                display: block;
-                width: 100%;
-                background-color: var(--accent-color);
-                color: var(--primary-text);
-                border: none;
-                padding: 0.85rem 1.5rem;
-                border-radius: 8px;
-                font-size: 1rem;
-                cursor: pointer;
-                text-decoration: none;
-                transition: all 0.2s ease;
-                font-weight: 500;
-            }
+      .button {
+        display: block;
+        width: 100%;
+        background-color: var(--accent-color);
+        color: var(--primary-text);
+        border: none;
+        padding: 0.85rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
 
-            .button:hover,
-            .button:focus {
-                background-color: var(--button-hover);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            }
+      .button:hover,
+      .button:focus {
+        background-color: var(--button-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
 
-            .button-primary {
-                background-color: var(--button-color);
-            }
+      .button-primary {
+        background-color: var(--button-color);
+      }
 
-            .button-primary:hover,
-            .button-primary:focus {
-                background-color: var(--button-hover);
-            }
+      .button-primary:hover,
+      .button-primary:focus {
+        background-color: var(--button-hover);
+      }
 
-            .status {
-                margin-top: 2rem;
-                font-size: 0.95rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                color: var(--text-secondary);
-                padding: 10px;
-                border-radius: 8px;
-                background-color: var(--secondary-bg);
-                border: 1px solid var(--border-color);
-            }
+      .status {
+        margin-top: 2rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: var(--text-secondary);
+        padding: 10px;
+        border-radius: 8px;
+        background-color: var(--secondary-bg);
+        border: 1px solid var(--border-color);
+      }
 
-            .connection-dot {
-                display: inline-block;
-                width: 12px;
-                height: 12px;
-                background-color: var(--warning-color);
-                border-radius: 50%;
-                box-shadow: 0 0 10px rgba(143, 143, 143, 0.5);
-                animation: blink 2s infinite;
-            }
+      .connection-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-color: var(--warning-color);
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(143, 143, 143, 0.5);
+        animation: blink 2s infinite;
+      }
 
-            @keyframes blink {
-                0%,
-                100% {
-                    opacity: 1;
-                }
-                50% {
-                    opacity: 0.5;
-                }
-            }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
 
-            .online .connection-dot {
-                background-color: var(--success-color);
-                box-shadow: 0 0 10px rgba(218, 218, 218, 0.5);
-                animation: none;
-            }
+      .online .connection-dot {
+        background-color: var(--success-color);
+        box-shadow: 0 0 10px rgba(218, 218, 218, 0.5);
+        animation: none;
+      }
 
-            .loading-bar {
-                height: 4px;
-                width: 100%;
-                background-color: rgba(255, 255, 255, 0.1);
-                border-radius: 4px;
-                overflow: hidden;
-                margin-top: 10px;
-                display: none;
-            }
+      .loading-bar {
+        height: 4px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+        display: none;
+      }
 
-            .loading-bar-progress {
-                height: 100%;
-                width: 0%;
-                background-color: var(--success-color);
-                border-radius: 4px;
-                transition: width 0.3s linear;
-            }
+      .loading-bar-progress {
+        height: 100%;
+        width: 0%;
+        background-color: var(--success-color);
+        border-radius: 4px;
+        transition: width 0.3s linear;
+      }
 
-            .online .loading-bar {
-                display: block;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="logo-container">
-                <div class="logo-bg"></div>
-                <img src="/Icon-White.png" alt="Unreal Logo" class="logo" />
-            </div>
-            <h1>You're Offline</h1>
-            <p>
-                We can't connect to Unreal right now. Check your internet
-                connection and try again, or continue browsing cached content.
-            </p>
+      .online .loading-bar {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo-container">
+        <div class="logo-bg"></div>
+        <img src="/Icon-White.png" alt="Unreal Logo" class="logo" />
+      </div>
+      <h1>You're Offline</h1>
+      <p>
+        We can't connect to Unreal right now. Check your internet connection and
+        try again.
+      </p>
 
-            <div class="buttons">
-                <button
-                    class="button button-primary"
-                    onclick="window.location.reload()"
-                >
-                    Reconnect
-                </button>
-                <button class="button" onclick="goBackToApp()">
-                    Back to App
-                </button>
-            </div>
+      <div class="buttons">
+        <button
+          class="button button-primary"
+          onclick="window.location.reload()"
+        >
+          Reconnect
+        </button>
+      </div>
 
-            <div class="status">
-                <span class="connection-dot"></span>
-                <span id="status-text">Not Connected</span>
-                <div class="loading-bar">
-                    <div
-                        class="loading-bar-progress"
-                        id="loading-progress"
-                    ></div>
-                </div>
-            </div>
+      <div class="status">
+        <span class="connection-dot"></span>
+        <span id="status-text">Not Connected</span>
+        <div class="loading-bar">
+          <div class="loading-bar-progress" id="loading-progress"></div>
         </div>
+      </div>
+    </div>
 
-        <script>
-            // Function to go back to the app
-            function goBackToApp() {
-                try {
-                    // First check if we have a 'from' parameter
-                    const urlParams = new URLSearchParams(
-                        window.location.search,
-                    );
-                    const from = urlParams.get("from");
+    <script>
+      // Function to go back to the app
+      function goBackToApp() {
+        try {
+          // First check if we have a 'from' parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const from = urlParams.get("from");
 
-                    if (from) {
-                        window.location.href = `/${from}`;
-                    } else {
-                        // If no from parameter, go to home
-                        window.location.href = "/home";
-                    }
-                } catch (e) {
-                    // Fallback to home if navigation fails
-                    window.location.href = "/home";
+          if (from) {
+            window.location.href = `/${from}`;
+          } else {
+            // If no from parameter, go to home
+            window.location.href = "/home";
+          }
+        } catch (e) {
+          // Fallback to home if navigation fails
+          window.location.href = "/home";
+        }
+      }
+
+      // Check connection status and update UI
+      function updateConnectionStatus() {
+        const statusContainer = document.querySelector(".status");
+        const statusText = document.getElementById("status-text");
+        const progressBar = document.getElementById("loading-progress");
+
+        if (navigator.onLine) {
+          statusContainer.classList.add("online");
+          statusText.textContent = "Reconnecting...";
+
+          // Animate progress bar
+          let progress = 0;
+          const interval = setInterval(() => {
+            progress += 5;
+            progressBar.style.width = `${progress}%`;
+
+            if (progress >= 100) {
+              clearInterval(interval);
+              statusText.textContent = "Connected...";
+              setTimeout(() => {
+                // Always go to /home when back online
+                window.location.href = "/home";
+              }, 500);
+            }
+          }, 100);
+        } else {
+          statusContainer.classList.remove("online");
+          statusText.textContent = "Not Connected";
+          progressBar.style.width = "0%";
+        }
+      }
+
+      // Check if we were redirected from a specific page
+      function checkRedirectSource() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const from = urlParams.get("from");
+
+        if (from) {
+          const backButton = document.querySelector(
+            ".button:not(.button-primary)"
+          );
+          backButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = `/${from}`;
+          });
+        } else {
+          // If no from parameter, back button should go to home
+          const backButton = document.querySelector(
+            ".button:not(.button-primary)"
+          );
+          backButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = "/home";
+          });
+        }
+      }
+
+      // Fix for the plain "You are offline" text issue
+      function fixPlainOfflineText() {
+        // Listen for unhandled fetch errors
+        window.addEventListener(
+          "error",
+          function (e) {
+            // If the error is related to a network request
+            if (
+              e.target &&
+              (e.target.tagName === "LINK" || e.target.tagName === "SCRIPT")
+            ) {
+              // If we're offline and see a plain text error, redirect to our proper offline page
+              if (!navigator.onLine) {
+                // Only reload if we're not already on the offline page
+                if (!window.location.pathname.includes("offline.html")) {
+                  window.location.href = "/offline.html";
                 }
+              }
             }
+          },
+          true
+        );
+      }
 
-            // Check connection status and update UI
-            function updateConnectionStatus() {
-                const statusContainer = document.querySelector(".status");
-                const statusText = document.getElementById("status-text");
-                const progressBar = document.getElementById("loading-progress");
+      // Cache available pages for offline use
+      function cachePagesForOffline() {
+        if ("caches" in window) {
+          // Add pages you want available offline
+          const pagesToCache = ["/home", "/"];
 
-                if (navigator.onLine) {
-                    statusContainer.classList.add("online");
-                    statusText.textContent = "Reconnecting...";
+          pagesToCache.forEach((page) => {
+            fetch(page, { method: "GET" }).catch(() => {
+              // Silently fail if can't fetch
+            });
+          });
+        }
+      }
 
-                    // Animate progress bar
-                    let progress = 0;
-                    const interval = setInterval(() => {
-                        progress += 5;
-                        progressBar.style.width = `${progress}%`;
+      // Initial checks
+      updateConnectionStatus();
+      checkRedirectSource();
+      fixPlainOfflineText();
 
-                        if (progress >= 100) {
-                            clearInterval(interval);
-                            statusText.textContent = "Connected...";
-                            setTimeout(() => {
-                                // Always go to /home when back online
-                                window.location.href = "/home";
-                            }, 500);
-                        }
-                    }, 100);
-                } else {
-                    statusContainer.classList.remove("online");
-                    statusText.textContent = "Not Connected";
-                    progressBar.style.width = "0%";
-                }
-            }
+      // Set up event listeners for connection changes
+      window.addEventListener("online", updateConnectionStatus);
+      window.addEventListener("offline", updateConnectionStatus);
 
-            // Check if we were redirected from a specific page
-            function checkRedirectSource() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const from = urlParams.get("from");
-
-                if (from) {
-                    const backButton = document.querySelector(
-                        ".button:not(.button-primary)",
-                    );
-                    backButton.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        window.location.href = `/${from}`;
-                    });
-                } else {
-                    // If no from parameter, back button should go to home
-                    const backButton = document.querySelector(
-                        ".button:not(.button-primary)",
-                    );
-                    backButton.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        window.location.href = "/home";
-                    });
-                }
-            }
-
-            // Fix for the plain "You are offline" text issue
-            function fixPlainOfflineText() {
-                // Listen for unhandled fetch errors
-                window.addEventListener(
-                    "error",
-                    function (e) {
-                        // If the error is related to a network request
-                        if (
-                            e.target &&
-                            (e.target.tagName === "LINK" ||
-                                e.target.tagName === "SCRIPT")
-                        ) {
-                            // If we're offline and see a plain text error, redirect to our proper offline page
-                            if (!navigator.onLine) {
-                                // Only reload if we're not already on the offline page
-                                if (
-                                    !window.location.pathname.includes(
-                                        "offline.html",
-                                    )
-                                ) {
-                                    window.location.href = "/offline.html";
-                                }
-                            }
-                        }
-                    },
-                    true,
-                );
-            }
-
-            // Cache available pages for offline use
-            function cachePagesForOffline() {
-                if ("caches" in window) {
-                    // Add pages you want available offline
-                    const pagesToCache = ["/home", "/"];
-
-                    pagesToCache.forEach((page) => {
-                        fetch(page, { method: "GET" }).catch(() => {
-                            // Silently fail if can't fetch
-                        });
-                    });
-                }
-            }
-
-            // Initial checks
-            updateConnectionStatus();
-            checkRedirectSource();
-            fixPlainOfflineText();
-
-            // Set up event listeners for connection changes
-            window.addEventListener("online", updateConnectionStatus);
-            window.addEventListener("offline", updateConnectionStatus);
-
-            // Try to cache important pages when this offline page loads
-            document.addEventListener("DOMContentLoaded", cachePagesForOffline);
-        </script>
-    </body>
+      // Try to cache important pages when this offline page loads
+      document.addEventListener("DOMContentLoaded", cachePagesForOffline);
+    </script>
+  </body>
 </html>
