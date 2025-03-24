@@ -1,7 +1,15 @@
 "use client";
-import { useEffect, memo } from "react";
+import { useEffect, memo, useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import the OfflineAlert component to avoid SSR issues
+const OfflineAlert = dynamic(() => import("./offlineAlert"), {
+  ssr: false,
+});
 
 function ServiceWorker() {
+  const [isRegistered, setIsRegistered] = useState(false);
+
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
@@ -20,12 +28,35 @@ function ServiceWorker() {
       }
     };
 
+    // Prefetch offline.html to ensure it's in the cache
+    const prefetchOfflinePage = async () => {
+      try {
+        // Create a hidden iframe to load the offline page
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = "/offline.html";
+        document.body.appendChild(iframe);
+
+        // Remove after loading
+        setTimeout(() => {
+          try {
+            document.body.removeChild(iframe);
+          } catch (e) {
+            // Ignore errors if already removed
+          }
+        }, 5000);
+      } catch (error) {
+        // Silently fail
+      }
+    };
+
     const idleCallback =
       window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
 
     const timeoutDelay = setTimeout(() => {
       idleCallback(async () => {
         try {
+          // Register service worker
           const registration = await navigator.serviceWorker.register(
             "/service-worker.js",
             {
@@ -33,6 +64,8 @@ function ServiceWorker() {
               updateViaCache: "none",
             }
           );
+
+          setIsRegistered(true);
 
           let sw =
             registration.waiting ||
@@ -44,13 +77,19 @@ function ServiceWorker() {
               if (registration.installing) {
                 registration.installing.addEventListener("statechange", () => {
                   if (registration.active) {
-                    idleCallback(() => sendBuildVersion(registration.active));
+                    idleCallback(() => {
+                      sendBuildVersion(registration.active);
+                      prefetchOfflinePage();
+                    });
                   }
                 });
               }
             });
           } else {
-            idleCallback(() => sendBuildVersion(sw));
+            idleCallback(() => {
+              sendBuildVersion(sw);
+              prefetchOfflinePage();
+            });
           }
         } catch (error) {
           if (process.env.NODE_ENV === "development") {
@@ -80,7 +119,7 @@ function ServiceWorker() {
     };
   }, []);
 
-  return null;
+  return <OfflineAlert />;
 }
 
 export default memo(ServiceWorker);

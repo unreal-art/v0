@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import LandingCarouselTwo from "../components/landingCarouselTwo";
 import { AppleIcon, GoogleIcon } from "../components/icons";
 import AuthBtn from "../components/authBtn";
+import OfflineCheck from "../components/OfflineCheck";
 
 export default async function Auth() {
   const supabaseSSR = await createClient();
@@ -18,6 +19,9 @@ export default async function Auth() {
 
   return (
     <main className="bg-primary-13 h-[100dvh] flex flex-col ">
+      {/* Client-side component to check for offline status */}
+      <OfflineCheck />
+
       <div className="w-full h-[65%]  overflow-clip">
         <LandingCarouselTwo />
       </div>
