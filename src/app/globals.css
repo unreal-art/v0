@@ -3,61 +3,56 @@
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --color-text-base: #ffffff;
-        --color-text-primary-1: #ffffff;
-        --color-text-primary-2: #fdfdfd;
-        --color-text-primary-3: #f5f5f5;
-        --color-text-primary-4: #f0f0f0;
-        --color-text-primary-5: #dadada;
-        --color-text-primary-6: #c1c1c1;
-        --color-text-primary-7: #8f8f8f;
-        --color-text-primary-8: #5d5d5d;
-        --color-text-primary-9: #494949;
-        --color-text-primary-10: #2b2b2b;
-        --color-text-primary-11: #232323;
-        --color-text-primary-12: #191919;
-        --color-text-primary-13: #050505;
-    }
+  :root {
+    --color-text-base: #ffffff;
+    --color-text-primary-1: #ffffff;
+    --color-text-primary-2: #fdfdfd;
+    --color-text-primary-3: #f5f5f5;
+    --color-text-primary-4: #f0f0f0;
+    --color-text-primary-5: #dadada;
+    --color-text-primary-6: #c1c1c1;
+    --color-text-primary-7: #8f8f8f;
+    --color-text-primary-8: #5d5d5d;
+    --color-text-primary-9: #494949;
+    --color-text-primary-10: #2b2b2b;
+    --color-text-primary-11: #232323;
+    --color-text-primary-12: #191919;
+    --color-text-primary-13: #050505;
+  }
 }
 
 body {
-    font-family: Archivo;
-    /* overflow: hidden;
+  font-family: Archivo;
+  /* overflow: hidden;
     height: 100%; */
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 .nasalization {
-    font-family: nasalization;
+  font-family: nasalization;
 }
 
 .picture-gradient {
-    background: linear-gradient(
-        180deg,
-        rgba(102, 102, 102, 0.6) 0%,
-        rgba(0, 0, 0, 0.6) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(102, 102, 102, 0.6) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
 }
 
 .generate-gradient {
-    background: linear-gradient(
-        180deg,
-        #2b2b2b 0%,
-        #5e5e5e 41.4%,
-        #919191 100%
-    );
+  background: linear-gradient(180deg, #2b2b2b 0%, #5e5e5e 41.4%, #919191 100%);
 }
 
 .topup-btn-gradient {
-    border: 1px solid;
-    border-image-source: linear-gradient(
-        235.59deg,
-        rgba(0, 0, 0, 0.3) 0%,
-        rgba(193, 193, 193, 0.3) 99.32%
-    );
+  border: 1px solid;
+  border-image-source: linear-gradient(
+    235.59deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(193, 193, 193, 0.3) 99.32%
+  );
 }
 
 /*
@@ -67,84 +62,101 @@ For our carousel, we will need to add some custom CSS to our global styles.
 .home-carousel .stage,
 .ring,
 .img {
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    user-select: none;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  user-select: none;
 }
 
 .home-carousel .ring {
-    box-shadow: none;
-    transition: display ring;
+  box-shadow: none;
+  transition: display ring;
 }
 
 .home-carousel div,
 .home-carousel div img {
-    position: absolute;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
-    user-select: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 }
 
 .home-carousel .stage {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .home-carousel .container {
-    perspective: 1000px;
-    width: 300px;
-    height: 400px;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+  perspective: 1000px;
+  width: 300px;
+  height: 400px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .shadow-bg {
-    background-color: #0000008c;
+  background-color: #0000008c;
 }
 
 #nprogress .bar {
-    background: #fff; /* Change this to any shade of gray */
-    height: 3px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1031;
+  background: #fff; /* Change this to any shade of gray */
+  height: 3px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1031;
 }
 
 .hide-arrow[type="number"]::-webkit-inner-spin-button,
 .hide-arrow[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Hide scrollbar for all elements */
 * {
-    scrollbar-width: none; /* For Firefox */
-    -ms-overflow-style: none; /* For Internet Explorer */
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer */
 }
 
 /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
 *::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 @media screen and (max-width: 746px) {
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 60px; /* Adjust as needed */
-        background-color: white;
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhones */
-        z-index: 1000;
-    }
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Adjust as needed */
+    background-color: white;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhones */
+    z-index: 1000;
+  }
+}
+
+/* Add styles for tab transitions without animations */
+.tab-active {
+  position: relative;
+}
+
+.tab-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 2px;
+  background-color: #5d5d5d;
+  border-radius: 2px;
 }

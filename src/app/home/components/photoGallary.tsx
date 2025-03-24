@@ -34,11 +34,11 @@ import { useGalleryStore } from "@/stores/galleryStore";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
-  const shouldPrioritize = index < 4;
+  const shouldPrioritize = index < 8;
 
   return (
     <div
@@ -240,7 +240,7 @@ function PhotoWithAuthor({
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
-            <p className="font-semibold text-sm drop-shadow-lg">{userName}</p>
+            <p className="font-light text-sm drop-shadow-lg">{userName}</p>
           </Link>
         )}
       </div>

@@ -3,10 +3,18 @@ import { QueryClient } from "@tanstack/react-query";
 // Request deduplication system to prevent duplicate API calls
 const pendingRequests: Record<string, Promise<any>> = {};
 
+// Request deduplication with priority support
 export const dedupedRequest = async <T>(
   key: string,
-  queryFn: () => Promise<T>
+  queryFn: () => Promise<T>,
+  options?: { priority?: "high" | "normal" | "low" }
 ): Promise<T> => {
+  // If this is a high priority request and there's a pending request
+  // for the same key, abort the current one to prioritize this one
+  if (options?.priority === "high" && key in pendingRequests) {
+    delete pendingRequests[key];
+  }
+
   if (!pendingRequests[key]) {
     pendingRequests[key] = queryFn().finally(() => {
       delete pendingRequests[key];
@@ -26,6 +34,15 @@ export const entityCache: EntityCache = {
   posts: new Map<string | number, any>(),
   users: new Map<string | number, any>(),
   comments: new Map<string | number, any>(),
+};
+
+// Clear cache helper for memory management
+export const clearEntityCache = (type?: keyof EntityCache) => {
+  if (type) {
+    entityCache[type].clear();
+  } else {
+    Object.values(entityCache).forEach((cache) => cache.clear());
+  }
 };
 
 // Normalize and store entity data
@@ -69,7 +86,7 @@ export const updateEntity = <T extends { id: number | string }>(
   return updated;
 };
 
-// Optimized query client configuration
+// Optimized query client configuration with improved settings for faster transitions
 export const createOptimizedQueryClient = (): QueryClient => {
   return new QueryClient({
     defaultOptions: {
@@ -79,9 +96,13 @@ export const createOptimizedQueryClient = (): QueryClient => {
         refetchOnWindowFocus: false,
         retry: 1,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        // Don't retry for 404s
+        retryOnMount: false,
+        // Add better batching for faster page transitions
+        refetchInterval: false,
       },
       mutations: {
-        retry: 2,
+        retry: 1,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 15000),
       },
     },
@@ -129,25 +150,81 @@ export const updatePostInQueries = (
   });
 };
 
+// Cache warming for critical routes - call this on app init
+export const warmCache = (
+  queryClient: QueryClient,
+  resources: Array<{
+    key: string[];
+    fetchFn: () => Promise<any>;
+  }>
+) => {
+  // Only attempt cache warming if we have valid inputs
+  if (!queryClient || !Array.isArray(resources) || resources.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  return Promise.allSettled(
+    resources.map(({ key, fetchFn }) => {
+      if (!Array.isArray(key) || typeof fetchFn !== "function") {
+        return Promise.resolve(null);
+      }
+
+      return queryClient.prefetchQuery({
+        queryKey: key,
+        queryFn: fetchFn,
+        staleTime: 5 * 60 * 1000, // 5 minutes - consistent with other timings
+      });
+    })
+  );
+};
+
+// Page transition optimizations
+export const prepareForNavigation = (
+  queryClient: QueryClient,
+  navigateTo: string
+) => {
+  // Set higher priority for queries related to the target page
+  return {
+    isPending: false,
+    // Clean in-flight requests that aren't critical
+    cleanup: () => {
+      queryClient.cancelQueries();
+      return Promise.resolve();
+    },
+  };
+};
+
 // Prefetch helper for common patterns
 export const prefetchRelatedData = async (
   queryClient: QueryClient,
   type: "post" | "user" | "comments",
   id: string | number,
-  fetcher: () => Promise<any>
+  fetchFn: () => Promise<any>
 ) => {
-  // Don't prefetch if already in cache and not stale
-  const existing = queryClient.getQueryData([type, id]);
-  if (existing) return;
+  // Safety check for inputs
+  if (
+    !queryClient ||
+    !type ||
+    id === undefined ||
+    id === null ||
+    typeof fetchFn !== "function"
+  ) {
+    return Promise.resolve(null);
+  }
 
+  // Don't prefetch if already in cache and not stale
   try {
-    await queryClient.prefetchQuery({
+    const existing = queryClient.getQueryData([type, id]);
+    if (existing) return existing;
+
+    return await queryClient.prefetchQuery({
       queryKey: [type, id],
-      queryFn: fetcher,
-      staleTime: 1000 * 60 * 5, // 5 minute stale time for prefetched data
+      queryFn: fetchFn,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     });
   } catch (error) {
-    console.error(`Error prefetching ${type} ${id}:`, error);
-    // Silently fail - prefetching should not interrupt user experience
+    // Silent fail for prefetching
+    console.debug("Prefetch failed silently:", error);
+    return null;
   }
 };

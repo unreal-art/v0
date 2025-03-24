@@ -25,7 +25,6 @@ const wallets = [
   createWallet("walletConnect"),
   createWallet("io.metamask"),
   createWallet("com.coinbase.wallet"),
-  createWallet("com.binance"),
   createWallet("me.rainbow"),
 ];
 

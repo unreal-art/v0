@@ -247,7 +247,7 @@ export default function PhotoGridTwo({
                       src={photo.src}
                       fill={true}
                       alt={String(photo.alt)}
-                      priority={index < 4}
+                      priority={index < 8}
                       className="object-cover"
                       loading={index < 8 ? "eager" : "lazy"}
                       sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
@@ -267,7 +267,7 @@ export default function PhotoGridTwo({
                       src={photo.src}
                       fill={true}
                       alt={String(photo.alt)}
-                      priority={index < 4}
+                      priority={index < 8}
                       className="object-cover"
                       loading={index < 8 ? "eager" : "lazy"}
                       sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
