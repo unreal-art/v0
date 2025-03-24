@@ -10,19 +10,28 @@ export type TabText =
   | "User"
   | "Image";
 
+// Add type for navigation type
+export type NavigationType = "page" | "tab" | "none";
+
 interface CreationAndProfileState {
   // Tab states
   creationTab: TabText;
   profileTab: TabText;
 
+  // Navigation state
+  lastNavigationType: NavigationType;
+  isTransitioning: boolean;
+
   // Setters
   setCreationTab: (tab: TabText) => void;
   setProfileTab: (tab: TabText) => void;
+  setNavigationType: (type: NavigationType) => void;
+  setIsTransitioning: (isTransitioning: boolean) => void;
 
   // Initializers from URL
   initFromUrl: (
     section: "creation" | "profile",
-    urlParam: string | null,
+    urlParam: string | null
   ) => void;
 }
 
@@ -33,11 +42,32 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
     creationTab: "Public",
     profileTab: "Public",
 
+    // Default navigation state
+    lastNavigationType: "none",
+    isTransitioning: false,
+
     // Set the creation tab
-    setCreationTab: (tab: TabText) => set({ creationTab: tab }),
+    setCreationTab: (tab: TabText) =>
+      set((state) => ({
+        creationTab: tab,
+        lastNavigationType:
+          state.creationTab !== tab ? "tab" : state.lastNavigationType,
+      })),
 
     // Set the profile tab
-    setProfileTab: (tab: TabText) => set({ profileTab: tab }),
+    setProfileTab: (tab: TabText) =>
+      set((state) => ({
+        profileTab: tab,
+        lastNavigationType:
+          state.profileTab !== tab ? "tab" : state.lastNavigationType,
+      })),
+
+    // Set navigation type
+    setNavigationType: (type: NavigationType) =>
+      set({ lastNavigationType: type }),
+
+    // Set transitioning state
+    setIsTransitioning: (isTransitioning: boolean) => set({ isTransitioning }),
 
     // Initialize from URL parameter
     initFromUrl: (section, urlParam) => {
@@ -57,12 +87,24 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
       ];
       if (!validTabs.includes(formattedTab)) return;
 
-      // Update the correct section
+      // Update the correct section and set navigation type to "tab"
       if (section === "creation") {
-        set({ creationTab: formattedTab });
+        set((state) => ({
+          creationTab: formattedTab,
+          lastNavigationType:
+            state.creationTab !== formattedTab
+              ? "tab"
+              : state.lastNavigationType,
+        }));
       } else if (section === "profile") {
-        set({ profileTab: formattedTab });
+        set((state) => ({
+          profileTab: formattedTab,
+          lastNavigationType:
+            state.profileTab !== formattedTab
+              ? "tab"
+              : state.lastNavigationType,
+        }));
       }
     },
-  }),
+  })
 );

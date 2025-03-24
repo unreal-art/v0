@@ -38,7 +38,7 @@ function renderNextImage(
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
-  const shouldPrioritize = index < 4;
+  const shouldPrioritize = index < 8;
 
   return (
     <div

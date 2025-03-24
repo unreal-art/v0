@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useTransition } from "react";
-import TabIcon from "./TabIcon";
+import TabIcon from "@/app/home/creations/components/TabIcon";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   useCreationAndProfileStore,
@@ -13,39 +13,33 @@ export interface ITabs {
   hideDraft?: boolean;
   currentIndex: number;
   setCurrentIndex: (value: number) => void;
-  section: "creation" | "profile"; // Added section prop to identify the context
 }
 
-// Memoize tab configuration
+// Memoize tab configuration for better performance
 const TAB_CONFIG = [
   { text: "Public", index: 0 },
   { text: "Private", index: 1 },
   { text: "Liked", index: 2 },
   { text: "Pinned", index: 3 },
-  { text: "Draft", index: 4 },
 ] as const;
 
 export default function Tabs({
   hideDraft,
   currentIndex,
   setCurrentIndex,
-  section,
 }: ITabs) {
   // Access the store and URL parameters
-  const { creationTab, profileTab, initFromUrl } = useCreationAndProfileStore();
+  const { profileTab, initFromUrl } = useCreationAndProfileStore();
   const searchParams = useSearchParams();
 
-  // Memoize the filtered tabs
-  const tabs = useMemo(
-    () => TAB_CONFIG.filter((tab) => !(hideDraft && tab.text === "Draft")),
-    [hideDraft]
-  );
+  // Since there's no Draft tab in profile, we can simplify this
+  const tabs = useMemo(() => TAB_CONFIG, []);
 
   // Sync with URL on initial load
   useEffect(() => {
     const urlParam = searchParams.get("s");
     if (urlParam) {
-      initFromUrl(section, urlParam);
+      initFromUrl("profile", urlParam);
 
       // Also update the currentIndex to match the URL
       const tabIndex = tabs.findIndex(
@@ -55,7 +49,7 @@ export default function Tabs({
         setCurrentIndex(tabIndex);
       }
     }
-  }, [searchParams, initFromUrl, section, tabs, setCurrentIndex]);
+  }, [searchParams, initFromUrl, tabs, setCurrentIndex]);
 
   return (
     <motion.div
@@ -71,7 +65,6 @@ export default function Tabs({
           index={index}
           text={text}
           setCurrentIndex={setCurrentIndex}
-          section={section}
         />
       ))}
     </motion.div>
@@ -83,7 +76,6 @@ export interface ITabBtn {
   index: number;
   text: TabText;
   setCurrentIndex: (value: number) => void;
-  section: "creation" | "profile"; // Added section prop
 }
 
 export function TabBtn({
@@ -91,16 +83,15 @@ export function TabBtn({
   currentIndex,
   text,
   setCurrentIndex,
-  section,
 }: ITabBtn) {
   const pathname = usePathname();
-  const router = useRouter(); // router
-  const searchParams = useSearchParams(); // Get searchParams here
+  const router = useRouter();
+  const searchParams = useSearchParams();
   // Add isPending state to show loading state and improve perceived performance
   const [isPending, startTransition] = useTransition();
 
-  // Get the correct setter based on the section
-  const { setCreationTab, setProfileTab } = useCreationAndProfileStore();
+  // Get the profile tab setter from the store
+  const { setProfileTab } = useCreationAndProfileStore();
 
   // Determine the active state
   const isActive = currentIndex === index;
@@ -124,12 +115,8 @@ export function TabBtn({
     // Update the local component state
     setCurrentIndex(index);
 
-    // Update the store based on the section
-    if (section === "creation") {
-      setCreationTab(text);
-    } else if (section === "profile") {
-      setProfileTab(text);
-    }
+    // Update the store
+    setProfileTab(text);
 
     // Update URL without page reload - use startTransition for smoother UI
     startTransition(() => {
@@ -139,10 +126,7 @@ export function TabBtn({
     index,
     setCurrentIndex,
     text,
-    section,
-    setCreationTab,
     setProfileTab,
-    pathname,
     router,
     isActive,
     createTabUrl,

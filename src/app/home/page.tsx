@@ -1,7 +1,10 @@
-import GenerateInput from "./components/generateInput";
+"use client";
+
+import React from "react";
+import { useSearchParams } from "next/navigation";
 import TabBtn from "./components/tabBtn";
+import GenerateInput from "./components/generateInput";
 import dynamic from "next/dynamic";
-import { HydrationBoundary } from "@tanstack/react-query";
 import Search from "./components/search";
 import Skeleton from "react-loading-skeleton";
 import PostsProvider from "./components/PostsProvider";
@@ -24,15 +27,12 @@ const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ),
 });
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
-  const searchType = await searchParams;
+export default function HomePage() {
+  const searchParams = useSearchParams();
+  const searchType = searchParams?.get("s") || "";
 
   return (
-    <PostsProvider searchType={searchType?.s}>
+    <PostsProvider searchType={searchType}>
       <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
         <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
           <GenerateInput />

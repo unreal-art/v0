@@ -3,10 +3,16 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ServiceWorker from "./components/serviceWorker";
 import ProgressBar from "./components/progressBar";
+import { Suspense } from "react";
+
 import { HighlightInit } from "@highlight-run/next/client";
+import PageTransitionProvider from "./providers/PageTransitionProvider";
 
 const nasalization = localFont({
   src: "./fonts/nasalization/Nasalization Rg.otf",
+  preload: true,
+  display: "swap",
+  variable: "--font-nasalization",
 });
 
 const archivo = localFont({
@@ -32,6 +38,9 @@ const archivo = localFont({
     //   style: 'italic',
     // },
   ],
+  preload: true,
+  display: "swap",
+  variable: "--font-archivo",
 });
 
 export const metadata: Metadata = {
@@ -78,12 +87,46 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${archivo.variable} ${nasalization.variable}`}>
+      <head>
+        {/* Storage URLs: Primary R2 storage for production assets */}
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_R2_STORAGE_URL} />
+
+        {/* Cloudflare URL: Used for both development and public resources */}
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_CF_URL} />
+
+        {/* Gateway URLs: For external content */}
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_MESH3_URL} />
+        <link
+          rel="dns-prefetch"
+          href={process.env.NEXT_PUBLIC_LIGHTHOUSE_URL}
+        />
+
+        {/* Preload key resources */}
+        <link rel="preload" href="/Icon-White.png" as="image" />
+        <link rel="preload" href="/logo.png" as="image" />
+
+        {/* Add resource hints */}
+        <link rel="prefetch" href="/auth" />
+        <link rel="prefetch" href="/home" />
+      </head>
       <body
         className={`background-color-primary-1 text-primary-11 ${archivo.className} ${nasalization.className}`}
       >
-        <ProgressBar />
-        {children}
+        <Suspense
+          fallback={
+            <div className="h-1 bg-white/30 absolute top-0 left-0 w-full"></div>
+          }
+        >
+          <ProgressBar />
+        </Suspense>
+        <Suspense
+          fallback={
+            <div className="min-h-screen background-color-primary-1"></div>
+          }
+        >
+          <PageTransitionProvider>{children}</PageTransitionProvider>
+        </Suspense>
         <ServiceWorker />
       </body>
     </html>

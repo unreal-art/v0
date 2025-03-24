@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useEffect, useState, useTransition, useCallback, useRef } from "react";
 import { useGalleryStore, GalleryTab } from "@/stores/galleryStore";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTransitionState } from "@/hooks/useTransitionState";
 
 interface NavBtnProps {
   text: "Explore" | "Following" | "Top" | "Search";
@@ -12,19 +14,56 @@ interface NavBtnProps {
 export default function TabBtn({ text }: NavBtnProps) {
   const [hover, setHover] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Add isPending state to improve perceived performance
+  const [isPending, startTransition] = useTransition();
+  const { markAsTabChange } = useTransitionState();
 
   // Get state from Zustand
-  const { activeTab, setActiveTab, initFromUrl } = useGalleryStore();
+  const {
+    activeTab,
+    setActiveTab,
+    initFromUrl,
+    isTabTransitioning,
+    setIsTabTransitioning,
+  } = useGalleryStore();
 
   // Sync store with URL on initial load
   useEffect(() => {
     const urlParam = searchParams.get("s");
-    initFromUrl(urlParam);
+    if (urlParam) {
+      initFromUrl(urlParam);
+    }
   }, [searchParams, initFromUrl]);
 
   // Determine if this tab is active
   const isActive = activeTab === text.toUpperCase();
+
+  // Use a useRef to track previous active state for smoother transitions
+  const wasActiveRef = useRef(isActive);
+
+  // Track transition completion with optimized animation timing
+  useEffect(() => {
+    if (isTabTransitioning && isActive && !wasActiveRef.current) {
+      // Tab has just become active - apply subtle highlight without animation
+      const button = buttonRef.current;
+      if (button) {
+        // Set immediate styles without animation
+        button.classList.add("tab-active");
+
+        // Just mark the transition as complete after a very short delay
+        setTimeout(() => {
+          setIsTabTransitioning(false);
+        }, 50);
+      }
+    }
+
+    // Update the ref for next comparison
+    wasActiveRef.current = isActive;
+  }, [isActive, isTabTransitioning, setIsTabTransitioning]);
 
   let iconSvg = null;
 
@@ -38,14 +77,44 @@ export default function TabBtn({ text }: NavBtnProps) {
     }
   }
 
-  // Handle tab click - update Zustand state and URL
-  const handleTabClick = () => {
-    // Update Zustand state
+  // Create URL object for smoother navigation
+  const createTabUrl = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("s", text.toLowerCase());
+    return `${pathname}?${params.toString()}`;
+  }, [pathname, searchParams, text]);
+
+  // Handle tab click with optimized performance
+  const handleTabClick = useCallback(() => {
+    if (isActive || isPending) return; // Skip if already active or pending
+
+    // Start the tab transition state
+    setIsTabTransitioning(true);
+
+    // Mark this as a tab change to avoid full page transition BEFORE any other updates
+    markAsTabChange();
+
+    // Update Zustand state first for immediate UI feedback
     setActiveTab(text.toUpperCase() as GalleryTab);
 
-    // Update URL without page reload
-    router.replace(`?s=${text.toLowerCase()}`, { scroll: false });
-  };
+    // Use Next.js transition for smoother navigation - with zero animation
+    startTransition(() => {
+      // Update URL without triggering layout effects
+      router.replace(createTabUrl(), {
+        scroll: false,
+      });
+    });
+  }, [
+    isActive,
+    isPending,
+    router,
+    createTabUrl,
+    setActiveTab,
+    markAsTabChange,
+    startTransition,
+    setIsTabTransitioning,
+    text,
+  ]);
 
   switch (text) {
     case "Explore":
@@ -119,36 +188,46 @@ export default function TabBtn({ text }: NavBtnProps) {
   // Special handling for Search tab
   if (text === "Search") {
     return (
-      <button
+      <motion.button
+        ref={buttonRef}
         className={`flex items-center p-2 rounded-full border-primary-9 border-[1px] ${
           hover || isActive ? "bg-primary-10" : ""
-        }`}
+        } ${isActive ? "tab-active" : ""}`}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
+        whileTap={{ scale: 0.97 }}
+        transition={{ duration: 0.1 }}
+        onClick={handleTabClick}
       >
         <div>{iconSvg}</div>
-      </button>
+      </motion.button>
     );
   }
 
-  // Regular tabs
+  // Regular tabs with smoother transitions
   return (
-    <button
-      className={`relative flex items-center gap-2 rounded-full  ${
+    <motion.button
+      ref={buttonRef}
+      className={`relative flex items-center gap-2 rounded-full ${
         isActive ? "bg-primary-10" : ""
-      } px-2 md:px-4 py-2 cursor-pointer hover:bg-primary-10 transition`}
+      } px-2 md:px-4 py-2 cursor-pointer hover:bg-primary-10 transition-colors duration-150 ${
+        isActive ? "tab-active" : ""
+      }`}
       onClick={handleTabClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.1 }}
+      disabled={isPending}
     >
       {iconSvg}
       <span
         className={`${
           isActive ? "text-primary-7" : "text-primary-5"
-        } font-poppins text-sm transition select-none`}
+        } font-poppins text-sm transition-colors duration-150 select-none`}
       >
         {text}
       </span>
-    </button>
+    </motion.button>
   );
 }

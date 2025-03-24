@@ -34,7 +34,7 @@ import { useGalleryStore } from "@/stores/galleryStore";
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -69,7 +69,7 @@ export default function SearchPhotoGallary({
 }) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4
+    window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
 
   // Use Zustand store for tab state
