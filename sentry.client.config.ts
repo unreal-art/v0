@@ -9,6 +9,7 @@ Sentry.init({
 
   // Add optional integrations for additional features
   integrations: [
+
     Sentry.replayIntegration({
       // Optimize replay configuration
       blockAllMedia: true, // Block recording all media (images, videos)
@@ -23,6 +24,7 @@ Sentry.init({
   // 10% of transactions will be captured instead of 100%
   tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 0.3,
 
+
   // Optimize replay sampling rates
   // Only capture 1% of sessions in production, 10% in development
   replaysSessionSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 0.1,
@@ -31,6 +33,7 @@ Sentry.init({
   replaysOnErrorSampleRate: process.env.NODE_ENV === "production" ? 0.3 : 1.0,
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
+
   debug: false,
 
   // Add performance optimizations
@@ -46,4 +49,5 @@ Sentry.init({
   // Optimize transport with batching
   maxBreadcrumbs: 50, // Reduce from default 100
   sendClientReports: false, // Disable client reports
+
 });
