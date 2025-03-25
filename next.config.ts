@@ -137,6 +137,9 @@ const sentryWebpackPluginOptions = {
   // Enables automatic instrumentation of Vercel Cron Monitors
   automaticVercelMonitors: true,
 
+  // Disable feedback widget/popup
+  disableFeedbackButton: true,
+
   // Additional security and performance options
   maxBreadcrumbs: 50, // Limit breadcrumb count
   beforeSend(event: Event): Event {

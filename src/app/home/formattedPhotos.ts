@@ -95,8 +95,8 @@ export const formattedPhotosForGallary = (pages: Page[]): ExtendedPhoto[] => {
         const assetHash = image.hash;
         const fileName = image.fileNames[0];
 
+        // Generate the image URL just once
         const imageUrl = getImage(assetHash, fileName, post.author);
-
         const height = 1080 * (index % 4 === 0 ? 2 : 1);
 
         return {
@@ -107,7 +107,7 @@ export const formattedPhotosForGallary = (pages: Page[]): ExtendedPhoto[] => {
           width: 1080,
           height: height, // Adjust based on actual aspect ratio
           srcSet: breakpoints.map((breakpoint) => ({
-            src: getImage(assetHash, fileName, post.author), // Ensure consistent source
+            src: imageUrl, // Reuse the same URL instead of regenerating
             width: breakpoint,
             height: Math.round((height / 1080) * breakpoint), // Maintain aspect ratio
           })),
@@ -139,6 +139,7 @@ export const formattedPhotosForGrid = (pages: Page[]): ExtendedPhoto[] => {
         const assetHash = image.hash;
         const fileName = image.fileNames[0];
 
+        // Generate the image URL just once
         const imageUrl = getImage(assetHash, fileName, post.author);
 
         return {
@@ -149,9 +150,9 @@ export const formattedPhotosForGrid = (pages: Page[]): ExtendedPhoto[] => {
           width: 1080,
           height: 1080, // Adjust based on actual aspect ratio
           srcSet: breakpoints.map((breakpoint) => ({
-            src: getImage(assetHash, fileName, post.author), // Ensure consistent source
+            src: imageUrl, // Reuse the same URL instead of regenerating
             width: breakpoint,
-            height: 1080 * breakpoint, // Maintain aspect ratio
+            height: breakpoint, // Maintain aspect ratio
           })),
           prompt: post.prompt,
           author: post.author,
@@ -175,17 +176,14 @@ export const formattedPhotos = (pages: Page[]): ExtendedPhoto[] => {
     .flatMap((page) =>
       page.data.map((post: Post) => {
         const image = post.ipfsImages?.[0]; // Assuming only one image per post
-        console.log(post.author);
+
         if (!image || !image.hash || !image.fileNames?.[0]) return null;
 
         const assetHash = image.hash;
         const fileName = image.fileNames[0];
 
-        const imageUrl = getImage(
-          assetHash,
-          fileName,
-          "e260b0ab-9867-4507-97be-976779c20c9f"
-        );
+        // Generate the image URL just once
+        const imageUrl = getImage(assetHash, fileName, post.author);
 
         return {
           id: post.id.toString(),
@@ -195,7 +193,7 @@ export const formattedPhotos = (pages: Page[]): ExtendedPhoto[] => {
           width: 1080,
           height: 720, // Adjust based on actual aspect ratio
           srcSet: breakpoints.map((breakpoint) => ({
-            src: getImage(assetHash, fileName, post.author), // Ensure consistent source
+            src: imageUrl, // Reuse the same URL instead of regenerating
             width: breakpoint,
             height: Math.round((720 / 1080) * breakpoint), // Maintain aspect ratio
           })),

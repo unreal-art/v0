@@ -13,7 +13,7 @@ import {
 import Reply from "./Reply";
 import { useState } from "react";
 import { formatNumber } from "@/utils";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
 export default function Comment({
   data,

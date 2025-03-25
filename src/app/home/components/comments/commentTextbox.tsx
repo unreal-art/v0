@@ -3,7 +3,7 @@ import { CommentWithUser } from "$/types/data.types";
 import { CloseIcon, EmojiIcon } from "@/app/components/icons";
 import { usePostComment } from "@/hooks/useComments";
 import { useUser } from "@/hooks/useUser";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 import { useState } from "react";
 
 interface CommentTextboxProps {

@@ -6,7 +6,7 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import CommentArea from "./comments/commentArea";
 import { useRef, useState, useEffect } from "react";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 import { startSpan } from "@/utils/sentryUtils";
 
 interface GenerateTextFieldProps {

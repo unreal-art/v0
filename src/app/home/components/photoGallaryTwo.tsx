@@ -6,13 +6,13 @@ import {
   RenderPhotoContext,
 } from "react-photo-album";
 import "react-photo-album/masonry.css";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
 //import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
 
 import Image from "next/image";
-import ImageView from "./imageView";
+import dynamic from "next/dynamic";
 // import { usePostsQuery } from "@/hooks/usePostsQuery";
 import { supabase } from "$/supabase/client";
 
@@ -31,13 +31,20 @@ import {
   getPostsByUser,
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
+// Dynamically import ImageView component to reduce initial bundle size
+const ImageView = dynamic(() => import("./imageView"), {
+  ssr: false,
+  loading: () => null,
+});
+
+// Define renderNextImage as a regular function since it's used as a render prop
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
   { photo, width, height, index = 0 }: RenderImageContext
 ) {
-  // Use priority loading for the first 4 images (eagerly loaded)
+  // Use priority loading for the first images (eagerly loaded)
   // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 8;
 
@@ -47,6 +54,10 @@ function renderNextImage(
       ? String(photo.src).split("/").pop()?.split("?")[0] ||
         `gallery-img-${index}`
       : `gallery-img-${index}`;
+
+  // Responsive size hints for optimal loading
+  const responsiveSizes =
+    sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 
   return (
     <div
@@ -61,18 +72,18 @@ function renderNextImage(
         src={photo}
         alt={alt || "Gallery image"}
         title={title}
-        sizes={sizes}
+        sizes={responsiveSizes}
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
-        trackPerformance={true}
+        trackPerformance={process.env.NODE_ENV === "development"}
         imageName={imageName}
       />
     </div>
   );
 }
 
-export default function PhotoGallaryTwo({}) {
+function PhotoGallaryTwo({}) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState<number | null>(null);
 
@@ -85,20 +96,9 @@ export default function PhotoGallaryTwo({}) {
   const postId = useMemo(() => (id ? parseInt(id as string) : null), [id]);
   const { data: post } = usePost(postId);
 
-  const {
-    isLoading,
-    isError,
-    error,
-    data,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useInfiniteQuery({
-    queryKey: [
-      "other_posts_by_user",
-      `${post?.author} "_" ${a} || "other_posts"`,
-    ],
-    queryFn: async ({ pageParam = 0 }) => {
+  // Memoize query function to avoid recreating on each render
+  const queryFn = useCallback(
+    async ({ pageParam = 0 }) => {
       let result: Post[] = [];
 
       if (a) {
@@ -122,6 +122,23 @@ export default function PhotoGallaryTwo({}) {
         nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
       };
     },
+    [a, postId, post?.author]
+  );
+
+  const {
+    isLoading,
+    isError,
+    error,
+    data,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: [
+      "other_posts_by_user",
+      `${post?.author} "_" ${a} || "other_posts"`,
+    ],
+    queryFn,
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       if (!lastPage?.data || !Array.isArray(lastPage.data)) {
@@ -131,20 +148,21 @@ export default function PhotoGallaryTwo({}) {
     },
   });
 
+  // Optimize resize handling with useCallback to prevent recreation
+  const handleResize = useCallback(() => {
+    setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const handleResize = () => {
-      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
-    };
-
-    window.addEventListener("resize", handleResize);
     handleResize();
+    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [handleResize]);
 
   const handleImageIndex = useCallback((context: RenderPhotoContext) => {
     setImageIndex(context.index);
@@ -165,6 +183,12 @@ export default function PhotoGallaryTwo({}) {
 
   if (!columns) return null;
 
+  // Memoize formatted photos to prevent recalculation on each render
+  const photos = useMemo(
+    () => formattedPhotos(data?.pages ?? []),
+    [data?.pages]
+  );
+
   return (
     <div className="w-full">
       <InfiniteScroll
@@ -174,7 +198,7 @@ export default function PhotoGallaryTwo({}) {
         hasNextPage={hasNextPage}
       >
         <MasonryPhotoAlbum
-          photos={formattedPhotos(data?.pages ?? [])}
+          photos={photos}
           columns={columns}
           spacing={4}
           render={{
@@ -189,16 +213,15 @@ export default function PhotoGallaryTwo({}) {
         />
       </InfiniteScroll>
       <ImageView
-        photo={
-          imageIndex > -1 && formattedPhotos(data?.pages ?? [])[imageIndex]
-        }
+        photo={imageIndex > -1 && photos[imageIndex]}
         setImageIndex={setImageIndex}
       />
     </div>
   );
 }
 
-function PhotoWithAuthor({
+// Memoize the PhotoWithAuthor component to prevent unnecessary rerenders
+const PhotoWithAuthor = memo(function PhotoWithAuthor({
   context,
   handleImageIndex,
 }: {
@@ -209,6 +232,7 @@ function PhotoWithAuthor({
 
   const { data: userName, isLoading: isLoading } = useAuthorUsername(authorId);
   const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
+
   return (
     <PhotoOverlay
       setImageIndex={() => handleImageIndex(context)}
@@ -238,4 +262,6 @@ function PhotoWithAuthor({
       </div>
     </PhotoOverlay>
   );
-}
+});
+
+export default memo(PhotoGallaryTwo);
