@@ -13,6 +13,12 @@ import {
 import { useGalleryStore, GalleryTab } from "@/stores/galleryStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTransitionState } from "@/hooks/useTransitionState";
+import {
+  GlobeIcon,
+  UserIcon,
+  FlashIcon,
+  SearchIcon,
+} from "@/app/components/icons";
 
 interface NavBtnProps {
   text: "Explore" | "Following" | "Top" | "Search";
@@ -45,14 +51,32 @@ function TabBtn({ text }: NavBtnProps) {
     });
   }, [router, pathname, paramValue, isActive, setActiveTab, text]);
 
+  // Get the appropriate icon based on tab text
+  const getIcon = () => {
+    const iconColor = isActive ? "#F0F0F0" : "#5D5D5D";
+    switch (text) {
+      case "Explore":
+        return <GlobeIcon color={iconColor} width={16} height={16} />;
+      case "Following":
+        return <UserIcon color={iconColor} width={16} height={16} />;
+      case "Top":
+        return <FlashIcon color={iconColor} width={16} height={16} />;
+      case "Search":
+        return <SearchIcon color={iconColor} width={16} height={16} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="relative rounded-full cursor-pointer overflow-hidden">
       <button
         onClick={handleClick}
         className={`rounded-full px-4 py-2 text-sm md:text-base font-medium ${
-          isActive ? "bg-primary-10" : "text-primary-10 bg-opacity-0"
-        }`}
+          isActive ? "bg-primary-10" : "text-primary-6 bg-opacity-0"
+        } flex items-center gap-2`}
       >
+        {getIcon()}
         {text}
       </button>
 
