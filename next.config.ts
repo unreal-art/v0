@@ -1,5 +1,6 @@
-import {withSentryConfig} from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+import type { Event } from "@sentry/core";
 
 // Performance optimized config
 const nextConfig: NextConfig = {
@@ -99,34 +100,54 @@ const nextConfig: NextConfig = {
   pageExtensions: ["tsx", "ts", "jsx", "js", "mdx"],
 };
 
-export default withSentryConfig(nextConfig, {
-// For all available options, see:
-// https://www.npmjs.com/package/@sentry/webpack-plugin#options
+// Sentry configuration
+const sentryWebpackPluginOptions = {
+  // Additional options for the Sentry Webpack plugin
+  silent: !process.env.CI, // Only print logs for uploading source maps in CI
 
-org: "unreal-decenterai",
-project: "unreal",
+  // Organization and project settings
+  org: "unreal-decenterai",
+  project: "unreal",
 
-// Only print logs for uploading source maps in CI
-silent: !process.env.CI,
+  // Performance monitoring
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.2 : 1.0, // 20% in production, 100% in development
+  replaysSessionSampleRate: 0.1, // Record 10% of sessions
+  replaysOnErrorSampleRate: 1.0, // Record 100% of sessions with errors
 
-// For all available options, see:
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+  // Error tracking
+  attachStacktrace: true, // Attach stack traces to errors
+  normalizeDepth: 10, // Control object serialization depth
 
-// Upload a larger set of source maps for prettier stack traces (increases build time)
-widenClientFileUpload: true,
+  // Release tracking
+  release: {
+    name: process.env.NEXT_PUBLIC_BUILD_VERSION,
+    create: true,
+    finalize: true,
+  },
 
-// Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-// This can increase your server load as well as your hosting bill.
-// Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-// side errors will fail.
-tunnelRoute: "/monitoring",
+  // Upload a larger set of source maps for prettier stack traces
+  widenClientFileUpload: true,
 
-// Automatically tree-shake Sentry logger statements to reduce bundle size
-disableLogger: true,
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: "/monitoring",
 
-// Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-// See the following for more information:
-// https://docs.sentry.io/product/crons/
-// https://vercel.com/docs/cron-jobs
-automaticVercelMonitors: true,
-});
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+
+  // Enables automatic instrumentation of Vercel Cron Monitors
+  automaticVercelMonitors: true,
+
+  // Additional security and performance options
+  maxBreadcrumbs: 50, // Limit breadcrumb count
+  beforeSend(event: Event): Event {
+    // Sanitize any sensitive data before sending to Sentry
+    if (event.request?.headers) {
+      const headers = event.request.headers;
+      delete headers["Authorization"];
+      delete headers["Cookie"];
+    }
+    return event;
+  },
+};
+
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
