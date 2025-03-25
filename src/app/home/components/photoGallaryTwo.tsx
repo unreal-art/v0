@@ -92,7 +92,7 @@ function PhotoGallaryTwo({}) {
   const { id } = useParams();
   const a = searchParams.get("a");
 
-  // Move postId calculation into a useMemo to maintain consistent hook ordering
+  // Always calculate postId in the same way for consistent hook ordering
   const postId = useMemo(() => (id ? parseInt(id as string) : null), [id]);
   const { data: post } = usePost(postId);
 
@@ -101,6 +101,7 @@ function PhotoGallaryTwo({}) {
     async ({ pageParam = 0 }) => {
       let result: Post[] = [];
 
+      // Always call the appropriate function based on the value of 'a'
       if (a) {
         result = await getOtherIsDraftPostsByUser(
           supabase,
@@ -125,6 +126,17 @@ function PhotoGallaryTwo({}) {
     [a, postId, post?.author]
   );
 
+  // Use a stable query key that won't change structure between renders
+  const queryKey = useMemo(
+    () => [
+      "other_posts_by_user",
+      post?.author || "",
+      a ? "drafts" : "public",
+      postId,
+    ],
+    [post?.author, a, postId]
+  );
+
   const {
     isLoading,
     isError,
@@ -134,10 +146,7 @@ function PhotoGallaryTwo({}) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: [
-      "other_posts_by_user",
-      `${post?.author} "_" ${a} || "other_posts"`,
-    ],
+    queryKey,
     queryFn,
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
@@ -168,6 +177,13 @@ function PhotoGallaryTwo({}) {
     setImageIndex(context.index);
   }, []);
 
+  // Memoize formatted photos to prevent recalculation on each render
+  const photos = useMemo(
+    () => formattedPhotos(data?.pages ?? []),
+    [data?.pages]
+  );
+
+  // Early return after all hooks have been called
   if (isError) {
     return (
       <p className="wrapper">{"message" in error ? error.message : error}</p>
@@ -182,12 +198,6 @@ function PhotoGallaryTwo({}) {
   }
 
   if (!columns) return null;
-
-  // Memoize formatted photos to prevent recalculation on each render
-  const photos = useMemo(
-    () => formattedPhotos(data?.pages ?? []),
-    [data?.pages]
-  );
 
   return (
     <div className="w-full">
