@@ -7,6 +7,7 @@ import {
 import { supabase } from "$/supabase/client";
 import { Notification } from "$/types/data.types";
 import { dedupedRequest, normalizeEntity } from "@/utils/queryOptimizer";
+import { log, logError, logWarning } from "@/utils/sentryUtils";
 
 // Define the sender type properly
 interface UserProfile {
@@ -83,14 +84,12 @@ export const useNotifications = (userId: string | null) => {
           // console.log("Supabase error:", error);
 
           if (error) {
-            console.error("Supabase error fetching notifications:", error);
+            logError("Supabase error fetching notifications", error);
             throw error;
           }
 
           if (!data || !Array.isArray(data)) {
-            // console.warn(
-            //   "No data received from notifications query or data is not an array"
-            // );
+            // logWarning("No data received from notifications query or data is not an array");
             return {
               notifications: [],
               hasMore: false,
@@ -98,7 +97,7 @@ export const useNotifications = (userId: string | null) => {
             };
           }
 
-          //console.log("Received", data.length, "notifications");
+          //log("Received", { count: data.length, notificationsType: "notifications" });
 
           // Handle data safely
           const notificationsWithSenders: NotificationWithSender[] = [];
@@ -106,7 +105,7 @@ export const useNotifications = (userId: string | null) => {
           if (data && Array.isArray(data)) {
             // Process each notification and fetch sender data as needed
             for (const notification of data) {
-              // console.log(`Processing notification:`, notification);
+              // log("Processing notification", notification);
 
               // Create a safe copy without modifying the original
               const notificationCopy: NotificationWithSender = {
@@ -139,13 +138,10 @@ export const useNotifications = (userId: string | null) => {
                       normalizeEntity("users", { id: senderData.id });
                     }
                   } else {
-                    console.warn(
-                      "Could not fetch sender profile:",
-                      senderError,
-                    );
+                    logWarning("Could not fetch sender profile", senderError);
                   }
                 } catch (err) {
-                  console.error("Error fetching sender profile:", err);
+                  logError("Error fetching sender profile", err);
                 }
               }
 
@@ -154,7 +150,7 @@ export const useNotifications = (userId: string | null) => {
               if (notificationData.id) {
                 normalizeEntity(
                   "comments",
-                  notificationData as { id: string | number },
+                  notificationData as { id: string | number }
                 );
               }
 
@@ -163,7 +159,7 @@ export const useNotifications = (userId: string | null) => {
             }
           }
 
-          //  console.log("Processed notifications:", notificationsWithSenders);
+          // log("Processed notifications", notificationsWithSenders);
           const hasMore = (currentPage + 1) * pageSize < totalCount;
 
           return {
@@ -171,7 +167,7 @@ export const useNotifications = (userId: string | null) => {
             hasMore,
             totalCount,
           };
-        },
+        }
       );
     },
     getNextPageParam: (lastPage, pages) => {
@@ -184,14 +180,14 @@ export const useNotifications = (userId: string | null) => {
 
   // For debugging: log when the component mounts and when data changes
   useEffect(() => {
-    // console.log("Notifications hook mounted for userId:", userId);
+    // log("Notifications hook mounted for userId", userId);
     return () => {
-      // console.log("Notifications hook unmounted for userId:", userId);
+      // log("Notifications hook unmounted for userId", userId);
     };
   }, [userId]);
 
   useEffect(() => {
-    // console.log("Current notification data:", query.data);
+    // log("Current notification data", query.data);
   }, [query.data]);
 
   // Set up real-time subscription
@@ -242,7 +238,7 @@ export const useNotifications = (userId: string | null) => {
               queryKey: ["notifications", userId],
             });
           }
-        },
+        }
       )
       .subscribe();
 
@@ -297,9 +293,9 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
     queryFn: async (): Promise<number> => {
       if (!userId) return 0;
 
-      // console.log(
-      //   "[useUnreadNotificationsCount] Fetching count for userId:",
-      //   userId,
+      // log(
+      //   "[useUnreadNotificationsCount] Fetching count for userId",
+      //   { userId }
       // );
 
       // Use deduplication for count queries
@@ -313,14 +309,11 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
           .eq("is_read", false);
 
         if (error) {
-          console.error(
-            "[useUnreadNotificationsCount] Error fetching count:",
-            error,
-          );
+          logError("[useUnreadNotificationsCount] Error fetching count", error);
           throw error;
         }
 
-        // console.log("[useUnreadNotificationsCount] Count result:", count);
+        // log("[useUnreadNotificationsCount] Count result", { count });
         return count || 0;
       });
     },
@@ -333,7 +326,7 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
   useEffect(() => {
     if (!userId) return;
 
-    // console.log(
+    // log(
     //   "[useUnreadNotificationsCount] Setting up real-time subscription"
     // );
 
@@ -349,8 +342,8 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          // console.log(
-          //   "[useUnreadNotificationsCount] Received change:",
+          // log(
+          //   "[useUnreadNotificationsCount] Received change",
           //   payload
           // );
 
@@ -359,16 +352,17 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
           queryClient.invalidateQueries({
             queryKey: ["notificationsCount", userId],
           });
-        },
+        }
       )
       .subscribe((status) => {
-        // console.log(
-        //   `[useUnreadNotificationsCount] Subscription status: ${status}`
+        // log(
+        //   `[useUnreadNotificationsCount] Subscription status`,
+        //   { status }
         // );
       });
 
     return () => {
-      //console.log("[useUnreadNotificationsCount] Removing channel");
+      //log("[useUnreadNotificationsCount] Removing channel");
       supabase.removeChannel(channel);
     };
   }, [userId, queryClient]);
@@ -377,7 +371,7 @@ export const useUnreadNotificationsCount = (userId: string | null) => {
 
   // Log every time the count changes
   // useEffect(() => {
-  //  // console.log("[useUnreadNotificationsCount] Current count:", count);
+  //  // log("[useUnreadNotificationsCount] Current count", { count });
   // }, [count]);
 
   return count;
@@ -404,7 +398,7 @@ export const useCountShareNotifications = (post_id: number | null) => {
 
           if (error) throw error;
           return count || 0;
-        },
+        }
       );
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
@@ -431,14 +425,14 @@ export const useCountShareNotifications = (post_id: number | null) => {
           // Optimistic increment for better UX
           queryClient.setQueryData(
             ["shareNotificationsCount", post_id],
-            (oldCount: number | undefined) => (oldCount || 0) + 1,
+            (oldCount: number | undefined) => (oldCount || 0) + 1
           );
 
           // Still invalidate to get actual data
           queryClient.invalidateQueries({
             queryKey: ["shareNotificationsCount", post_id],
           });
-        },
+        }
       )
       .subscribe();
 
@@ -453,7 +447,7 @@ export const useCountShareNotifications = (post_id: number | null) => {
 
     queryClient.setQueryData(
       ["shareNotificationsCount", post_id],
-      (oldCount: number | undefined) => (oldCount || 0) + 1,
+      (oldCount: number | undefined) => (oldCount || 0) + 1
     );
   }, [post_id, queryClient]);
 

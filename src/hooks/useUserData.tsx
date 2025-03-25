@@ -8,6 +8,7 @@ import {
 } from "@/utils/queryOptimizer";
 import { useCallback, useMemo } from "react";
 import { useUser } from "./useUser";
+import { log } from "@/utils/sentryUtils";
 
 // Define the user type to make the hook more type-safe
 interface UserData {
@@ -70,11 +71,11 @@ export default function useUserData(profileId: string | undefined | null) {
       if (!profileId) return;
 
       // Log current data and updates for debugging
-      console.log(
-        "Current data in cache:",
+      log(
+        "Current data in cache",
         queryClient.getQueryData(["profile_data", profileId])
       );
-      console.log("Applying updates:", updates);
+      log("Applying updates", updates);
 
       // Filter updates to only include valid database fields plus UI fields
       const validDatabaseFields = ["full_name", "display_name", "bio"];
@@ -114,7 +115,7 @@ export default function useUserData(profileId: string | undefined | null) {
             ...enhancedUpdates,
           };
 
-          console.log("New data after merge:", newData);
+          log("New data after merge", newData);
 
           // Update normalized entity cache too
           normalizeEntity("users", {

@@ -10,6 +10,7 @@ import {
   normalizeEntity,
   updateEntity,
 } from "@/utils/queryOptimizer";
+import { logError } from "@/utils/sentryUtils";
 
 // Define extended comment type that includes user data
 interface ExtendedComment extends CommentWithUser {
@@ -302,7 +303,7 @@ export function useRealtimeReplies(parentId: string) {
 // ✅ Optimistic Like
 export function useLikeComment(postId: string) {
   const queryClient = useQueryClient();
-  // console.log(postId);
+  // log("Processing like comment for post", { postId });
   return useMutation({
     mutationFn: async (commentId: string) => {
       await axios.post("/api/comments/like", { comment_id: commentId });
@@ -311,7 +312,7 @@ export function useLikeComment(postId: string) {
       await queryClient.cancelQueries({ queryKey: ["comments", postId] });
 
       const previousComments = queryClient.getQueryData(["comments", postId]);
-      // console.log(previousComments, "previous");
+      // log("Previous comments state", previousComments);
       queryClient.setQueryData(
         ["comments", postId],
         (oldData: CommentWithUser[]) => {
@@ -331,7 +332,7 @@ export function useLikeComment(postId: string) {
       return { previousComments };
     },
     onError: (_err, _commentId, context) => {
-      console.log(_err, "error");
+      logError("Error liking comment", _err);
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["comments", postId],
@@ -379,6 +380,7 @@ export function useUnlikeComment(postId: string) {
       return { previousComments };
     },
     onError: (_err, _commentId, context) => {
+      logError("Error unliking comment", _err);
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["comments", postId],
@@ -395,7 +397,7 @@ export function useUnlikeComment(postId: string) {
 // ✅ Optimistic Like
 export function useLikeReply(postId: string, parentId: string) {
   const queryClient = useQueryClient();
-  // console.log(postId);
+  // log("Processing like reply for post", { postId });
   return useMutation({
     //reply is also a comment
     mutationFn: async (commentId: string) => {
@@ -405,7 +407,7 @@ export function useLikeReply(postId: string, parentId: string) {
       await queryClient.cancelQueries({ queryKey: ["replies", parentId] });
 
       const previousComments = queryClient.getQueryData(["replies", parentId]);
-      // console.log(previousComments, "previous");
+      // log("Previous replies state", previousComments);
       queryClient.setQueryData(
         ["replies", parentId],
         (oldData: CommentWithUser[]) => {
@@ -425,7 +427,7 @@ export function useLikeReply(postId: string, parentId: string) {
       return { previousComments };
     },
     onError: (_err, _commentId, context) => {
-      console.log(_err, "error");
+      logError("Error liking reply", _err);
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["replies", parentId],
@@ -473,6 +475,7 @@ export function useUnlikeReply(postId: string, parentId: string) {
       return { previousComments };
     },
     onError: (_err, _commentId, context) => {
+      logError("Error unliking reply", _err);
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["replies", parentId],

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toggleFollow from "@/queries/user/toggleFollow";
 import { useCallback } from "react";
+import { logError } from "@/utils/sentryUtils";
 
 interface FollowStats {
   followeeCount: number;
@@ -90,7 +91,7 @@ export const useToggleFollow = () => {
     },
 
     onError: (error, { followerId, followeeId }, context) => {
-      console.error("Error toggling follow status:", error);
+      logError("Error toggling follow status", error);
 
       // Rollback to previous values on error
       if (context?.previousFollowStatus !== undefined) {

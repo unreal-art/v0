@@ -24,6 +24,7 @@ import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
 import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
+import { log, logError } from "@/utils/sentryUtils";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
@@ -37,7 +38,7 @@ const dartContract = getContractInstance(
 // This is a placeholder - you would need to implement the actual function
 const getFollowerIds = async (userId: string): Promise<string[]> => {
   // In a real implementation, you would fetch follower IDs from your API
-  console.log(`Fetching followers for user ${userId}`);
+  log(`Fetching followers for user ${userId}`);
   return []; // Return empty array for now
 };
 
@@ -97,7 +98,7 @@ export default function UserData() {
             prefetchUserData(queryClient, followerId);
           });
         } catch (error) {
-          console.error("Error prefetching followers:", error);
+          logError("Error prefetching followers", error);
         }
       };
 
@@ -119,7 +120,7 @@ export default function UserData() {
   //     await updateViewedProfile(profileId, { bio: newBio });
   //   } catch (error) {
   //     const err = error as Error;
-  //     console.error("Failed to update bio:", err.message);
+  //     logError("Failed to update bio", err);
   //     // The UI will automatically revert if the mutation fails
   //   }
   // };

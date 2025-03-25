@@ -7,6 +7,7 @@ import {
   updatePostInQueries,
 } from "@/utils/queryOptimizer";
 import { useCallback, useEffect } from "react";
+import { logError } from "@/utils/sentryUtils";
 
 // Enhanced hook for fetching pinned posts with optimized caching
 export function usePinnedPosts(userId: string) {
@@ -30,7 +31,7 @@ export function usePinnedPosts(userId: string) {
         }
       }
     } catch (error) {
-      console.error("Error retrieving cached pinned posts:", error);
+      logError("Error retrieving cached pinned posts", error);
     }
   }, [userId, queryClient]);
 
@@ -58,7 +59,7 @@ export function usePinnedPosts(userId: string) {
             })
           );
         } catch (error) {
-          console.error("Error caching pinned posts:", error);
+          logError("Error caching pinned posts", error);
         }
 
         return posts || [];
@@ -137,7 +138,7 @@ export function useIsPostPinned(postId: number, userId: string) {
           .single();
 
         if (error && error.code !== "PGRST116") {
-          console.error("Error checking post pin:", error.message);
+          logError("Error checking post pin", error);
           return false;
         }
 

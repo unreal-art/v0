@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
 import { Notification } from "$/types/data.types";
 import { useUser } from "@/hooks/useUser";
+import { log, logError } from "@/utils/sentryUtils";
 
 export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
@@ -9,9 +10,9 @@ export const useMarkNotificationAsRead = () => {
 
   return useMutation<void, Error, string>({
     mutationFn: async (notificationId) => {
-      // console.log(
-      //   "[useMarkNotificationAsRead] Marking notification as read:",
-      //   notificationId
+      // log(
+      //   "[useMarkNotificationAsRead] Marking notification as read",
+      //   { notificationId }
       // );
 
       const { error } = await supabase
@@ -20,22 +21,22 @@ export const useMarkNotificationAsRead = () => {
         .eq("id", notificationId);
 
       if (error) {
-        // console.error("[useMarkNotificationAsRead] Error:", error);
+        // logError("[useMarkNotificationAsRead] Error", error);
         throw error;
       }
 
-      // console.log("[useMarkNotificationAsRead] Successfully marked as read");
+      // log("[useMarkNotificationAsRead] Successfully marked as read");
     },
 
     onSuccess: () => {
-      // console.log("[useMarkNotificationAsRead] Mutation succeeded");
+      // log("[useMarkNotificationAsRead] Mutation succeeded");
 
       // IMPORTANT: Invalidate the notifications count for the current user
       if (userId) {
         // Use the correct query key to match the one in useUnreadNotificationsCount
-        // console.log(
-        //   "[useMarkNotificationAsRead] Invalidating count for userId:",
-        //   userId
+        // log(
+        //   "[useMarkNotificationAsRead] Invalidating count for userId",
+        //   { userId }
         // );
         queryClient.invalidateQueries({
           queryKey: ["notificationsCount", userId],
@@ -49,9 +50,9 @@ export const useMarkNotificationAsRead = () => {
     },
 
     onError: (error) => {
-      // console.error(
-      //   "[useMarkNotificationAsRead] Failed to mark notification as read:",
-      //   error,
+      // logError(
+      //   "[useMarkNotificationAsRead] Failed to mark notification as read",
+      //   error
       // );
     },
   });
