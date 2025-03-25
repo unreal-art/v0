@@ -13,7 +13,9 @@ Sentry.init({
 
   // Explicitly disable the feedback widget
   integrations: [
-    // No integrations - removed all including replay and feedback
+    Sentry.feedbackIntegration({
+      autoInject: false, // This prevents the button from being automatically injected
+    }),
   ],
 
   // Reduce sampling rate for better performance
