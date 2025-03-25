@@ -1,9 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { logError } from "@/utils/sentryUtils";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || "", // Service role key (used ONLY in backend)
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "" // Service role key (used ONLY in backend)
 );
 
 export async function DELETE(req: Request) {
@@ -11,9 +12,10 @@ export async function DELETE(req: Request) {
     const { userId, token } = await req.json();
 
     if (!userId || !token) {
+      logError("Account deletion missing required fields", { userId });
       return NextResponse.json(
         { error: "User ID and token are required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -21,13 +23,18 @@ export async function DELETE(req: Request) {
     const supabaseAuthClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || "",
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-      { global: { headers: { Authorization: `Bearer ${token}` } } },
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
     );
 
     const { data: user, error: authError } =
       await supabaseAuthClient.auth.getUser();
 
     if (authError || user?.user?.id !== userId) {
+      logError("Unauthorized account deletion attempt", {
+        userId,
+        authError,
+        authenticatedUserId: user?.user?.id,
+      });
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -46,18 +53,21 @@ export async function DELETE(req: Request) {
     await supabaseAdmin.from("profiles").delete().eq("id", userId);
 
     // Delete the user from Supabase Auth
-    const { error: deleteError } =
-      await supabaseAdmin.auth.admin.deleteUser(userId);
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
+      userId
+    );
 
     if (deleteError) {
+      logError("Error deleting user from Supabase Auth", deleteError);
       throw deleteError;
     }
 
     return NextResponse.json(
       { message: "User deleted successfully" },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error: any) {
+    logError("Account deletion failed", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

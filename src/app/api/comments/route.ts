@@ -1,25 +1,8 @@
 import { createClient } from "$/supabase/server";
 import { NextResponse } from "next/server";
+import { logError, logWarning } from "@/utils/sentryUtils";
 
-// ✅ Fetch all comments for a post
-// export async function GET(req: Request) {
-//   const supabase = await createClient();
 
-//   const { searchParams } = new URL(req.url);
-//   const postId = searchParams.get("postId");
-
-//   if (!postId)
-//     return NextResponse.json({ error: "Missing postId" }, { status: 400 });
-
-//   const { data, error } = await supabase.rpc("get_comments_with_users", {
-//     _post_id: Number(postId),
-//   });
-//   console.log(error);
-//   if (error)
-//     return NextResponse.json({ error: error.message }, { status: 500 });
-
-//   return NextResponse.json(data);
-// }
 
 // ✅ Fetch comments with like count
 export async function GET(req: Request) {
@@ -27,8 +10,10 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const postId = searchParams.get("postId");
 
-  if (!postId)
+  if (!postId) {
+    logWarning("Comments GET request missing postId");
     return NextResponse.json({ error: "Missing postId" }, { status: 400 });
+  }
 
   const user = await supabase.auth.getUser();
 
@@ -37,10 +22,14 @@ export async function GET(req: Request) {
     current_user_id: user?.data?.user?.id as string,
   });
 
-  // console.log(error);
-
-  if (error)
+  if (error) {
+    logError("Error fetching comments with likes", {
+      error,
+      postId,
+      userId: user?.data?.user?.id,
+    });
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return NextResponse.json(data);
 }
@@ -49,19 +38,38 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const supabase = await createClient();
 
-  const { post_id, content, parent_id } = await req.json();
-  const { data: user } = await supabase.auth.getUser();
+  try {
+    const { post_id, content, parent_id } = await req.json();
+    const { data: user } = await supabase.auth.getUser();
 
-  if (!user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user || !user.user) {
+      logWarning("Unauthorized comment POST attempt");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const { data, error } = await supabase
-    .from("comments")
-    .insert([{ post_id, user_id: user.user?.id as string, content, parent_id }])
-    .select();
+    if (!post_id) {
+      logWarning("Comment POST missing post_id", { userId: user.user.id });
+      return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
+    }
 
-  if (error)
+    const { data, error } = await supabase
+      .from("comments")
+      .insert([{ post_id, user_id: user.user.id, content, parent_id }])
+      .select();
+
+    if (error) {
+      logError("Error creating comment", {
+        error,
+        post_id,
+        user_id: user.user.id,
+        parent_id,
+      });
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (error: any) {
+    logError("Unexpected error in comment POST", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
-
-  return NextResponse.json(data);
+  }
 }
