@@ -9,20 +9,41 @@ Sentry.init({
 
   // Add optional integrations for additional features
   integrations: [
-    Sentry.replayIntegration(),
+    Sentry.replayIntegration({
+      // Optimize replay configuration
+      blockAllMedia: true, // Block recording all media (images, videos)
+      maskAllText: true, // Mask all text inputs by default
+    }),
+    Sentry.feedbackIntegration({
+      disabled: true, // removes the bug cacher ui from the page
+    }),
   ],
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+  // Reduce sampling rate for better performance
+  // 10% of transactions will be captured instead of 100%
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 0.3,
 
-  // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+  // Optimize replay sampling rates
+  // Only capture 1% of sessions in production, 10% in development
+  replaysSessionSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 0.1,
 
-  // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
+  // Capture less error sessions in production (30% instead of 100%)
+  replaysOnErrorSampleRate: process.env.NODE_ENV === "production" ? 0.3 : 1.0,
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  // Add performance optimizations
+  // Don't block page load while sending events
+  beforeSend(event) {
+    // Ignore non-critical errors automatically
+    if (event.level === "info" && process.env.NODE_ENV === "production") {
+      return null;
+    }
+    return event;
+  },
+
+  // Optimize transport with batching
+  maxBreadcrumbs: 50, // Reduce from default 100
+  sendClientReports: false, // Disable client reports
 });

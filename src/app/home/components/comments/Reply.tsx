@@ -3,7 +3,7 @@ import { HeartFillIcon, HeartIcon } from "@/app/components/icons";
 import { CommentWithUser } from "$/types/data.types";
 import { timeAgo } from "@/app/libs/timeAgo";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
-import Image from "next/image";
+import OptimizedImage from "@/components/OptimizedImage";
 import {
   useLikeComment,
   useLikeReply,
@@ -15,9 +15,9 @@ import {
 
 export default function Reply({
   data,
-  // setReplyTo,
-  // setCommentToReply,
-}: {
+}: // setReplyTo,
+// setCommentToReply,
+{
   data: CommentWithUser;
   // setReplyTo: (data: CommentWithUser | null) => void;
   // setCommentToReply: (data: CommentWithUser) => void;
@@ -25,11 +25,11 @@ export default function Reply({
   const { data: user } = useAuthorUsername(data.user_id);
   const likeReply = useLikeReply(
     data.post_id.toString(),
-    data.parent_id as string,
+    data.parent_id as string
   );
   const unlikeReply = useUnlikeReply(
     data.post_id.toString(),
-    data.parent_id as string,
+    data.parent_id as string
   );
 
   return (
@@ -37,12 +37,14 @@ export default function Reply({
       <div className=" gap-2 py-2  border-primary-10">
         <div className="flex w-full  gap-2">
           <div className="h-12 w-12">
-            <Image
+            <OptimizedImage
               src={data.avatar_url || "/profile.jpg"}
               width={48}
               height={48}
-              alt="profile"
+              alt={`${user || "User"}'s profile picture`}
               className="rounded-full"
+              trackPerformance={true}
+              imageName={`reply-avatar-${data.user_id}`}
             />
           </div>
           <div className="w-full">

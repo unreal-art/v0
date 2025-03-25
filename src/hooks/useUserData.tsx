@@ -8,7 +8,7 @@ import {
 } from "@/utils/queryOptimizer";
 import { useCallback, useMemo } from "react";
 import { useUser } from "./useUser";
-import { log } from "@/utils/sentryUtils";
+import { log, startSpan } from "@/utils/sentryUtils";
 
 // Define the user type to make the hook more type-safe
 export interface UserData {
@@ -41,13 +41,31 @@ export default function useUserData(profileId: string | undefined | null) {
     queryFn: async () => {
       if (!profileId) return null;
 
-      // Try to get from normalized entity cache first
-      const cachedUser = getEntity("users", profileId);
-      if (cachedUser) return cachedUser as UserData;
+      // Start tracking performance
+      const finishSpan = startSpan("getUserData", "data-fetching", {
+        profileId,
+      });
 
-      // Use request deduplication to prevent duplicate API calls
-      return dedupedRequest(`user-profile-${profileId}`, async () => {
-        const userData = await getUserById(profileId, supabase);
+      try {
+        // Try to get from normalized entity cache first
+        const cachedUser = getEntity("users", profileId);
+        if (cachedUser) {
+          finishSpan();
+          return cachedUser as UserData;
+        }
+
+        // Use request deduplication to prevent duplicate API calls
+        const userData = await dedupedRequest(
+          `user-profile-${profileId}`,
+          async () => {
+            const fetchSpan = startSpan("getUserById", "database-query", {
+              profileId,
+            });
+            const result = await getUserById(profileId, supabase);
+            fetchSpan();
+            return result;
+          }
+        );
 
         if (userData) {
           // Store in normalized cache for efficient reuse across components
@@ -57,8 +75,13 @@ export default function useUserData(profileId: string | undefined | null) {
           });
         }
 
+        finishSpan();
         return userData as UserData;
-      });
+      } catch (error) {
+        // Make sure we finish the span even if there's an error
+        finishSpan();
+        throw error;
+      }
     },
     enabled: !!profileId, // Ensures query only runs if profileId exists
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
@@ -70,6 +93,15 @@ export default function useUserData(profileId: string | undefined | null) {
   const updateUserDataOptimistically = useCallback(
     (updates: Partial<UserData>) => {
       if (!profileId) return;
+
+      const finishSpan = startSpan(
+        "updateUserDataOptimistically",
+        "client-update",
+        {
+          profileId,
+          updateFields: Object.keys(updates),
+        }
+      );
 
       // Log current data and updates for debugging
       log(
@@ -122,6 +154,8 @@ export default function useUserData(profileId: string | undefined | null) {
           return newData;
         }
       );
+
+      finishSpan();
     },
     [profileId, queryClient]
   );
@@ -150,14 +184,23 @@ export const prefetchUserData = async (
 ) => {
   if (!userId) return;
 
+  const finishSpan = startSpan("prefetchUserData", "prefetching", { userId });
+
   // Don't prefetch if already in cache
-  if (queryClient.getQueryData(["profile_data", userId])) return;
+  if (queryClient.getQueryData(["profile_data", userId])) {
+    finishSpan();
+    return;
+  }
 
   return queryClient.prefetchQuery({
     queryKey: ["profile_data", userId],
     queryFn: async () => {
       return dedupedRequest(`user-profile-${userId}`, async () => {
+        const fetchSpan = startSpan("getUserById", "database-query", {
+          userId,
+        });
         const userData = await getUserById(userId, supabase);
+        fetchSpan();
 
         if (userData) {
           // Store in normalized cache
@@ -167,6 +210,7 @@ export const prefetchUserData = async (
           });
         }
 
+        finishSpan();
         return userData as UserData;
       });
     },

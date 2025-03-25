@@ -7,9 +7,25 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: "https://52a47ad954fe8d72ef8330abd1980242@o4509038822031360.ingest.us.sentry.io/4509038936064000",
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+  // Reduce sampling rate for better performance - only sample 10% of server transactions
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 0.3,
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  // Disable debug mode in all environments
   debug: false,
+
+  // Optimize performance
+  maxBreadcrumbs: 50, // Reduce from default 100
+  initialScope: {
+    tags: {
+      environment: process.env.NODE_ENV || "development",
+    },
+  },
+
+  // Filter out non-critical errors in production
+  beforeSend(event) {
+    if (event.level === "info" && process.env.NODE_ENV === "production") {
+      return null;
+    }
+    return event;
+  },
 });

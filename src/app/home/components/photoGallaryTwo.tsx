@@ -31,14 +31,22 @@ import {
   getPostsByUser,
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
+import OptimizedImage from "@/components/OptimizedImage";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 8;
+
+  // Extract image name for tracking
+  const imageName =
+    typeof photo === "object" && photo !== null && "src" in photo
+      ? String(photo.src).split("/").pop()?.split("?")[0] ||
+        `gallery-img-${index}`
+      : `gallery-img-${index}`;
 
   return (
     <div
@@ -48,16 +56,17 @@ function renderNextImage(
         aspectRatio: `${width} / ${height}`,
       }}
     >
-      <Image
+      <OptimizedImage
         fill
         src={photo}
-        alt={alt}
+        alt={alt || "Gallery image"}
         title={title}
         sizes={sizes}
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
-        data-index={index} // Add index as data attribute for debugging
+        trackPerformance={true}
+        imageName={imageName}
       />
     </div>
   );
@@ -97,14 +106,14 @@ export default function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          post?.author,
+          post?.author
         );
       } else {
         result = await getOtherPostsByUser(
           supabase,
           pageParam,
           Number(postId),
-          post?.author,
+          post?.author
         );
       }
 
@@ -210,12 +219,14 @@ function PhotoWithAuthor({
           <>
             <div className="rounded-full">
               {image ? (
-                <Image
+                <OptimizedImage
                   className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
                   src={image}
                   width={24}
                   height={24}
-                  alt="profile"
+                  alt={`${userName}'s profile picture`}
+                  trackPerformance={true}
+                  imageName={`profile-${authorId}`}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar

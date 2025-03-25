@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState, memo, useMemo } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import OptimizedImage from "@/components/OptimizedImage";
 
 import { usePathname } from "next/navigation";
 
@@ -89,13 +90,15 @@ function NavLink({ href, text, icon }: NavLinkProps) {
           <>
             {!loading ? (
               <div className="w-8 h-8 rounded-full overflow-hidden will-change-transform">
-                <Image
+                <OptimizedImage
                   src={user?.avatar_url || "/profile.jpg"}
-                  alt="profile"
+                  alt="User profile"
                   width={32}
                   height={32}
                   className="rounded-full object-cover"
                   priority
+                  trackPerformance={true}
+                  imageName="nav-profile-avatar"
                 />
               </div>
             ) : (

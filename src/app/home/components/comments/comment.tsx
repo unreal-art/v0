@@ -13,12 +13,13 @@ import {
 import Reply from "./Reply";
 import { useState } from "react";
 import { formatNumber } from "@/utils";
+import OptimizedImage from "@/components/OptimizedImage";
 
 export default function Comment({
   data,
   setReplyTo,
-  // setCommentToReply,
-}: {
+}: // setCommentToReply,
+{
   data: CommentWithUser;
   setReplyTo: (data: CommentWithUser | null) => void;
   // setCommentToReply: (data: CommentWithUser) => void;
@@ -35,12 +36,14 @@ export default function Comment({
     <div className=" gap-2 py-2  border-primary-10">
       <div className="flex w-full  gap-2">
         <div className="h-12 w-12">
-          <Image
+          <OptimizedImage
             src={data.avatar_url || "/profile.jpg"}
             width={48}
             height={48}
-            alt="profile"
+            alt={`${user || "User"}'s profile picture`}
             className="rounded-full"
+            trackPerformance={true}
+            imageName={`comment-avatar-${data.user_id}`}
           />
         </div>
         <div className="w-full">
