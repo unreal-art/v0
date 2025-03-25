@@ -4,6 +4,7 @@ import { createClient } from "$/supabase/server";
 import { generateEthereumWallet } from "@/utils";
 import { Client } from "$/supabase/client";
 import { ExtendedUser } from "$/types/data.types";
+import { logError } from "@/utils/sentryUtils";
 
 export const getUser = async (
   client?: Client
@@ -14,6 +15,7 @@ export const getUser = async (
   const { data: userData, error } = await authClient.auth.getUser();
 
   if (error) {
+    logError("Error fetching auth user", error);
     return null;
   }
 
@@ -24,13 +26,13 @@ export const getUser = async (
     .eq("id", userData?.user?.id);
 
   if (profileError) {
+    logError("Error fetching user profile data", profileError);
     return null;
   }
 
   //check if user has a wallet
   if (!profileData[0].wallet) {
     const wallet = generateEthereumWallet();
-    console.log(wallet);
 
     const { error: walletError } = await supabase
       .from("profiles")
@@ -39,6 +41,7 @@ export const getUser = async (
       .single(); // Ensures only one row is returned
 
     if (walletError) {
+      logError("Error updating user wallet", walletError);
       return null;
     }
   }

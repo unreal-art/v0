@@ -1,22 +1,29 @@
 import { supabase } from "$/supabase/client";
+import { logError } from "@/utils/sentryUtils";
 
-const doesUserFollow = async (followerId: string, followeeId: string) => {
-  if (!followerId || !followeeId) return false; // Prevent unnecessary calls
+// Check if one user follows another
+const doesUserFollow = async (
+  followerId: string,
+  followeeId: string
+): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from("follows")
+      .select("*")
+      .eq("follower_id", followerId)
+      .eq("followee_id", followeeId)
+      .single();
 
-  const { data, error } = await supabase
-    .from("follows")
-    .select("*")
-    .eq("follower_id", followerId)
-    .eq("followee_id", followeeId)
-    .single(); // Retrieve a single record
+    if (error && error.code !== "PGRST116") {
+      logError("Error checking follow relationship", error);
+      return false;
+    }
 
-  if (error) {
-    if (error.code === "PGRST116") return false; // No follow relationship found
-    console.error("Error checking follow relationship:", error.message);
+    return !!data;
+  } catch (error) {
+    logError("Error in doesUserFollow", error);
     return false;
   }
-
-  return !!data; // Return true if follow relationship exists
 };
 
 export default doesUserFollow;

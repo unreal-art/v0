@@ -1,10 +1,11 @@
 import { supabase } from "$/supabase/client";
 import { addNotification } from "./addNotification";
+import { log, logError } from "@/utils/sentryUtils";
 
 export async function likePost(
   postId: number,
   userId: string,
-  postAuthor: string,
+  postAuthor: string
 ) {
   try {
     // Check if a like already exists
@@ -17,7 +18,7 @@ export async function likePost(
 
     if (fetchError && fetchError.code !== "PGRST116") {
       // Ignore 'not found' errors (code PGRST116 indicates no rows found)
-      console.error("Error fetching like:", fetchError);
+      logError("Error fetching like", fetchError);
       return false;
     }
 
@@ -29,11 +30,9 @@ export async function likePost(
         .eq("id", existingLike.id); // Delete by primary key
 
       if (deleteError) {
-        console.error("Error deleting like:", deleteError);
+        logError("Error deleting like", deleteError);
         return false;
       }
-
-      console.log("Like removed");
     } else {
       // Like does not exist, add it
       const { error: insertError } = await supabase.from("likes").insert([
@@ -45,7 +44,7 @@ export async function likePost(
       ]);
 
       if (insertError) {
-        console.error("Error adding like:", insertError);
+        logError("Error adding like", insertError);
         return false;
       }
 
@@ -56,13 +55,11 @@ export async function likePost(
         postId,
         type: "like",
       });
-
-      console.log("Like added");
     }
 
     return true;
   } catch (err) {
-    console.error("An unexpected error occurred:", err);
+    logError("An unexpected error occurred", err);
     return false;
   }
 }

@@ -1,9 +1,10 @@
 import { Client } from "$/supabase/client";
 import { Like } from "$/types/data.types";
+import { logError } from "@/utils/sentryUtils";
 
 export const getPostLikes = async (
   postId: number,
-  client: Client,
+  client: Client
 ): Promise<Like[] | null> => {
   const { data, error } = await client
     .from("likes")
@@ -11,7 +12,7 @@ export const getPostLikes = async (
     .eq("post_id", postId);
 
   if (error) {
-    console.error("Error fetching likes:", error);
+    logError("Error fetching post likes", error);
     return null;
   }
 

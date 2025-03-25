@@ -1,6 +1,7 @@
 import { createClient } from "$/supabase/server";
 // import { generateEthereumWallet } from "$/utils";
 import { Client } from "$/supabase/client";
+import { logError } from "@/utils/sentryUtils";
 
 //client user getter , no wallet gen
 export const fetchUser = async (client?: Client) => {
@@ -10,6 +11,7 @@ export const fetchUser = async (client?: Client) => {
   const { data: userData, error } = await authClient.auth.getUser();
 
   if (error) {
+    logError("Error fetching auth user", error);
     return null;
   }
 
@@ -20,21 +22,23 @@ export const fetchUser = async (client?: Client) => {
     .eq("id", userData?.user?.id);
 
   if (profileError) {
+    logError("Error fetching user profile", profileError);
     return null;
   }
 
   // //check if user has a wallet
   // if (!profileData[0].wallet) {
   //   const wallet = generateEthereumWallet();
-  //   console.log(wallet);
-
+  //   // logError("Generated wallet", wallet);
+  //
   //   const { error: walletError } = await supabase
   //     .from("profiles")
   //     .update({ wallet }) // Set new wallet
   //     .eq("id", profileData[0].id) // Where the user_id matches
   //     .single(); // Ensures only one row is returned
-
+  //
   //   if (walletError) {
+  //     logError("Error updating wallet", walletError);
   //     return null;
   //   }
   // }

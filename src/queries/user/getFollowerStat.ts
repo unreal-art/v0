@@ -1,12 +1,13 @@
 import { Client } from "$/supabase/client";
 import { FollowStats } from "$/types/data.types";
+import { logWarning, logError } from "@/utils/sentryUtils";
 
 export const getFollowStats = async (
   userId: string | undefined,
-  client: Client,
+  client: Client
 ): Promise<FollowStats> => {
   if (!userId) {
-    console.warn("⚠️ No userId provided. Returning default stats.");
+    logWarning("No userId provided. Returning default stats");
     return { followeeCount: 0, followerCount: 0 };
   }
 
@@ -18,9 +19,9 @@ export const getFollowStats = async (
       .eq("follower_id", userId);
 
     if (followerError) {
-      console.error("❌ Supabase follower count error:", followerError);
+      logError("Supabase follower count error", followerError);
       throw new Error(
-        `Error fetching follower count: ${followerError.message}`,
+        `Error fetching follower count: ${followerError.message}`
       );
     }
 
@@ -31,9 +32,9 @@ export const getFollowStats = async (
       .eq("followee_id", userId);
 
     if (followeeError) {
-      console.error("❌ Supabase followee count error:", followeeError);
+      logError("Supabase followee count error", followeeError);
       throw new Error(
-        `Error fetching followee count: ${followeeError.message}`,
+        `Error fetching followee count: ${followeeError.message}`
       );
     }
 
@@ -42,7 +43,7 @@ export const getFollowStats = async (
       followeeCount: followeeCount || 0,
     };
   } catch (error) {
-    console.error("❌ Server error in getFollowStats:", error);
+    logError("Server error in getFollowStats", error);
     throw error;
   }
 };

@@ -1,5 +1,6 @@
 import { supabase } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
+import { logError, logWarning } from "@/utils/sentryUtils";
 
 export type ProfileWithPosts = {
   id: string;
@@ -41,7 +42,7 @@ export const searchUsersPaginated = async (
     .range(start, end);
 
   if (error) {
-    console.error("Supabase search error:", error.message);
+    logError("Supabase user search error", error);
     throw new Error(error.message);
   }
   // Transform data to match `ProfileWithPosts` type
@@ -62,7 +63,9 @@ export const searchUsersPaginated = async (
               try {
                 return JSON.parse(post.ipfsImages) as UploadResponse[];
               } catch {
-                console.warn("Failed to parse ipfsImages:", post.ipfsImages);
+                logWarning("Failed to parse ipfsImages", {
+                  ipfsImages: post.ipfsImages,
+                });
                 return null;
               }
             }

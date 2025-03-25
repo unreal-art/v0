@@ -3,6 +3,7 @@ import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance";
 import axios from "axios";
 import random from "random";
 import { toast } from "sonner";
+import { logError } from "@/utils/sentryUtils";
 
 // Function to send job request (Fire-and-Forget)
 export const sendJobRequest = ({
@@ -15,11 +16,17 @@ export const sendJobRequest = ({
   stopGeneration: () => void;
 }) => {
   if (!user) {
-    console.error("User is undefined, cannot send job request.");
+    logError(
+      "User is undefined, cannot send job request",
+      new Error("No user")
+    );
     return;
   }
   if (!user.wallet?.privateKey) {
-    console.error("Missing private key, cannot proceed.");
+    logError(
+      "Missing private key, cannot proceed",
+      new Error("No private key")
+    );
     return;
   }
 
@@ -54,12 +61,9 @@ export const sendJobRequest = ({
     stopGeneration();
     toast.error(
       "Error sending job request:",
-      error.response?.data || error.message,
+      error.response?.data || error.message
     );
-    console.error(
-      "Error sending job request:",
-      error.response?.data || error.message,
-    );
+    logError("Error sending job request", error);
   });
 };
 
@@ -68,6 +72,7 @@ export const sendJobRequest = ({
 // import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance";
 // import axios from "axios";
 // import random from "random";
+// import { logError } from "@/utils/sentryUtils";
 
 // // Function to send job request
 // export const sendJobRequest = async ({
@@ -121,7 +126,7 @@ export const sendJobRequest = ({
 //     // });
 //     return response.data;
 //   } catch (error: unknown) {
-//     console.error("Error sending job request:", error);
+//     logError("Error sending job request", error);
 
 //     if (axios.isAxiosError(error)) {
 //       throw new Error(error.response?.data || error.message);
