@@ -2,16 +2,11 @@
 import { splitName } from "@/utils";
 import { useUpdateUserDetails } from "../../../../../hooks/useUpdateUserDetails";
 import Image from "next/image";
-import {
-  FormEvent,
-  ReactEventHandler,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
-import useUserData from "@/hooks/useUserData";
+import useUserData, { UserData } from "@/hooks/useUserData";
+import { log } from "@/utils/sentryUtils";
 
 // Update the types to be more specific
 interface EditProfileModalProps {
@@ -33,17 +28,17 @@ export default function EditProfileModal({
 
   // State for form fields - using the original UI's state structure
   const [firstname, setFirstName] = useState<string>(
-    splitName(profileData?.full_name || "").firstName,
+    splitName(profileData?.full_name || "").firstName
   );
   const [lastname, setLastName] = useState<string>(
-    splitName(profileData?.full_name || "").lastName,
+    splitName(profileData?.full_name || "").lastName
   );
   const [full_name, setFullName] = useState<string>(
-    profileData?.full_name || "",
+    profileData?.full_name || ""
   );
   const [bio, setBio] = useState<string>(profileData?.bio || "");
   const [displayName, setDisplayName] = useState<string>(
-    profileData?.username || profileData?.display_name || "",
+    profileData?.display_name || profileData?.username || ""
   );
   const [email] = useState<string>(authUser?.email || "");
 
@@ -56,10 +51,9 @@ export default function EditProfileModal({
       setFullName(profileData.full_name || "");
       setBio(profileData.bio || "");
       setDisplayName(profileData.display_name || profileData.username || "");
-      console.log(
-        "Updated display name from profile data:",
-        profileData.display_name || profileData.username || "",
-      );
+      log("Updated display name from profile data", {
+        displayName: profileData.display_name || profileData.username || "",
+      });
     }
   }, [profileData]);
 
@@ -68,65 +62,6 @@ export default function EditProfileModal({
     if (firstname || lastname) setFullName(`${firstname} ${lastname}`);
     else setFullName("");
   }, [firstname, lastname]);
-
-  // Modify the handleFieldChange function to ensure display_name is preserved
-  // const handleFieldChange = useCallback(
-  //   (field: string, value: string) => {
-  //     console.log(`Field change: ${field} = ${value}`);
-
-  //     // Create the update object
-  //     let updateData: any = {};
-
-  //     // Handle special case for first/last name
-  //     if (field === "firstname" || field === "lastname") {
-  //       console.log("First/Last name change detected");
-
-  //       // For name updates, we only want to update full_name
-  //       field = "full_name";
-  //       value = full_name;
-  //       updateData[field] = value;
-
-  //       // CRITICAL: Always include the current display_name in the update
-  //       // to prevent it from being lost during first/last name updates
-  //       if (profileData?.display_name) {
-  //         console.log(
-  //           "Explicitly including display_name during name update:",
-  //           profileData.display_name
-  //         );
-  //         updateData.display_name = profileData.display_name;
-  //       } else if (displayName) {
-  //         console.log("Using current displayName state:", displayName);
-  //         updateData.display_name = displayName;
-  //       }
-  //     } else if (field === "display_name") {
-  //       // When directly updating display_name, update both fields
-  //       updateData.display_name = value;
-  //       updateData.username = value; // Keep username in sync for UI
-  //     } else {
-  //       // For regular field updates
-  //       updateData[field] = value;
-  //     }
-
-  //     console.log("Sending update:", updateData);
-
-  //     // Use throttled update when typing in fields
-  //     if (profileId) {
-  //       // Optimistically update the UI - but preserve existing fields
-  //       updateUserDataOptimistically(updateData);
-
-  //       // Use throttled update to reduce API calls - only update the specific field
-  //       throttledUpdateUser(profileId, updateData);
-  //     }
-  //   },
-  //   [
-  //     throttledUpdateUser,
-  //     profileId,
-  //     full_name,
-  //     updateUserDataOptimistically,
-  //     profileData,
-  //     displayName,
-  //   ]
-  // );
 
   // Modify the handleSave function to preserve existing data
   const handleSave = (e: FormEvent) => {
@@ -137,7 +72,10 @@ export default function EditProfileModal({
       return;
     }
 
-    console.log("Full name:", full_name, "Display name:", displayName);
+    log("Profile update initiated", {
+      full_name,
+      displayName,
+    });
 
     if (!full_name || !displayName) {
       toast.error("Please fill in all fields.");
@@ -145,18 +83,18 @@ export default function EditProfileModal({
     }
 
     // Log current profile data for debugging
-    console.log("Current profile data:", profileData);
+    log("Current profile data before update", { profileData });
 
     // Only include the fields we're actually changing
     // Important: display_name should be used for the API, not username
-    const updates = {
+    const updates: Partial<UserData> = {
       full_name,
       bio,
       display_name: displayName, // This is correct - we send display_name to the API
     };
 
     // Log what we're sending for debugging
-    console.log("Sending updates:", updates);
+    log("Sending profile updates", updates);
 
     // Optimistically update the UI - preserve existing fields
     updateUserDataOptimistically(updates);
@@ -196,7 +134,6 @@ export default function EditProfileModal({
             value={firstname}
             onChange={(e) => {
               setFirstName(e.target.value);
-              // handleFieldChange("firstname", e.target.value);
             }}
           />
         </div>
@@ -211,7 +148,6 @@ export default function EditProfileModal({
             value={lastname}
             onChange={(e) => {
               setLastName(e.target.value);
-              // handleFieldChange("lastname", e.target.value);
             }}
           />
         </div>
@@ -226,7 +162,6 @@ export default function EditProfileModal({
             value={displayName}
             onChange={(e) => {
               setDisplayName(e.target.value);
-              // handleFieldChange("display_name", e.target.value);
             }}
           />
         </div>
@@ -249,29 +184,27 @@ export default function EditProfileModal({
           <input
             className="block border-[1px] border-primary-10 h-14 w-full rounded-2xl bg-inherit outline-none text-primary-5 placeholder:text-primary-7 indent-4"
             type="text"
-            placeholder="Write about yourself"
+            placeholder="Enter your bio"
             value={bio}
             onChange={(e) => {
               setBio(e.target.value);
-              // handleFieldChange("bio", e.target.value);
             }}
           />
         </div>
 
-        <div className="flex justify-end h-12 mb-4 mt-8 text-primary-6 gap-4 col-span-2">
+        <div className="rounded-2xl flex items-center justify-end col-span-2 space-x-5">
           <button
             onClick={closeAction}
-            className="border-primary-10 w-40 border-[1px] rounded-full"
             type="button"
+            className="cursor-pointer transition duration-300 hover:scale-105 px-8 py-3 rounded-full border-[1px] border-primary-10 text-primary-4"
           >
             Cancel
           </button>
-
           <button
-            className="bg-primary-10 w-40 rounded-full text-primary-3 disabled:bg-primary-11 disabled:text-primary-9"
             type="submit"
+            className="bg-primary-1 text-black font-semibold cursor-pointer transition duration-300 hover:scale-105 px-8 py-3 rounded-full"
           >
-            Save changes
+            Save
           </button>
         </div>
       </form>

@@ -11,7 +11,7 @@ import { useUser } from "./useUser";
 import { log } from "@/utils/sentryUtils";
 
 // Define the user type to make the hook more type-safe
-interface UserData {
+export interface UserData {
   id: string;
   wallet?: any;
   bio?: string | null;
@@ -21,6 +21,7 @@ interface UserData {
   full_name?: string | null;
   avatar_url?: string | null;
   username?: string | null;
+  display_name?: string | null;
   [key: string]: any; // For flexibility
 }
 
@@ -56,7 +57,7 @@ export default function useUserData(profileId: string | undefined | null) {
           });
         }
 
-        return userData;
+        return userData as UserData;
       });
     },
     enabled: !!profileId, // Ensures query only runs if profileId exists
@@ -103,11 +104,6 @@ export default function useUserData(profileId: string | undefined | null) {
           if (enhancedUpdates.display_name) {
             enhancedUpdates.username = enhancedUpdates.display_name;
           }
-
-          // If username is being updated but display_name is not, update display_name
-          // if (enhancedUpdates.username && !enhancedUpdates.display_name) {
-          //   enhancedUpdates.display_name = enhancedUpdates.username;
-          // }
 
           // Merge updates with existing data rather than replacing
           const newData = {
@@ -171,7 +167,7 @@ export const prefetchUserData = async (
           });
         }
 
-        return userData;
+        return userData as UserData;
       });
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
