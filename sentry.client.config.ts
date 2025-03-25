@@ -9,21 +9,19 @@ Sentry.init({
 
   // Add optional integrations for additional features
   integrations: [
-
     Sentry.replayIntegration({
       // Optimize replay configuration
       blockAllMedia: true, // Block recording all media (images, videos)
       maskAllText: true, // Mask all text inputs by default
     }),
     Sentry.feedbackIntegration({
-      disabled: true, // removes the bug cacher ui from the page
+      disabled: true, // removes the bug catcher ui from the page
     }),
   ],
 
   // Reduce sampling rate for better performance
   // 10% of transactions will be captured instead of 100%
   tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 0.3,
-
 
   // Optimize replay sampling rates
   // Only capture 1% of sessions in production, 10% in development
@@ -49,5 +47,4 @@ Sentry.init({
   // Optimize transport with batching
   maxBreadcrumbs: 50, // Reduce from default 100
   sendClientReports: false, // Disable client reports
-
 });
