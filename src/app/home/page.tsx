@@ -12,15 +12,13 @@ import PostsProvider from "./components/PostsProvider";
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
   loading: () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full ">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
       {Array(12)
         .fill(null)
         .map((_, index) => (
-          <Skeleton
+          <div
             key={index}
-            height={200}
-            baseColor="#1a1a1a"
-            highlightColor="#333"
+            className="bg-primary-13 h-[200px] animate-pulse rounded-md"
           />
         ))}
     </div>

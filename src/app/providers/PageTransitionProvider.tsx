@@ -9,95 +9,122 @@ export const PageTransitionContext = React.createContext({
   isPageTransitioning: false,
 });
 
-// Animation variants for smoother transitions - ONLY used for actual page changes
-const pageVariants = {
-  initial: {
-    opacity: 0.98,
-    scale: 0.997,
-  },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.15,
-      ease: [0.2, 0.0, 0.2, 1], // Improved easing function based on Material Design
-    },
-  },
-  exit: {
-    opacity: 0.98,
-    scale: 0.997,
-    transition: {
-      duration: 0.1,
-      ease: [0.2, 0.0, 0.2, 1],
-    },
-  },
-};
+// Create memoized versions of transition components to prevent unnecessary re-renders
+const PageTransition = React.memo(
+  ({ children, stableKey, currentVariants }: any) => (
+    <AnimatePresence mode="sync" initial={false}>
+      <motion.div
+        key={stableKey}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={currentVariants}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  )
+);
 
-// No animation for tab changes - instant transition
-const noAnimationVariants = {
-  initial: { opacity: 1 },
-  animate: { opacity: 1 },
-  exit: { opacity: 1 },
-};
+PageTransition.displayName = "PageTransition";
 
 export default function PageTransitionProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const {
-    lastNavigationType,
-    isTransitioning,
-    setNavigationType,
-    setIsTransitioning,
-  } = useCreationAndProfileStore();
+  const { lastNavigationType, setNavigationType, setIsTransitioning } =
+    useCreationAndProfileStore();
 
-  // Animation frame ID for cleanup
-  const animationRef = useRef<number | null>(null);
-
-  // Track if animation is in progress to prevent flickering
   const isAnimatingRef = useRef(false);
 
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [prevPathname, setPrevPathname] = useState(pathname);
-  const [prevSearchKey, setPrevSearchKey] = useState(
-    searchParams?.get("tab") || searchParams?.get("s") || ""
+  const prevPathRef = useRef(pathname);
+  const prevSearchParamsRef = useRef(
+    searchParams?.get("s") || searchParams?.get("tab") || ""
   );
 
   // Create a stable key that only changes for page transitions, not tab changes
-  // This is the key insight: by keeping the key the same during tab changes,
-  // we prevent AnimatePresence from triggering animations
   const [stableKey, setStableKey] = useState(pathname);
 
-  // Helper function to check if navigation is just a tab change
+  // Check if navigation is a tab change (within the same page)
+  // This function is memoized to avoid unnecessary recreations
   const isTabChange = useCallback(
     (
-      newPath: string,
-      oldPath: string,
-      newSearchKey?: string,
-      oldSearchKey?: string
+      currentPath: string,
+      prevPath: string | null,
+      currentTab: string,
+      prevTab: string
     ) => {
-      // If the pathname has changed completely, it's a page change, not a tab change
-      if (newPath !== oldPath) return false;
+      // If paths are different, it's a page change, not a tab change
+      if (currentPath !== prevPath) return false;
 
-      // If search parameter changed but it's just a tab or section parameter, consider it a tab change
-      if (
-        newSearchKey !== oldSearchKey &&
-        ((newSearchKey?.includes("tab=") && oldSearchKey?.includes("tab=")) ||
-          (newSearchKey?.includes("s=") && oldSearchKey?.includes("s=")))
-      ) {
-        return true;
-      }
-
-      return false;
+      // If tabs are different but paths are the same, it's a tab change
+      return currentTab !== prevTab;
     },
     []
   );
 
-  // Preload related pages to make transitions feel faster
-  const preloadRelatedPages = useCallback(() => {
+  // Monitor URL changes to handle transitions
+  useEffect(() => {
+    const currentSearchKey =
+      searchParams?.get("s") || searchParams?.get("tab") || "";
+
+    // Skip initial render
+    if (!prevPathRef.current) {
+      prevPathRef.current = pathname;
+      prevSearchParamsRef.current = currentSearchKey;
+      setStableKey(pathname);
+      return;
+    }
+
+    // Determine if this is a tab change or page change
+    const tabChange = isTabChange(
+      pathname,
+      prevPathRef.current,
+      currentSearchKey,
+      prevSearchParamsRef.current || ""
+    );
+
+    // Only trigger animations when needed
+    if (!tabChange && pathname !== prevPathRef.current) {
+      // Real page change
+      setNavigationType("page");
+      setIsPageTransitioning(true);
+
+      // Update the stable key to force a new animation
+      setStableKey(pathname);
+
+      // Reset transition state after animation completes
+      setTimeout(() => {
+        setIsPageTransitioning(false);
+      }, 300); // Match this to your animation duration
+    } else if (tabChange) {
+      // Tab change - lighter transition
+      setNavigationType("tab");
+      setIsTransitioning(true);
+
+      // Reset the transition after a short delay
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 150);
+    }
+
+    // Update previous values for next comparison
+    prevPathRef.current = pathname;
+    prevSearchParamsRef.current = currentSearchKey;
+  }, [
+    pathname,
+    searchParams,
+    isTabChange,
+    setNavigationType,
+    setIsTransitioning,
+  ]);
+
+  // Preload related content
+  useEffect(() => {
     // Only preload if we're in a section with tabs
     if (
       pathname.includes("/home") ||
@@ -147,132 +174,28 @@ export default function PageTransitionProvider({
     }
   }, [pathname]);
 
-  // Start transition with appropriate timing based on navigation type
-  const startTransition = useCallback(
-    (isTab: boolean) => {
-      // For tab changes, we don't animate at all
-      if (isTab) {
-        setNavigationType("tab");
-        setIsTransitioning(false);
-        return;
-      }
+  // Animation variants for different types of transitions
+  const pageVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.15 } },
+  };
 
-      // Cancel any in-progress animation
-      if (animationRef.current !== null) {
-        cancelAnimationFrame(animationRef.current);
-      }
+  const noAnimationVariants = {
+    initial: { opacity: 1 },
+    animate: { opacity: 1 },
+    exit: { opacity: 1 },
+  };
 
-      // If already animating, don't restart animation
-      if (isAnimatingRef.current) return;
-
-      isAnimatingRef.current = true;
-
-      // Real page change - animate with appropriate duration
-      setIsPageTransitioning(true);
-      setIsTransitioning(true);
-      setNavigationType("page");
-
-      // Update the stable key for new page animations
-      setStableKey(pathname);
-
-      // Use requestAnimationFrame for smoother animations
-      const startTime = performance.now();
-      // Shorter duration for more subtlety - match with Framer transition
-      const duration = 150;
-
-      const animate = (currentTime: number) => {
-        const elapsed = currentTime - startTime;
-
-        if (elapsed >= duration) {
-          // Animation complete
-          setIsPageTransitioning(false);
-          setIsTransitioning(false);
-          isAnimatingRef.current = false;
-          animationRef.current = null;
-        } else {
-          // Continue animation
-          animationRef.current = requestAnimationFrame(animate);
-        }
-      };
-
-      // Start the animation loop
-      animationRef.current = requestAnimationFrame(animate);
-    },
-    [setIsPageTransitioning, setIsTransitioning, setNavigationType, pathname]
-  );
-
-  // Cleanup animation on unmount
-  useEffect(() => {
-    return () => {
-      if (animationRef.current !== null) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const currentSearchKey =
-      searchParams?.get("tab") || searchParams?.get("s") || "";
-
-    // Skip initial render
-    if (prevPathname === "" && prevSearchKey === "") {
-      setPrevPathname(pathname);
-      setPrevSearchKey(currentSearchKey);
-      setStableKey(pathname);
-      return;
-    }
-
-    // Check if this is a tab change or a real page change
-    const tabChange = isTabChange(
-      pathname,
-      prevPathname,
-      currentSearchKey,
-      prevSearchKey
-    );
-
-    // Only trigger animations when needed
-    if (!tabChange && pathname !== prevPathname) {
-      // Real page change
-      startTransition(false);
-    } else if (tabChange) {
-      // Tab change - NO animation
-      startTransition(true);
-    }
-
-    // Preload related pages for better UX
-    preloadRelatedPages();
-
-    // Update previous values for next comparison
-    setPrevPathname(pathname);
-    setPrevSearchKey(currentSearchKey);
-  }, [
-    pathname,
-    searchParams,
-    prevPathname,
-    prevSearchKey,
-    isTabChange,
-    preloadRelatedPages,
-    startTransition,
-  ]);
-
-  // Choose animation variants - no animation for tabs
+  // Use appropriate animation based on transition type
   const currentVariants =
     lastNavigationType === "tab" ? noAnimationVariants : pageVariants;
 
   return (
     <PageTransitionContext.Provider value={{ isPageTransitioning }}>
-      <AnimatePresence mode="sync" initial={false}>
-        <motion.div
-          // Use stableKey which only changes on actual page changes
-          key={stableKey}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          variants={currentVariants}
-        >
-          {children}
-        </motion.div>
-      </AnimatePresence>
+      <PageTransition stableKey={stableKey} currentVariants={currentVariants}>
+        {children}
+      </PageTransition>
     </PageTransitionContext.Provider>
   );
 }

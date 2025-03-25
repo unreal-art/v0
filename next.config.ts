@@ -114,6 +114,15 @@ const sentryWebpackPluginOptions = {
   replaysSessionSampleRate: 0.1, // Record 10% of sessions
   replaysOnErrorSampleRate: 1.0, // Record 100% of sessions with errors
 
+  // Disable Sentry feedback widget entirely
+  hideSourceMaps: true,
+  disableClientSideLogging: true, //prevent automatic logging of errors to sentry
+
+  // Disable Sentry feedback widget
+  feedback: {
+    disabled: true,
+  },
+
   // Error tracking
   attachStacktrace: true, // Attach stack traces to errors
   normalizeDepth: 10, // Control object serialization depth

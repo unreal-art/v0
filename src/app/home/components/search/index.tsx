@@ -1,18 +1,54 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CloseIcon, SearchIcon } from "@/app/components/icons";
 import Tabs from "./searchTab";
 import SearchPhotoGallary from "./searchPhotoGallary";
 import UserSearch from "./userSearch";
-import { useDebounce } from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Search() {
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch] = useDebounce(searchTerm, 500);
+  const [search, setSearch] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize search from URL on mount
+  useEffect(() => {
+    const s = searchParams?.get("s") || "";
+    if (s.toLowerCase() === "search") {
+      // Extract 'q' parameter which contains the actual search term
+      const q = searchParams?.get("q") || "";
+      setSearch(q);
+    } else {
+      setSearch("");
+    }
+  }, [searchParams]);
+
+  // Implement debounced search to prevent excessive URL updates
+  const debouncedSearch = useDebouncedCallback((value) => {
+    if (value.trim().length > 0) {
+      router.push(`/home?s=search&q=${encodeURIComponent(value.trim())}`);
+    } else if (searchParams?.get("s") === "search") {
+      // If search is cleared, revert to default tab
+      router.push("/home?s=explore");
+    }
+  }, 400); // 400ms debounce
+
+  const handleSearch = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setSearch(value);
+      debouncedSearch(value);
+    },
+    [debouncedSearch]
+  );
+
+  const handleFocus = useCallback(() => setIsFocused(true), []);
+  const handleBlur = useCallback(() => setIsFocused(false), []);
 
   function getIconColor() {
     if (hover) {
@@ -61,8 +97,10 @@ export default function Search() {
                 <input
                   type="text"
                   placeholder="Search for anything imaginable"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={search}
+                  onChange={handleSearch}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                   className="absolute text-primary-2 placeholder:text-primary-2 bg-inherit left-0 top-0 w-full h-14 px-10 rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0"
                 />
               </div>
@@ -76,13 +114,9 @@ export default function Search() {
             </div>
 
             <div className="overflow-y-auto h-[70vh]">
-              {currentIndex === 0 && (
-                <UserSearch searchTerm={debouncedSearch} />
-              )}
+              {currentIndex === 0 && <UserSearch searchTerm={search} />}
 
-              {currentIndex === 1 && (
-                <SearchPhotoGallary searchTerm={debouncedSearch} />
-              )}
+              {currentIndex === 1 && <SearchPhotoGallary searchTerm={search} />}
             </div>
           </div>
         </div>

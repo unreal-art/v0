@@ -1,5 +1,5 @@
 import Image, { ImageProps } from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { startSpan } from "@/utils/sentryUtils";
 
 interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
@@ -11,7 +11,7 @@ interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
  * A wrapper around Next.js Image component that provides performance tracking
  * and improved error handling.
  */
-export default function OptimizedImage({
+function OptimizedImage({
   src,
   alt,
   width,
@@ -50,7 +50,7 @@ export default function OptimizedImage({
     };
   }, [trackPerformance, imageIdentifier, src, width, height, priority, loaded]);
 
-  const handleLoadingComplete = () => {
+  const handleLoadingComplete = useCallback(() => {
     if (trackPerformance) {
       // Record successful load time
       const finishLoadSpan = startSpan(
@@ -61,9 +61,9 @@ export default function OptimizedImage({
       finishLoadSpan();
     }
     setLoaded(true);
-  };
+  }, [trackPerformance, imageIdentifier, src, width, height, priority]);
 
-  const handleError = () => {
+  const handleError = useCallback(() => {
     if (trackPerformance) {
       // Record error
       const finishErrorSpan = startSpan(
@@ -74,7 +74,7 @@ export default function OptimizedImage({
       finishErrorSpan();
     }
     setError(true);
-  };
+  }, [trackPerformance, imageIdentifier, src, width, height, priority]);
 
   // Show a fallback for failed images
   if (error) {
@@ -111,3 +111,5 @@ export default function OptimizedImage({
     />
   );
 }
+
+export default memo(OptimizedImage);
