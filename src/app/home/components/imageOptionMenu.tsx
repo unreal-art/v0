@@ -41,7 +41,7 @@ export default function ImageOptionMenu({
 
   const { isPinned, setPinned } = useIsPostPinned(
     Number(postId),
-    userId as string,
+    userId as string
   );
   const { data: post } = usePost(Number(postId));
   const pinPostMutation = usePinPost(userId as string);
@@ -115,6 +115,7 @@ export default function ImageOptionMenu({
 
             <MenuItem
               onClick={() => {
+                console.log(image);
                 if (!image.src) {
                   handleClose();
                   return;

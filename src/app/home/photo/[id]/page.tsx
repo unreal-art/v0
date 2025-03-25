@@ -31,7 +31,7 @@ const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
   {
     ssr: false,
-  },
+  }
 );
 
 export default function Generation() {
@@ -65,7 +65,7 @@ export default function Generation() {
   const [isFetching, setIsFetching] = useState(true);
   const [dynamicTitle, setDynamicTitle] = useState("Default Title");
   const [dynamicDescription, setDynamicDescription] = useState(
-    "Default Description",
+    "Default Description"
   );
   const [commentPhoto, setCommentPhoto] = useState<IPhoto | boolean>(false);
   const [dynamicImage, setDynamicImage] = useState("/default-image.jpg");
@@ -86,7 +86,7 @@ export default function Generation() {
         image: getImage(
           (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
           (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-          post?.author as string,
+          post?.author as string
         ),
       };
 
@@ -207,7 +207,7 @@ export default function Generation() {
   const image = getImage(
     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
     (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-    post?.author as string,
+    post?.author as string
   );
 
   return (
@@ -269,9 +269,9 @@ export default function Generation() {
                   </div>
                 </Link>
 
-                <ImageOptionMenu postId={String(postId)} image={post as any}>
+                {/* <ImageOptionMenu postId={String(postId)} image={post as any}>
                   <OptionMenuIcon color="#C1C1C1" />
-                </ImageOptionMenu>
+                </ImageOptionMenu> */}
               </div>
 
               <div className="flex justify-center  w-full">
@@ -311,7 +311,7 @@ export default function Generation() {
                     src={getImage(
                       (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                       (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                      post?.author as string,
+                      post?.author as string
                     )}
                     width={98}
                     height={128}
@@ -333,13 +333,13 @@ export default function Generation() {
               <div className="grid grid-cols-2 gap-6">
                 <Feature title="Model" content="Dart 2.0" />
 
-                <Feature title="Style" content="Anime" />
+                <Feature title="Style" content="Default" />
 
                 <ImageResolutionFeature
                   imageUrl={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                     (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                    post?.author as string,
+                    post?.author as string
                   )}
                 />
 

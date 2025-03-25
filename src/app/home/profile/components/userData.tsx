@@ -30,7 +30,7 @@ type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 // Add this placeholder function at the top of the file, outside the component
