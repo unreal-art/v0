@@ -41,7 +41,16 @@ const cleanThrottleCache = (): void => {
   if (keys.length > MAX_CACHE_SIZE) {
     // Remove oldest entries if cache is too large
     const oldestKeys = keys
-      .map((key) => ({ key, time: messageCache[key].timestamp }))
+      .map((key) => {
+        // Add safety check for undefined entries
+        if (
+          !messageCache[key] ||
+          typeof messageCache[key].timestamp !== "number"
+        ) {
+          return { key, time: 0 };
+        }
+        return { key, time: messageCache[key].timestamp };
+      })
       .sort((a, b) => a.time - b.time)
       .slice(0, keys.length - MAX_CACHE_SIZE / 2)
       .map((item) => item.key);
@@ -51,7 +60,18 @@ const cleanThrottleCache = (): void => {
 
   // Remove expired entries
   keys.forEach((key) => {
-    if (now - messageCache[key].timestamp > MIN_THROTTLE_MS * 10) {
+    // Add safety check for undefined entries
+    if (
+      messageCache[key] &&
+      typeof messageCache[key].timestamp === "number" &&
+      now - messageCache[key].timestamp > MIN_THROTTLE_MS * 10
+    ) {
+      delete messageCache[key];
+    } else if (
+      !messageCache[key] ||
+      typeof messageCache[key].timestamp !== "number"
+    ) {
+      // Remove invalid entries that could cause errors
       delete messageCache[key];
     }
   });
@@ -322,55 +342,80 @@ export const startSpan = (
     return () => {};
   }
 
-  // Create unique ID for this operation
-  const spanId = `${op}-${name}-${Date.now()}`;
-  const startTime = performance.now();
+  try {
+    // Create unique ID for this operation
+    const spanId = `${op}-${name}-${Date.now()}`;
+    const startTime = performance.now();
 
-  // Add breadcrumb for operation start
-  const safeData = data
-    ? Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [key, safeStringify(value)])
-      )
-    : undefined;
+    // Add breadcrumb for operation start
+    const safeData = data
+      ? Object.fromEntries(
+          Object.entries(data).map(([key, value]) => [
+            key,
+            safeStringify(value),
+          ])
+        )
+      : undefined;
 
-  addBreadcrumb(`Started ${op}: ${name}`, "performance", "info", {
-    ...safeData,
-    spanId,
-  });
-
-  // Return a function to finish the span
-  return () => {
-    const endTime = performance.now();
-    const duration = Math.round(endTime - startTime);
-
-    // Only track operations that took significant time (> 50ms)
-    if (duration > 50) {
-      addBreadcrumb(
-        `Finished ${op}: ${name} (${duration}ms)`,
-        "performance",
-        duration > 500 ? "warning" : "info", // Mark slow operations as warnings
-        {
-          ...safeData,
-          duration,
-          spanId,
-        }
-      );
-
-      // For very slow operations (>1s), send a performance issue
-      if (duration > 1000) {
-        captureMessage(
-          `Slow operation: ${op} - ${name} took ${duration}ms`,
-          "warning",
-          {
-            performance: true,
-            duration,
-            operation: op,
-            ...safeData,
-          }
-        );
-      }
+    // Safely add breadcrumb with error handling
+    try {
+      addBreadcrumb(`Started ${op}: ${name}`, "performance", "info", {
+        ...safeData,
+        spanId,
+      });
+    } catch (e) {
+      // Silently fail breadcrumb to not affect performance
+      console.warn("Failed to add breadcrumb:", e);
     }
-  };
+
+    // Return a function to finish the span
+    return () => {
+      try {
+        const endTime = performance.now();
+        const duration = Math.round(endTime - startTime);
+
+        // Only track operations that took significant time (> 50ms)
+        if (duration > 50) {
+          try {
+            addBreadcrumb(
+              `Finished ${op}: ${name} (${duration}ms)`,
+              "performance",
+              duration > 500 ? "warning" : "info", // Mark slow operations as warnings
+              {
+                ...safeData,
+                duration,
+                spanId,
+              }
+            );
+
+            // For very slow operations (>1s), send a performance issue
+            if (duration > 1000) {
+              captureMessage(
+                `Slow operation: ${op} - ${name} took ${duration}ms`,
+                "warning",
+                {
+                  performance: true,
+                  duration,
+                  operation: op,
+                  ...safeData,
+                }
+              );
+            }
+          } catch (e) {
+            // Silently fail to not affect performance
+            console.warn("Failed to record performance data:", e);
+          }
+        }
+      } catch (e) {
+        // Silently fail to not affect performance
+        console.warn("Failed to finish performance span:", e);
+      }
+    };
+  } catch (e) {
+    // Return a no-op function if anything fails
+    console.warn("Failed to start performance tracking:", e);
+    return () => {};
+  }
 };
 
 /**

@@ -10,7 +10,7 @@ import { CommentWithUser } from "$/types/data.types";
 import ImageOptionMenu from "../imageOptionMenu";
 import { IPhoto } from "@/app/libs/interfaces";
 import { Following } from "../followingBtn";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
 interface CommentAreaProps {
   image: string;

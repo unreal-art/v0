@@ -3,7 +3,7 @@ import { HeartFillIcon, HeartIcon } from "@/app/components/icons";
 import { CommentWithUser } from "$/types/data.types";
 import { timeAgo } from "@/app/libs/timeAgo";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 import {
   useLikeComment,
   useLikeReply,

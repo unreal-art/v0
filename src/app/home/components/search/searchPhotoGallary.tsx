@@ -30,6 +30,7 @@ import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
 import { useGalleryStore } from "@/stores/galleryStore";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
@@ -40,6 +41,17 @@ function renderNextImage(
   // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 8;
 
+  // Extract image name for tracking
+  const imageName =
+    typeof photo === "object" && photo !== null && "src" in photo
+      ? String(photo.src).split("/").pop()?.split("?")[0] ||
+        `search-img-${index}`
+      : `search-img-${index}`;
+
+  // Responsive size hints for optimal loading
+  const responsiveSizes =
+    sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
+
   return (
     <div
       style={{
@@ -48,15 +60,17 @@ function renderNextImage(
         aspectRatio: `${width} / ${height}`,
       }}
     >
-      <Image
+      <OptimizedImage
         fill
         src={photo}
-        alt={alt}
+        alt={alt || "Search result"}
         title={title}
-        sizes={sizes}
+        sizes={responsiveSizes}
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
+        trackPerformance={process.env.NODE_ENV === "development"}
+        imageName={imageName}
       />
     </div>
   );

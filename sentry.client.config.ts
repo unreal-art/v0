@@ -7,31 +7,20 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: "https://52a47ad954fe8d72ef8330abd1980242@o4509038822031360.ingest.us.sentry.io/4509038936064000",
 
-  // Add optional integrations for additional features
+  // Disable all opt-in features including feedback button and session replay
+  replaysSessionSampleRate: 0, // Disable session replay completely
+  replaysOnErrorSampleRate: 0, // Disable error replay completely
+
+  // Explicitly disable the feedback widget
   integrations: [
-    Sentry.replayIntegration({
-      // Optimize replay configuration
-      blockAllMedia: true, // Block recording all media (images, videos)
-      maskAllText: true, // Mask all text inputs by default
-    }),
-    Sentry.feedbackIntegration({
-      disabled: true, // removes the bug catcher ui from the page
-    }),
+    // No integrations - removed all including replay and feedback
   ],
 
   // Reduce sampling rate for better performance
   // 10% of transactions will be captured instead of 100%
   tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 0.3,
 
-  // Optimize replay sampling rates
-  // Only capture 1% of sessions in production, 10% in development
-  replaysSessionSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 0.1,
-
-  // Capture less error sessions in production (30% instead of 100%)
-  replaysOnErrorSampleRate: process.env.NODE_ENV === "production" ? 0.3 : 1.0,
-
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
-
   debug: false,
 
   // Add performance optimizations

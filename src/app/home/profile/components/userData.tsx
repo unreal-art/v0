@@ -25,7 +25,7 @@ import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
 import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
 import { log, logError } from "@/utils/sentryUtils";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";

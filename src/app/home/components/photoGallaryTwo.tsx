@@ -31,7 +31,7 @@ import {
   getPostsByUser,
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
-import OptimizedImage from "@/components/OptimizedImage";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
 // Dynamically import ImageView component to reduce initial bundle size
 const ImageView = dynamic(() => import("./imageView"), {
@@ -55,6 +55,10 @@ function renderNextImage(
         `gallery-img-${index}`
       : `gallery-img-${index}`;
 
+  // Responsive size hints for optimal loading
+  const responsiveSizes =
+    sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
+
   return (
     <div
       style={{
@@ -68,11 +72,11 @@ function renderNextImage(
         src={photo}
         alt={alt || "Gallery image"}
         title={title}
-        sizes={sizes}
+        sizes={responsiveSizes}
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
-        trackPerformance={true}
+        trackPerformance={process.env.NODE_ENV === "development"}
         imageName={imageName}
       />
     </div>

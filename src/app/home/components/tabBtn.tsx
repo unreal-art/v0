@@ -49,17 +49,15 @@ function TabBtn({ text }: NavBtnProps) {
     <div className="relative rounded-full cursor-pointer overflow-hidden">
       <button
         onClick={handleClick}
-        className={`rounded-md px-4 py-2 text-sm md:text-base font-medium ${
-          isActive
-            ? "text-primary-1 bg-gradient-to-r from-[#9B53E0] to-[#8551E6]"
-            : "text-primary-2 bg-opacity-0"
+        className={`rounded-full px-4 py-2 text-sm md:text-base font-medium ${
+          isActive ? "bg-primary-10" : "text-primary-10 bg-opacity-0"
         }`}
       >
         {text}
       </button>
 
       {isActive && (
-        <div className="hidden md:flex bg-gradient-to-r from-[#9B53E0] to-[#8551E6] absolute w-[90px] h-[2px] -bottom-[1px] left-0 right-0 mx-auto" />
+        <div className="hidden md:flex  absolute w-[90px] h-[2px] -bottom-[1px] left-0 right-0 mx-auto" />
       )}
     </div>
   );
