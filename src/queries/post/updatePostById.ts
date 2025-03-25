@@ -1,13 +1,14 @@
 import { supabase } from "$/supabase/client";
 import { Post } from "$/types/data.types";
+import { logError } from "@/utils/sentryUtils";
 
-export async function updatePostById(postId: number, data: Partial<Post>) {
-  const { error } = await supabase.from("posts").update(data).eq("id", postId);
+export const updatePostById = async (id: number, data: Partial<Post>) => {
+  const { error } = await supabase.from("posts").update(data).eq("id", id);
 
   if (error) {
-    console.error("Error updating post:", error.message);
-    throw new Error(error.message);
+    logError("Error updating post", error);
+    throw new Error(`Failed to update post: ${error.message}`);
   }
 
-  return true; // Return success
-}
+  return true;
+};

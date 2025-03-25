@@ -2,6 +2,7 @@ import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
 import { getRange } from "@/utils";
 import { LIST_LIMIT } from "@/app/libs/constants";
+import { logError } from "@/utils/sentryUtils";
 
 export async function getPosts(client: Client, start = 0): Promise<Post[]> {
   const range = getRange(start, LIST_LIMIT);
@@ -15,7 +16,7 @@ export async function getPosts(client: Client, start = 0): Promise<Post[]> {
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching posts", error);
     throw new Error(error.message);
   }
 
@@ -44,7 +45,7 @@ export async function getTopPosts(client: Client, start = 0): Promise<Post[]> {
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching top posts", error);
     throw new Error(error.message);
   }
 
@@ -71,7 +72,7 @@ export async function getFollowingPosts(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for following posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -87,6 +88,7 @@ export async function getFollowingPosts(
     .eq("follower_id", id);
 
   if (followingsError) {
+    logError("Error fetching user followings", followingsError);
     throw followingsError;
   }
 
@@ -106,7 +108,7 @@ export async function getFollowingPosts(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching following posts", error);
     throw new Error(error.message);
   }
 

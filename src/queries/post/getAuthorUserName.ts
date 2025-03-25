@@ -1,4 +1,5 @@
 import { Client } from "$/supabase/client";
+import { logWarning, logError } from "@/utils/sentryUtils";
 
 // Retrieve a user's username by their ID, or return an empty string if not found.
 export const getAuthorUserName = async (
@@ -6,7 +7,7 @@ export const getAuthorUserName = async (
   client: Client
 ): Promise<string | null> => {
   if (!authorId) {
-    console.warn("Author ID is not provided.");
+    logWarning("Author ID is not provided");
     return null;
   }
 
@@ -19,17 +20,14 @@ export const getAuthorUserName = async (
       .single();
 
     if (error) {
-      console.error(
-        `Error fetching profile for author ID ${authorId}:`,
-        error.message
-      );
+      logError(`Error fetching profile for author ID ${authorId}`, error);
       return null;
     }
 
     return profile?.display_name || profile?.full_name || null; // Ensure safe access to the field
   } catch (err) {
-    console.error(
-      `Unexpected error fetching profile for author ID ${authorId}:`,
+    logError(
+      `Unexpected error fetching profile for author ID ${authorId}`,
       err
     );
     return null;

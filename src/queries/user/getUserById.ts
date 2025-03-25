@@ -1,39 +1,41 @@
 import { Client } from "$/supabase/client";
+import { ExtendedUser } from "$/types/data.types";
+import { logError } from "@/utils/sentryUtils";
 
-// Get user profile by ID
-export const getUserById = async (id: string, client: Client) => {
+// Get user by ID with error handling
+export const getUserById = async (
+  userId: string,
+  client: Client
+): Promise<Partial<ExtendedUser> | null> => {
+  if (!userId) return null;
+
   try {
-    // Fetch user profile from "profiles" table
-    const { data: profileData, error: profileError } = await client
+    const { data, error } = await client
       .from("profiles")
-      .select(
-        "id, wallet, bio, location, likes_received, credit_balance, full_name, display_name, avatar_url"
-      )
-      .eq("id", id)
-      .single(); // Ensures only one row is returned
+      .select("*")
+      .eq("id", userId)
+      .single();
 
-    if (profileError || !profileData) {
-      console.error(
-        "Error fetching profile:",
-        profileError?.message || "Profile not found"
-      );
+    if (error) {
+      logError(`Error fetching user profile with ID: ${userId}`, error);
       return null;
     }
 
+    if (!data) return null;
+
+    // Return processed user data
     return {
-      id: profileData.id,
-      wallet: profileData.wallet,
-      bio: profileData.bio,
-      location: profileData.location,
-      likesReceived: profileData.likes_received,
-      creditBalance: profileData.credit_balance,
-      full_name: profileData.full_name,
-      avatar_url: profileData.avatar_url,
-      username: profileData.display_name || profileData.full_name,
-      display_name: profileData.display_name,
+      id: data.id,
+      wallet: data.wallet as WalletObject | undefined,
+      bio: data.bio as string,
+      location: data.location as string,
+      creditBalance: data.credit_balance as number,
+      full_name: data.full_name as string,
+      username: data.display_name || data.full_name,
+      avatar_url: data.avatar_url as string,
     };
   } catch (error) {
-    console.error("Unexpected error:", error);
+    logError("Unexpected error", error);
     return null;
   }
 };

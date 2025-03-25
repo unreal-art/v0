@@ -1,4 +1,5 @@
 import { supabase } from "$/supabase/client";
+import { log, logError } from "@/utils/sentryUtils";
 
 // Toggle follow/unfollow status
 const toggleFollow = async (followerId: string, followeeId: string) => {
@@ -13,7 +14,7 @@ const toggleFollow = async (followerId: string, followeeId: string) => {
     .single();
 
   if (error && error.code !== "PGRST116") {
-    console.error("Error fetching follow relationship:", error.message);
+    logError("Error fetching follow relationship", error);
     return;
   }
 
@@ -26,9 +27,9 @@ const toggleFollow = async (followerId: string, followeeId: string) => {
       .eq("followee_id", followeeId);
 
     if (deleteError) {
-      console.error("Error deleting follow relationship:", deleteError.message);
+      logError("Error deleting follow relationship", deleteError);
     } else {
-      console.log(`Unfollowed: ${followerId} -> ${followeeId}`);
+      log("Unfollowed user", { followerId, followeeId });
     }
   } else {
     // If not following, follow
@@ -37,9 +38,9 @@ const toggleFollow = async (followerId: string, followeeId: string) => {
       .insert([{ follower_id: followerId, followee_id: followeeId }]);
 
     if (insertError) {
-      console.error("Error adding follow relationship:", insertError.message);
+      logError("Error adding follow relationship", insertError);
     } else {
-      console.log(`Followed: ${followerId} -> ${followeeId}`);
+      log("Followed user", { followerId, followeeId });
     }
   }
 };

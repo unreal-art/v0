@@ -1,24 +1,30 @@
 import { supabase } from "$/supabase/client";
+import { logError } from "@/utils/sentryUtils";
 
+// Add notification
 export const addNotification = async ({
-  userId, // Receiver (post owner)
-  senderId, // User who liked/commented/shared
+  userId,
   postId,
-  type, // "like", "comment", "share"
+  type,
+  senderId,
 }: {
-  userId: string;
-  senderId: string;
-  postId: number; // Ensure this matches BIGINT
-  type: "like" | "comment" | "share" | "follow";
+  userId: string; // User to receive the notification
+  postId: number; // The post the notification is about
+  type: "like" | "comment" | "follow" | "share"; // Notification type
+  senderId: string; // User who performed the action
 }) => {
-  const { error } = await supabase.from("notifications").insert([
+  // Don't add notification if user is sending to self
+  if (userId === senderId) return;
+
+  const { data, error } = await supabase.from("notifications").insert([
     {
       user_id: userId,
-      sender_id: senderId,
       post_id: postId,
       type,
+      sender_id: senderId,
     },
   ]);
 
-  if (error) console.error("Error adding notification:", error);
+  if (error) logError("Error adding notification", error);
+  return data;
 };

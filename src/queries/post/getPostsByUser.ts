@@ -2,6 +2,7 @@ import { Client } from "$/supabase/client";
 import { Post, UploadResponse } from "$/types/data.types";
 import { getRange } from "@/utils";
 import { LIST_LIMIT } from "@/app/libs/constants";
+import { logError, logWarning } from "@/utils/sentryUtils";
 
 export async function getPostsByUser(
   client: Client,
@@ -14,7 +15,7 @@ export async function getPostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -34,7 +35,7 @@ export async function getPostsByUser(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching user posts", error);
     throw new Error(error.message);
   }
 
@@ -62,7 +63,7 @@ export async function getOtherPostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for other posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -82,7 +83,7 @@ export async function getOtherPostsByUser(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching other user posts", error);
     throw new Error(error.message);
   }
 
@@ -109,7 +110,7 @@ export async function getPrivatePostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for private posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -128,7 +129,7 @@ export async function getPrivatePostsByUser(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching private posts", error);
     throw new Error(error.message);
   }
 
@@ -154,7 +155,7 @@ export async function getPinnedPostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for pinned posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -180,12 +181,12 @@ export async function getPinnedPostsByUser(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching pinned posts", error);
     throw new Error(error.message);
   }
 
   if (!Array.isArray(data)) {
-    console.error("Unexpected response from Supabase:", data);
+    logError("Unexpected response from Supabase", { data });
     throw new Error("Invalid data format received from Supabase.");
   }
 
@@ -214,7 +215,7 @@ export async function getIsDraftPostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for draft posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -232,7 +233,7 @@ export async function getIsDraftPostsByUser(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching draft posts", error);
     throw new Error(error.message);
   }
 
@@ -259,7 +260,7 @@ export async function getOtherIsDraftPostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for other draft posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -278,7 +279,7 @@ export async function getOtherIsDraftPostsByUser(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching other draft posts", error);
     throw new Error(error.message);
   }
 
@@ -305,7 +306,7 @@ export async function getUserLikedPosts(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
     if (userError) {
-      console.error("Error fetching user:", userError.message);
+      logError("Error fetching user for liked posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
     id = userData?.user?.id;
@@ -324,7 +325,7 @@ export async function getUserLikedPosts(
     .range(range[0], range[1]);
 
   if (error) {
-    console.error("Supabase error:", error.message);
+    logError("Supabase error fetching liked posts", error);
     throw new Error(error.message);
   }
 
