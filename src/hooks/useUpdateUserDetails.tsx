@@ -3,6 +3,7 @@ import { supabase } from "$/supabase/client";
 import { normalizeEntity, getEntity } from "@/utils/queryOptimizer";
 import { useCallback, useRef } from "react";
 import { toast } from "sonner";
+import { log, logError } from "@/utils/sentryUtils";
 
 // Enhanced interface for user data
 interface UserData {
@@ -58,11 +59,11 @@ export const useUpdateUserDetails = () => {
 
       // Only send the update if there are actual changes
       if (Object.keys(updates).length === 0) {
-        console.log("No valid fields to update");
+        log("No valid fields to update");
         return user; // No changes to make
       }
 
-      console.log("Final updates to send to API:", updates);
+      log("Final updates to send to API:", updates);
 
       // Send only the expected fields to the database
       const { data, error } = await supabase
@@ -132,8 +133,8 @@ export const useUpdateUserDetails = () => {
         const existingEntity = getEntity("users", id) || {};
 
         // Log for debugging
-        console.log("Existing entity before update:", existingEntity);
-        console.log("Updates being applied:", user);
+        log("Existing entity before update", existingEntity);
+        log("Updates being applied", user);
 
         // Create an enhanced update with only valid fields and field mappings
         const validUpdateFields = ["full_name", "display_name", "bio"];
@@ -143,7 +144,7 @@ export const useUpdateUserDetails = () => {
 
         clientCacheUpdate.username = user.display_name;
 
-        console.log("Enhanced client cache update:", clientCacheUpdate);
+        log("Enhanced client cache update", clientCacheUpdate);
 
         normalizeEntity("users", {
           ...existingEntity,
@@ -156,7 +157,7 @@ export const useUpdateUserDetails = () => {
     },
 
     onError: (error, { id }, context) => {
-      console.error("Error updating user details:", error);
+      logError("Error updating user details:", error);
       toast.error(`Failed to update profile: ${error.message}`);
 
       // Revert all optimistic updates
@@ -198,11 +199,11 @@ export const useUpdateUserDetails = () => {
   // Helper to throttle rapid consecutive updates
   const throttledUpdate = useCallback(
     (id: string, updates: UserData) => {
-      console.log("Throttled update called with:", id, updates);
+      log("Throttled update called with", { id, updates });
 
       // If an update is already pending, combine the updates
       if (pendingUpdatesRef.current) {
-        console.log("Existing pending updates:", pendingUpdatesRef.current);
+        log("Existing pending updates", pendingUpdatesRef.current);
 
         // Before combining, check if we need to preserve the display_name
         const needToPreserveDisplayName =
@@ -222,20 +223,20 @@ export const useUpdateUserDetails = () => {
 
         // If updating first/last name but not display_name, preserve the existing display_name
         if (needToPreserveDisplayName) {
-          console.log(
+          log(
             "Preserving display_name when combining updates with first/last name changes"
           );
           pendingUpdatesRef.current.user.display_name =
             pendingUpdatesRef.current.user.display_name;
         }
 
-        console.log("Combined pending updates:", pendingUpdatesRef.current);
+        log("Combined pending updates", pendingUpdatesRef.current);
         return;
       }
 
       // Store the current update
       pendingUpdatesRef.current = { user: updates, id };
-      console.log("Stored pending update:", pendingUpdatesRef.current);
+      log("Stored pending update", pendingUpdatesRef.current);
 
       // Clear any existing timeout
       if (throttleTimeoutRef.current) {
@@ -245,14 +246,14 @@ export const useUpdateUserDetails = () => {
       // Set a timeout to process the update
       throttleTimeoutRef.current = setTimeout(() => {
         if (pendingUpdatesRef.current) {
-          console.log("Processing throttled update...");
+          log("Processing throttled update");
 
           // Get the current data from cache before making the update
           const currentProfileData = queryClient.getQueryData<UserData>([
             "profile_data",
             id,
           ]);
-          console.log("Current profile data from cache:", currentProfileData);
+          log("Current profile data from cache", currentProfileData);
 
           if (currentProfileData) {
             // Create an update object that only includes fields the database expects
@@ -270,8 +271,8 @@ export const useUpdateUserDetails = () => {
 
             // If we're updating name but not display_name, make sure to preserve the current display_name
             if (isUpdatingName && currentProfileData.display_name) {
-              console.log(
-                "Name update detected - explicitly preserving display_name:",
+              log(
+                "Name update detected - explicitly preserving display_name",
                 currentProfileData.display_name
               );
               // Include the current display_name in our update to prevent it from being lost
@@ -292,7 +293,7 @@ export const useUpdateUserDetails = () => {
                 pendingUpdates.hasOwnProperty("lastname"))
             ) {
               // This means we're updating firstname or lastname, but not directly full_name
-              console.log("Handling firstname/lastname update");
+              log("Handling firstname/lastname update");
 
               // We need to get the current full_name and update it
               const currentFirstName =
@@ -310,8 +311,8 @@ export const useUpdateUserDetails = () => {
 
               updateData.full_name =
                 `${currentFirstName} ${currentLastName}`.trim();
-              console.log(
-                "Setting full_name from first/last name:",
+              log(
+                "Setting full_name from first/last name",
                 updateData.full_name
               );
             }
@@ -322,21 +323,19 @@ export const useUpdateUserDetails = () => {
               !updateData.display_name &&
               currentProfileData.display_name
             ) {
-              console.log(
-                "Re-checking display_name is preserved during name update"
-              );
+              log("Re-checking display_name is preserved during name update");
               updateData.display_name = currentProfileData.display_name;
             }
 
             // Skip update if nothing to update
             if (Object.keys(updateData).length === 0) {
-              console.log("No valid fields to update, skipping");
+              log("No valid fields to update, skipping");
               pendingUpdatesRef.current = null;
               throttleTimeoutRef.current = null;
               return;
             }
 
-            console.log("Final update data to send to API:", updateData);
+            log("Final update data to send to API", updateData);
 
             // Execute the mutation with only the allowed fields
             mutation.mutate({
@@ -346,7 +345,7 @@ export const useUpdateUserDetails = () => {
             });
           } else {
             // If we don't have current data, use a safer approach
-            console.log("No current data found, using safer update approach");
+            log("No current data found, using safer update approach");
 
             const updateData: Partial<UserData> = {};
             const pendingUpdates = pendingUpdatesRef.current?.user || {};

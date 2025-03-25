@@ -2,6 +2,7 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { searchPostsPaginated } from "@/queries/post/searchPostsPaginated";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { normalizeEntity } from "@/utils/queryOptimizer";
+import { log, logError } from "@/utils/sentryUtils";
 
 // Optimized hook for searching posts with efficient data loading and caching
 export const useSearchPostsInfinite = (keyword: string, limit = 10) => {

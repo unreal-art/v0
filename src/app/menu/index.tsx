@@ -12,6 +12,7 @@ import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { useReadContract } from "thirdweb/react";
 import { formatEther } from "ethers";
+import { log, logError } from "@/utils/sentryUtils";
 
 interface INotificationProps {
   children: ReactNode;
@@ -19,7 +20,7 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string
 );
 
 export default function Menu({ children }: INotificationProps) {
@@ -47,13 +48,13 @@ export default function Menu({ children }: INotificationProps) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Error logging out:", error.message);
+        logError("Error logging out", error);
       } else {
-        console.log("User logged out successfully.");
+        log("User logged out successfully");
         router.replace("/");
       }
     } catch (err) {
-      console.error("Unexpected error during logout:", err);
+      logError("Unexpected error during logout", err);
     }
   };
   return (

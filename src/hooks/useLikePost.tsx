@@ -4,6 +4,7 @@ import { likePost } from "@/queries/post/likePost";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updatePostInQueries } from "@/utils/queryOptimizer";
 import { useCallback } from "react";
+import { logError } from "@/utils/sentryUtils";
 
 export const useLikePost = (
   postId: number,
@@ -87,7 +88,7 @@ export const useLikePost = (
     },
 
     onError: (err, _, context) => {
-      console.error("Error toggling like:", err);
+      logError("Error toggling like", err);
 
       // Rollback to previous state
       if (context?.previousLikes) {

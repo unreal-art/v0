@@ -3,6 +3,7 @@ import { getPostLikes } from "@/queries/post/getPostLikes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { dedupedRequest } from "@/utils/queryOptimizer";
 import { useCallback } from "react";
+import { log, logError } from "@/utils/sentryUtils";
 
 // Define a local interface for Like to avoid type conflicts
 interface PostLike {

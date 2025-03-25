@@ -7,6 +7,7 @@ import { sendJobRequest } from "@/queries/post/sendJobRequest";
 import { useRouter } from "next/navigation";
 import { useEffect, useCallback, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { logError } from "@/utils/sentryUtils";
 
 interface JobParams {
   prompt: string;
@@ -66,7 +67,7 @@ export function useCreateJob(user: ExtendedUser | null) {
       }
     },
     onError: (error) => {
-      console.error("Error creating job:", error);
+      logError("Error creating job", error);
       setIsGenerating(false);
       stopGeneration();
 
@@ -170,13 +171,13 @@ export function useCreateJob(user: ExtendedUser | null) {
 
 //     onSuccess: (data) => {
 //       //TODO: the post id should be among the data returned
-//       console.log("Job created successfully:", data);
+//       log("Job created successfully", data);
 //       stopGeneration();
 //       router.push(`/home/photo/${data.data[0].id}?a=${data.data[0].author}`); // Navigate after success
 //     },
 //     onError: (error) => {
 //       stopGeneration();
-//       console.error("Error creating job:", error);
+//       logError("Error creating job", error);
 //     },
 //   });
 // }

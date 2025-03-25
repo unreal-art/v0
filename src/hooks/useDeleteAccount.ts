@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "$/supabase/client";
 import { axiosInstanceLocal } from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { log, logError } from "@/utils/sentryUtils";
 
 interface DeleteAccountResponse {
   success: boolean;
@@ -19,14 +20,20 @@ const useDeleteAccount = () => {
     setLoading(true);
     setError(null);
 
+    log("Account deletion process initiated");
+
     try {
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (userError || !userData.user) {
-        throw new Error("You need to be logged in.");
+        const errorMsg = "You need to be logged in.";
+        logError(errorMsg, userError || new Error(errorMsg));
+        throw new Error(errorMsg);
       }
 
       const { data: sessionData } = await supabase.auth.getSession();
+
+      log("Sending account deletion request", { userId: userData.user.id });
 
       // Send request to delete account
       const response = await axiosInstanceLocal.delete("/api/account/delete", {
@@ -38,6 +45,7 @@ const useDeleteAccount = () => {
       });
 
       if (response.status === 200) {
+        log("Account deleted successfully, logging out user");
         // Log the user out from Supabase
         await supabase.auth.signOut();
 
@@ -51,6 +59,8 @@ const useDeleteAccount = () => {
         err.response?.data?.error ||
         err.message ||
         "An unexpected error occurred";
+
+      logError("Account deletion failed", err);
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
