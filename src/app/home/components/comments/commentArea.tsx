@@ -10,6 +10,7 @@ import { CommentWithUser } from "$/types/data.types";
 import ImageOptionMenu from "../imageOptionMenu";
 import { IPhoto } from "@/app/libs/interfaces";
 import { Following } from "../followingBtn";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface CommentAreaProps {
   image: string;
@@ -50,12 +51,14 @@ export default function CommentArea({
                 <BackIcon width={24} height={24} color="#C1C1C1" />
               </button>
               {!imageLoading && (
-                <Image
+                <OptimizedImage
                   className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
                   src={image || ""}
                   width={48}
                   height={48}
-                  alt="profile"
+                  alt={`${userName || "Unknown"}'s profile picture`}
+                  imageName="comment-area-avatar"
+                  trackPerformance={true}
                 />
               )}
             </div>

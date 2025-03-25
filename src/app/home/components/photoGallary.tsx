@@ -31,6 +31,7 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { useGalleryStore } from "@/stores/galleryStore";
+import OptimizedImage from "@/components/OptimizedImage";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
@@ -40,6 +41,13 @@ function renderNextImage(
   // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 8;
 
+  // Extract image name for tracking
+  const imageName =
+    typeof photo === "object" && photo !== null && "src" in photo
+      ? String(photo.src).split("/").pop()?.split("?")[0] ||
+        `gallery-img-${index}`
+      : `gallery-img-${index}`;
+
   return (
     <div
       style={{
@@ -48,15 +56,17 @@ function renderNextImage(
         aspectRatio: `${width} / ${height}`,
       }}
     >
-      <Image
+      <OptimizedImage
         fill
         src={photo}
-        alt={alt}
+        alt={alt || "Gallery image"}
         title={title}
         sizes={sizes}
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
+        trackPerformance={true}
+        imageName={imageName}
       />
     </div>
   );
@@ -229,12 +239,14 @@ function PhotoWithAuthor({
           >
             <div className="rounded-full">
               {image ? (
-                <Image
+                <OptimizedImage
                   className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
                   src={image}
                   width={24}
                   height={24}
-                  alt="profile"
+                  alt={`${userName}'s profile`}
+                  trackPerformance={true}
+                  imageName={`profile-${authorId}`}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar

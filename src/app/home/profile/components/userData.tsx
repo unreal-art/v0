@@ -25,6 +25,7 @@ import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
 import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
 import { log, logError } from "@/utils/sentryUtils";
+import OptimizedImage from "@/components/OptimizedImage";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
@@ -148,12 +149,14 @@ export default function UserData() {
       <div className="flex flex-col md:flex-row pt-5 w-full mb-12 gap-4">
         <div className="flex gap-4">
           <div className="w-28 h-28 md:w-52 md:h-52">
-            <Image
+            <OptimizedImage
               className="rounded-full"
               src={profileData?.avatar_url || "/profile.jpg"}
               width={200}
               height={200}
-              alt="profile"
+              alt={`${profileData?.full_name}'s profile picture`}
+              trackPerformance={true}
+              imageName={`profile-${profileId}`}
             />
           </div>
 

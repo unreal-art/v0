@@ -5,6 +5,9 @@ import { ExtendedPhoto } from "../formattedPhotos";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import CommentArea from "./comments/commentArea";
+import { useRef, useState, useEffect } from "react";
+import OptimizedImage from "@/components/OptimizedImage";
+import { startSpan } from "@/utils/sentryUtils";
 
 interface GenerateTextFieldProps {
   photo: boolean | IPhoto;
@@ -19,6 +22,42 @@ export default function ImageView({
   const authorId = currentImage.author || "";
   const { data: userName, isLoading } = useAuthorUsername(authorId);
   const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
+  const [isImageVisible, setIsImageVisible] = useState(false);
+  const imgRef = useRef<HTMLDivElement | null>(null);
+
+  // Track how long it takes for the image to become visible in the viewport
+  useEffect(() => {
+    const finishSpan = startSpan(
+      `image-visibility-${
+        currentImage.src?.split("/").pop()?.split("?")[0] || "unknown"
+      }`,
+      "image-visibility",
+      { imageUrl: currentImage.src }
+    );
+
+    // Use Intersection Observer to detect when image enters viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsImageVisible(true);
+            observer.disconnect();
+            finishSpan();
+          }
+        });
+      },
+      { threshold: 0.1 } // Trigger when 10% of the image is visible
+    );
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+      finishSpan(); // Clean up the span if component unmounts before visible
+    };
+  }, [currentImage.src]);
 
   const handleClose = () => {
     setImageIndex(-1);
@@ -44,12 +83,18 @@ export default function ImageView({
             <div className="grid grid-cols-1 h-full md:grid-cols-2">
               <div className="h-full col-span-1 hidden md:block">
                 <div className="relative w-full md:h-full">
-                  <Image
+                  <OptimizedImage
                     src={currentImage.src}
-                    fill={true}
-                    alt=""
-                    placeholder="blur"
-                    blurDataURL="L6PZfSi_.AyE_3t7t7R**0o#DgR4"
+                    alt={currentImage.caption || "Image"}
+                    width={450}
+                    height={450}
+                    quality={75}
+                    priority={false}
+                    trackPerformance={true}
+                    imageName={
+                      currentImage.src?.split("/").pop()?.split("?")[0]
+                    }
+                    className="object-cover w-full h-full"
                   />
                 </div>
               </div>

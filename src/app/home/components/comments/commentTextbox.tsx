@@ -3,7 +3,7 @@ import { CommentWithUser } from "$/types/data.types";
 import { CloseIcon, EmojiIcon } from "@/app/components/icons";
 import { usePostComment } from "@/hooks/useComments";
 import { useUser } from "@/hooks/useUser";
-import Image from "next/image";
+import OptimizedImage from "@/components/OptimizedImage";
 import { useState } from "react";
 
 interface CommentTextboxProps {
@@ -52,12 +52,14 @@ export default function CommentTextbox({
 
           <div className="flex gap-2 items-center">
             <div>
-              <Image
+              <OptimizedImage
                 src={replyTo.avatar_url || "/profile.jpg"}
                 width={32}
                 height={32}
-                alt="profile"
+                alt={`${replyTo.username || "User"}'s profile picture`}
                 className="rounded-full"
+                trackPerformance={true}
+                imageName={`reply-to-avatar-${replyTo.user_id}`}
               />
             </div>
 
