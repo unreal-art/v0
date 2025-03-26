@@ -29,8 +29,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname:
-          "unreal01.61bc404fed98028e594de8e8bed90315.r2.cloudflarestorage.com",
+        hostname: "r2.unreal.art",
       },
       {
         protocol: "https",
@@ -49,8 +48,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_VERSION: `1.0.0-${Date.now()}`,
 
     // Storage URLs for preconnect
-    NEXT_PUBLIC_R2_STORAGE_URL:
-      "https://unreal01.61bc404fed98028e594de8e8bed90315.r2.cloudflarestorage.com",
+    NEXT_PUBLIC_R2_STORAGE_URL: "https://r2.unreal.art",
 
     // Lighthouse gateway
     NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY: "https://gateway.lighthouse.storage/ipfs/",
