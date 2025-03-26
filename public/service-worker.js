@@ -66,8 +66,8 @@ const waitForBuildVersion = async () => {
     new Promise((_, reject) =>
       setTimeout(
         () => reject(new Error("Timeout waiting for build version")),
-        5000 // Shorter timeout
-      )
+        5000, // Shorter timeout
+      ),
     ),
   ]);
 };
@@ -79,7 +79,7 @@ const CRITICAL_ASSETS = [
   "/Icon-White.png",
   "/logo.png",
   "/whiteLogo.png",
-  "/fallback.jpg",
+  "/fallback.jpng",
   "/offline.html",
 ];
 
@@ -117,9 +117,9 @@ self.addEventListener("install", (event) => {
 
       // Cache critical assets with version parameter
       await cache.addAll(
-        CRITICAL_ASSETS.map((url) => `${url}?v=${buildVersion}`)
+        CRITICAL_ASSETS.map((url) => `${url}?v=${buildVersion}`),
       );
-    })()
+    })(),
   );
 });
 
@@ -146,9 +146,9 @@ self.addEventListener("activate", (event) => {
           if (key !== CURRENT_CACHE && key !== IMAGE_CACHE) {
             return caches.delete(key);
           }
-        })
+        }),
       );
-    })()
+    })(),
   );
 });
 
@@ -178,7 +178,7 @@ self.addEventListener("fetch", (event) => {
   // Use different strategies for different content
   if (
     CRITICAL_ASSETS.some(
-      (asset) => url.pathname === asset || url.pathname.endsWith(asset)
+      (asset) => url.pathname === asset || url.pathname.endsWith(asset),
     )
   ) {
     // For critical assets: Cache first, network fallback
@@ -337,7 +337,7 @@ async function cacheFirstStrategy(request) {
       {
         status: 503,
         headers: { "Content-Type": "text/html" },
-      }
+      },
     );
   }
 }
@@ -502,6 +502,6 @@ async function serveOfflinePage(path = "") {
     {
       status: 503,
       headers: { "Content-Type": "text/html" },
-    }
+    },
   );
 }

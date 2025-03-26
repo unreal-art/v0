@@ -24,12 +24,12 @@ const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
 export const getImage = (
   cidOrUrl: string | undefined,
   fileName: string,
-  author: string
+  author: string,
 ) => {
   try {
     if (!cidOrUrl) {
       //console.warn("getImage called with an undefined or empty cidOrUrl");
-      return "/fallback.jpg"; // Handle missing value gracefully
+      return "/fallback.png"; // Handle missing value gracefully
     }
 
     const isDev = process.env.NODE_ENV === "development";
@@ -61,7 +61,7 @@ export const getImage = (
       : `${process.env.NEXT_PUBLIC_CF_URL}/${author}/${fileName}`; //cidOrUrl; //TODO: Correctly return the Cloudflare URL which is cidOrUrl
   } catch (error) {
     console.error("Error fetching image:", error);
-    return "/fallback.jpg"; // Fallback if there's an error
+    return "/fallback.png"; // Fallback if there's an error
   }
 };
 
@@ -123,7 +123,7 @@ export const formattedPhotosForGallary = (pages: Page[]): ExtendedPhoto[] => {
           caption: post.caption,
           seed: post.seed,
         } as ExtendedPhoto;
-      })
+      }),
     )
     .filter(Boolean) as ExtendedPhoto[];
 };
@@ -166,7 +166,7 @@ export const formattedPhotosForGrid = (pages: Page[]): ExtendedPhoto[] => {
           caption: post.caption,
           seed: post.seed,
         } as ExtendedPhoto;
-      })
+      }),
     )
     .filter(Boolean) as ExtendedPhoto[];
 };
@@ -209,7 +209,7 @@ export const formattedPhotos = (pages: Page[]): ExtendedPhoto[] => {
           caption: post.caption,
           seed: post.seed,
         } as ExtendedPhoto;
-      })
+      }),
     )
     .filter(Boolean) as ExtendedPhoto[];
 };
