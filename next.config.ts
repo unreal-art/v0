@@ -64,18 +64,18 @@ const nextConfig: NextConfig = {
   //       "*.mdx": ["mdx-loader"],
   //     },
   //   },
-  //   // Enable optimizations for faster page transitions
-  //   optimizePackageImports: [
-  //     "react-multi-carousel",
-  //     "framer-motion",
-  //     "gsap",
-  //     "lodash",
-  //     "swiper",
-  //     "react-loading-skeleton",
-  //   ],
-  //   // Optimize CSS for faster processing
-  //   optimizeCss: true,
-  // },
+    // Enable optimizations for faster page transitions
+    optimizePackageImports: [
+      "react-multi-carousel",
+      "framer-motion",
+      "gsap",
+      "lodash",
+      "swiper",
+      "react-loading-skeleton",
+    ],
+    // Optimize CSS for faster processing
+    optimizeCss: true,
+  },
   // Compress responses for faster delivery
   compress: true,
   // Transpile specific packages that need it
