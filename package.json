@@ -6,6 +6,7 @@
     "node": ">=16.0.0",
     "bun": ">=1.0.0"
   },
+  "packageManager": "bun@1.1.38",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
