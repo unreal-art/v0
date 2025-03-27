@@ -20,6 +20,21 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Deploy on Cloudflare
+
+To deploy this application to Cloudflare Workers:
+
+```bash
+# Install dependencies with Bun
+bun install
+
+# Build the application
+bun run cloudflare:build
+
+# Deploy to Cloudflare
+bun run cloudflare:deploy
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
