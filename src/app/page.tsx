@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient as createServerClient } from "$/supabase/server";
 import ClientHome from "./components/clientHome";
 
+export const dynamic = "force-dynamic";
+
 // Server-side auth check
 async function getSession() {
   try {
