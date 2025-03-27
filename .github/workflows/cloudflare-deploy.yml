@@ -1,15 +1,9 @@
-name: Build
+name: Deploy to Cloudflare
 
 on:
   push:
     branches:
       - main
-
-    tags:
-      - "*"
-  pull_request:
-    branches: ["main"]
-
   workflow_dispatch:
 
 concurrency:
@@ -20,7 +14,7 @@ env:
   envfile: ${{secrets.ENV}}
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,13 +26,6 @@ jobs:
           bun-version: ">=1"
           bun-repo: "oven-sh/bun"
           cache: true
-          # cache-bin: true
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          check-latest: false
 
       - name: Install Dependencies
         run: |
@@ -47,8 +34,14 @@ jobs:
 
       - name: Write environment
         run: |
-          echo "\n$envfile" >> .env
+          echo "$envfile" >> .env
 
       - name: Build
         run: |
-          bun run build
+          bun run cloudflare:build
+
+      - name: Deploy to Cloudflare
+        run: |
+          bun run cloudflare:deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

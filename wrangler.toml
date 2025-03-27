@@ -1,14 +1,19 @@
-"$schema" = "node_modules/wrangler/config-schema.json"
 name = "unreal"
-# main = "src/index.ts"
+main = "src/index.ts"
 compatibility_date = "2025-02-04"
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
+
+[build]
+command = "bun run build"
 
 [observability]
 enabled = true
 
-
 # Define environment variables
 [vars]
+# Non-sensitive configuration
+NEXT_PUBLIC_DEBUG = "true"
+NEXT_PUBLIC_BUILD_VERSION = "v1.0.0"
 
-#origin = "http://localhost:8787"
+# Origin for local development
+# origin = "http://localhost:8787" 
