@@ -1,0 +1,20 @@
+{
+  "/api/account/delete/route": "app/api/account/delete/route.js",
+  "/api/auth/callback/route": "app/api/auth/callback/route.js",
+  "/api/comments/like/route": "app/api/comments/like/route.js",
+  "/api/comments/replies/route": "app/api/comments/replies/route.js",
+  "/api/comments/route": "app/api/comments/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
+  "/api/sentry-example-api/route": "app/api/sentry-example-api/route.js",
+  "/api/darts/route": "app/api/darts/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/sentry-example-page/page": "app/sentry-example-page/page.js",
+  "/page": "app/page.js",
+  "/home/creations/page": "app/home/creations/page.js",
+  "/home/page": "app/home/page.js",
+  "/home/profile/[id]/page": "app/home/profile/[id]/page.js",
+  "/home/photo/[id]/page": "app/home/photo/[id]/page.js",
+  "/home/profile/page": "app/home/profile/page.js"
+}

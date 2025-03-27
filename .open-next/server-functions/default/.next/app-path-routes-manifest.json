@@ -1,0 +1,20 @@
+{
+  "/api/account/delete/route": "/api/account/delete",
+  "/api/auth/callback/route": "/api/auth/callback",
+  "/api/comments/like/route": "/api/comments/like",
+  "/api/comments/replies/route": "/api/comments/replies",
+  "/api/comments/route": "/api/comments",
+  "/favicon.ico/route": "/favicon.ico",
+  "/manifest.webmanifest/route": "/manifest.webmanifest",
+  "/api/sentry-example-api/route": "/api/sentry-example-api",
+  "/api/darts/route": "/api/darts",
+  "/_not-found/page": "/_not-found",
+  "/auth/page": "/auth",
+  "/sentry-example-page/page": "/sentry-example-page",
+  "/page": "/",
+  "/home/creations/page": "/home/creations",
+  "/home/page": "/home",
+  "/home/profile/[id]/page": "/home/profile/[id]",
+  "/home/photo/[id]/page": "/home/photo/[id]",
+  "/home/profile/page": "/home/profile"
+}

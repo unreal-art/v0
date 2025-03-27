@@ -1,0 +1,1 @@
+self.__RSC_SERVER_MANIFEST="{\"node\":{\"7fbe796e2ed096f78d3b020da10b4dbad05ca067aa\":{\"workers\":{\"app/api/darts/route\":{\"moduleId\":\"84599\",\"async\":false}},\"layer\":{\"app/api/darts/route\":\"rsc\"}}},\"edge\":{},\"encryptionKey\":\"process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY\"}"

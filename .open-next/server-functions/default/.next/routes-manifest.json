@@ -1,0 +1,148 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [
+    {
+      "page": "/home/photo/[id]",
+      "regex": "^/home/photo/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/home/photo/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/home/profile/[id]",
+      "regex": "^/home/profile/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/home/profile/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/auth",
+      "regex": "^/auth(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/home",
+      "regex": "^/home(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/home(?:/)?$"
+    },
+    {
+      "page": "/home/creations",
+      "regex": "^/home/creations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/home/creations(?:/)?$"
+    },
+    {
+      "page": "/home/profile",
+      "regex": "^/home/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/home/profile(?:/)?$"
+    },
+    {
+      "page": "/manifest.webmanifest",
+      "regex": "^/manifest\\.webmanifest(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/manifest\\.webmanifest(?:/)?$"
+    },
+    {
+      "page": "/sentry-example-page",
+      "regex": "^/sentry\\-example\\-page(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sentry\\-example\\-page(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": [
+    {
+      "source": "/monitoring(/?)",
+      "has": [
+        {
+          "type": "query",
+          "key": "o",
+          "value": "(?<orgid>\\d*)"
+        },
+        {
+          "type": "query",
+          "key": "p",
+          "value": "(?<projectid>\\d*)"
+        },
+        {
+          "type": "query",
+          "key": "r",
+          "value": "(?<region>[a-z]{2})"
+        }
+      ],
+      "destination": "https://o:orgid.ingest.:region.sentry.io/api/:projectid/envelope/?hsts=0",
+      "regex": "^/monitoring(/?)(?:/)?$"
+    },
+    {
+      "source": "/monitoring(/?)",
+      "has": [
+        {
+          "type": "query",
+          "key": "o",
+          "value": "(?<orgid>\\d*)"
+        },
+        {
+          "type": "query",
+          "key": "p",
+          "value": "(?<projectid>\\d*)"
+        }
+      ],
+      "destination": "https://o:orgid.ingest.sentry.io/api/:projectid/envelope/?hsts=0",
+      "regex": "^/monitoring(/?)(?:/)?$"
+    }
+  ]
+}

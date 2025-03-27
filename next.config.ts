@@ -58,24 +58,24 @@ const nextConfig: NextConfig = {
       process.env.NODE_ENV === "development" ? "true" : "false",
   },
   // Enable turbopack for faster dev experience
-  experimental: {
-    turbo: {
-      rules: {
-        "*.mdx": ["mdx-loader"],
-      },
-    },
-    // Enable optimizations for faster page transitions
-    optimizePackageImports: [
-      "react-multi-carousel",
-      "framer-motion",
-      "gsap",
-      "lodash",
-      "swiper",
-      "react-loading-skeleton",
-    ],
-    // Optimize CSS for faster processing
-    optimizeCss: true,
-  },
+  // experimental: {
+  //   turbo: {
+  //     rules: {
+  //       "*.mdx": ["mdx-loader"],
+  //     },
+  //   },
+  //   // Enable optimizations for faster page transitions
+  //   optimizePackageImports: [
+  //     "react-multi-carousel",
+  //     "framer-motion",
+  //     "gsap",
+  //     "lodash",
+  //     "swiper",
+  //     "react-loading-skeleton",
+  //   ],
+  //   // Optimize CSS for faster processing
+  //   optimizeCss: true,
+  // },
   // Compress responses for faster delivery
   compress: true,
   // Transpile specific packages that need it
@@ -152,3 +152,7 @@ const sentryWebpackPluginOptions = {
 };
 
 export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+
+// Enable Cloudflare context in development
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();

@@ -1,2 +1,0 @@
-b:
-  bun run build
