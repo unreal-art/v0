@@ -58,12 +58,12 @@ const nextConfig: NextConfig = {
       process.env.NODE_ENV === "development" ? "true" : "false",
   },
   // Enable turbopack for faster dev experience
-  // experimental: {
-  //   turbo: {
-  //     rules: {
-  //       "*.mdx": ["mdx-loader"],
-  //     },
-  //   },
+  experimental: {
+    turbo: {
+      rules: {
+        "*.mdx": ["mdx-loader"],
+      },
+    },
     // Enable optimizations for faster page transitions
     optimizePackageImports: [
       "react-multi-carousel",
