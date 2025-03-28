@@ -92,11 +92,11 @@ function NavLink({ href, text, icon }: NavLinkProps) {
               <div className="w-8 h-8 rounded-full overflow-hidden will-change-transform">
                 <OptimizedImage
                   src={user?.avatar_url || "/profile.jpg"}
+                  isProfile={true}
                   alt="User profile"
                   width={32}
                   height={32}
                   className="rounded-full object-cover"
-                  
                   trackPerformance={true}
                   imageName="nav-profile-avatar"
                 />

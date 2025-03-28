@@ -25,11 +25,11 @@ export default function Reply({
   const { data: user } = useAuthorUsername(data.user_id);
   const likeReply = useLikeReply(
     data.post_id.toString(),
-    data.parent_id as string
+    data.parent_id as string,
   );
   const unlikeReply = useUnlikeReply(
     data.post_id.toString(),
-    data.parent_id as string
+    data.parent_id as string,
   );
 
   return (
@@ -42,6 +42,7 @@ export default function Reply({
               width={48}
               height={48}
               alt={`${user || "User"}'s profile picture`}
+              isProfile={true}
               className="rounded-full"
               trackPerformance={true}
               imageName={`reply-avatar-${data.user_id}`}
