@@ -14,16 +14,14 @@ function AppBase({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
 
   return (
-    <main
-      className="fixed z-10 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen will-change-transform"
-    >
+    <main className="fixed z-10 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen will-change-transform">
       <Toaster />
       <div className="md:flex md:flex-col p-3 gap-3 items-center basis-1/12 bg-primary-13 h-full select-none">
-        <Link href={"/"} className="hidden md:block m-6">
-          <Image 
-            src="/icons/logo.png" 
-            alt="logo" 
-            width={38} 
+        <Link href={"/home"} className="hidden md:block m-6">
+          <Image
+            src="/icons/logo.png"
+            alt="logo"
+            width={38}
             height={38}
             priority
             className="w-[38px] h-[38px]"

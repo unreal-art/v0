@@ -39,15 +39,21 @@ jobs:
         with:
           node-version: 22
           check-latest: false
+          # cache-dependency-path: "bun.lockb"
+          cache: "yarn"
 
       - name: Install Dependencies
         run: |
           cp .env.example .env
-          bun install
+          # source .env.example
+          # bun i
+          yarn install
 
       - name: Write environment
         run: |
           echo "\n$envfile" >> .env
+          # sed -i 's/ /\n/g' .env
+          # source .env
 
       - name: Build
         run: |
