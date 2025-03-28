@@ -54,6 +54,7 @@ export default function CommentTextbox({
             <div>
               <OptimizedImage
                 src={replyTo.avatar_url || "/profile.jpg"}
+                isProfile={true}
                 width={32}
                 height={32}
                 alt={`${replyTo.username || "User"}'s profile picture`}

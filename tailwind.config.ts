@@ -64,11 +64,17 @@ export default {
       },
       animation: {
         "infinite-scroll": "infinite-scroll 70s linear infinite",
+        pulseWave: "pulseWave 1.5s infinite ease-in-out",
       },
       keyframes: {
         "infinite-scroll": {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-100%)" },
+        },
+        pulseWave: {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "50%": { transform: "scale(1.4)", opacity: "0.5" },
+          "100%": { transform: "scale(1)", opacity: "1" },
         },
       },
     },

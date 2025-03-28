@@ -38,6 +38,7 @@ export default function Comment({
         <div className="h-12 w-12">
           <OptimizedImage
             src={data.avatar_url || "/profile.jpg"}
+            isProfile={true}
             width={48}
             height={48}
             alt={`${user || "User"}'s profile picture`}

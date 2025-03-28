@@ -26,12 +26,13 @@ import ImageOptionMenu from "../../components/imageOptionMenu";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
 import { IPhoto } from "@/app/libs/interfaces";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
   {
     ssr: false,
-  }
+  },
 );
 
 export default function Generation() {
@@ -65,7 +66,7 @@ export default function Generation() {
   const [isFetching, setIsFetching] = useState(true);
   const [dynamicTitle, setDynamicTitle] = useState("Default Title");
   const [dynamicDescription, setDynamicDescription] = useState(
-    "Default Description"
+    "Default Description",
   );
   const [commentPhoto, setCommentPhoto] = useState<IPhoto | boolean>(false);
   const [dynamicImage, setDynamicImage] = useState("/default-image.jpg");
@@ -86,7 +87,7 @@ export default function Generation() {
         image: getImage(
           (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
           (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-          post?.author as string
+          post?.author as string,
         ),
       };
 
@@ -207,7 +208,7 @@ export default function Generation() {
   const image = getImage(
     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
     (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-    post?.author as string
+    post?.author as string,
   );
 
   return (
@@ -274,8 +275,16 @@ export default function Generation() {
                 </ImageOptionMenu> */}
               </div>
 
-              <div className="flex justify-center  w-full">
-                <Image src={image} width={306} height={408} alt="generated" />
+              <div className="flex justify-center w-full relative">
+                <OptimizedImage
+                  className="w-[306px] h-[408px] sm:w-[350px] sm:h-[450px] md:w-[400px] md:h-[500px] lg:w-[450px] lg:h-[550px] xl:w-[500px] xl:h-[600px] object-contain"
+                  src={image}
+                  width={0} // Allow automatic width handling
+                  height={0} // Allow automatic height handling
+                  alt={`unreal-image-${(post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]}`}
+                  trackPerformance={true}
+                  imageName={`view-${(post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]}`}
+                />
               </div>
 
               <div className="flex flex-col w-full px-1 mt-8 md:mt-0 md:px-6 gap-y-4">
@@ -306,12 +315,12 @@ export default function Generation() {
               <div className="h-48">
                 <p className="text-primary-5 text-lg">Output quantity</p>
 
-                <div className="px-3 py-2">
+                <div className="px-3 py-2 relative">
                   <Image
                     src={getImage(
                       (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                       (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                      post?.author as string
+                      post?.author as string,
                     )}
                     width={98}
                     height={128}
@@ -339,7 +348,7 @@ export default function Generation() {
                   imageUrl={getImage(
                     (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                     (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                    post?.author as string
+                    post?.author as string,
                   )}
                 />
 

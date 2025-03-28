@@ -5,6 +5,7 @@ import { useState, useCallback, memo } from "react";
 interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
   trackPerformance?: boolean;
   imageName?: string;
+  isProfile?: boolean;
 }
 
 function OptimizedImage({
@@ -15,6 +16,7 @@ function OptimizedImage({
   trackPerformance = false,
   imageName,
   priority,
+  isProfile,
   sizes = "100vw",
   loading = "lazy",
   quality = 80,
@@ -81,11 +83,18 @@ function OptimizedImage({
         <div
           className="absolute inset-0 flex items-center justify-center"
           style={{
-            backgroundColor: "rgba(0,0,0,0.2)",
+            // backgroundColor: "rgba(0,0,0,0.2)",
             zIndex: 10,
           }}
         >
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white"></div>
+          {!isProfile && (
+            <div className="flex items-center justify-center h-full w-full bg-transparent ">
+              <div className="relative w-10 h-10">
+                <div className="absolute inset-0 w-full h-full bg-[#5d5d5d] rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-full h-full bg-[#8f8f8f] rounded-full animate-ping"></div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>

@@ -37,12 +37,12 @@ export default async function Auth() {
           Continue with Google
         </AuthBtn>
 
-        <AuthBtn
+        {/* <AuthBtn
           icon={<AppleIcon color="#C1C1C1" width={21} height={20} />}
           provider="apple"
         >
           Continue with Apple
-        </AuthBtn>
+        </AuthBtn> */}
       </div>
 
       <div className="flex-1 flex flex-col items-center  justify-center w-full borderColor-primary-10/50 ">
