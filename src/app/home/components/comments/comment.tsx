@@ -64,7 +64,8 @@ export default function Comment({
                   setReplyTo(data);
                 }}
               >
-                reply ({replies ? formatNumber(replies.length) : ""})
+                reply{" "}
+                {replies ? <span>({formatNumber(replies.length)})</span> : ""}
               </button>
             </div>
             <div className="justify-end">
