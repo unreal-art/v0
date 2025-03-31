@@ -120,7 +120,7 @@ const isThrottled = (cacheKey: string): boolean => {
  */
 export const captureException = (
   error: Error | unknown,
-  context?: Record<string, any>
+  context?: Record<string, any>,
 ): void => {
   // Skip in development for better performance, just log to console
   if (process.env.NODE_ENV === "development") {
@@ -140,7 +140,7 @@ export const captureException = (
         Object.entries(context).map(([key, value]) => [
           key,
           safeStringify(value),
-        ])
+        ]),
       )
     : undefined;
 
@@ -161,7 +161,7 @@ export const captureException = (
 export const captureMessage = (
   message: string,
   level: Sentry.SeverityLevel = "info",
-  context?: Record<string, any>
+  context?: Record<string, any>,
 ): void => {
   // Skip low-priority messages in production
   if (process.env.NODE_ENV === "production" && level === "info") {
@@ -182,7 +182,7 @@ export const captureMessage = (
         Object.entries(context).map(([key, value]) => [
           key,
           safeStringify(value),
-        ])
+        ]),
       )
     : undefined;
 
@@ -199,7 +199,7 @@ export const setUser = (
   id: string | null,
   email?: string,
   username?: string,
-  additionalData?: Record<string, any>
+  additionalData?: Record<string, any>,
 ): void => {
   if (id) {
     Sentry.setUser({
@@ -221,7 +221,7 @@ export const addBreadcrumb = (
   message: string,
   category?: string,
   level: Sentry.SeverityLevel = "info",
-  data?: Record<string, any>
+  data?: Record<string, any>,
 ): void => {
   // Skip breadcrumbs in production for better performance
   if (process.env.NODE_ENV === "production" && level === "info") {
@@ -231,7 +231,7 @@ export const addBreadcrumb = (
   // Limit data size
   const safeData = data
     ? Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [key, safeStringify(value)])
+        Object.entries(data).map(([key, value]) => [key, safeStringify(value)]),
       )
     : undefined;
 
@@ -248,11 +248,11 @@ export const addBreadcrumb = (
  */
 export const setContext = (
   name: string,
-  context: Record<string, any>
+  context: Record<string, any>,
 ): void => {
   // Limit context size
   const safeContext = Object.fromEntries(
-    Object.entries(context).map(([key, value]) => [key, safeStringify(value)])
+    Object.entries(context).map(([key, value]) => [key, safeStringify(value)]),
   );
 
   Sentry.setContext(name, safeContext);
@@ -267,7 +267,7 @@ export const log = (message: string, data?: any): void => {
   const isDev = process.env.NODE_ENV === "development";
 
   if (isDev) {
-    console.log(message, data);
+    // console.log(message, data);
     return;
   }
 
@@ -334,7 +334,7 @@ export const logWarning = (message: string, data?: any): void => {
 export const startSpan = (
   name: string,
   op: string,
-  data?: Record<string, any>
+  data?: Record<string, any>,
 ): (() => void) => {
   // Skip in production environments where we've disabled performance monitoring for speed
   if (process.env.NODE_ENV === "production") {
@@ -353,7 +353,7 @@ export const startSpan = (
           Object.entries(data).map(([key, value]) => [
             key,
             safeStringify(value),
-          ])
+          ]),
         )
       : undefined;
 
@@ -385,7 +385,7 @@ export const startSpan = (
                 ...safeData,
                 duration,
                 spanId,
-              }
+              },
             );
 
             // For very slow operations (>1s), send a performance issue
@@ -398,7 +398,7 @@ export const startSpan = (
                   duration,
                   operation: op,
                   ...safeData,
-                }
+                },
               );
             }
           } catch (e) {
