@@ -1,6 +1,6 @@
 "use client";
 import { torusTestnet } from "$/constants/chains";
-import { getContractInstance } from "@/utils";
+import { getContractInstance, logError } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { parseEther } from "ethers";
@@ -48,6 +48,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
       }
 
       const parsedAmount = parseEther(amount.toString());
+      console.log(parsedAmount);
 
       const transaction = prepareContractCall({
         contract: exchangeContract,
@@ -57,12 +58,12 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
 
       swapTransaction(transaction, {
         onSuccess: () => {
-          console.log("Swap successful");
           refetch(); //refetch dart balance
           setMainLoadingState(false);
           // show success modal
         },
         onError: (error) => {
+          logError(error.message);
           toast.error("Swap failed:");
           setMainLoadingState(false);
           setMainTransaction(false);
@@ -89,7 +90,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
     });
     approveTransaction(transaction, {
       onSuccess: () => {
-        console.log("Approved");
+        // console.log("Approved");
         swapTokens();
       },
       onError: (error) => {
@@ -100,12 +101,12 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
     });
   };
 
-  useEffect(() => {
-    if (swapLoading || approveLoading) {
-      console.log(approveLoading, swapLoading);
-      //show loading modal
-    }
-  }, [swapLoading, approveLoading]);
+  // useEffect(() => {
+  //   if (swapLoading || approveLoading) {
+  //     console.log(approveLoading, swapLoading);
+  //     //show loading modal
+  //   }
+  // }, [swapLoading, approveLoading]);
 
   return (
     <>
