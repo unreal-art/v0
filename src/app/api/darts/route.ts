@@ -1,14 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 // import { axiosInstance } from "@/lib/axiosInstance";
 // import axios from "axios";
 import { getUser } from "@/queries/user";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { withEdgeHighlight } from "@/utils/edge-highlight.config";
 
-export const runtime = "edge"; // Use Edge Functions
-export const maxDuration = 300; // 5-minute max execution time
+//remove edge runtime since we are not on vercel
+// import { withEdgeHighlight } from "@/utils/edge-highlight.config";
 
-export async function POST(req: NextRequest) {
+// export const runtime = "edge"; // Use Edge Functions
+// export const maxDuration = 300; // 5-minute max execution time
+
+export async function POST(req: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
   const private_SRK = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
 

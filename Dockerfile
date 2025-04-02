@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY . .
 
-COPY .env.example .env
+# COPY .env.example .env
 
 
 RUN npm install -g bun
@@ -21,6 +21,8 @@ ENV NODE_ENV="production"
 
 
 WORKDIR /app
+
+RUN npm install -g bun # the other bun not visible here
 
 EXPOSE $PORT
 
