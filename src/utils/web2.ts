@@ -123,22 +123,24 @@ export function getImageResolution(imageUrl: string) {
 //       window.URL.revokeObjectURL(url);
 //     })
 //     .catch((error) => console.error("Error downloading image:", error));
-// }
+//
 
 export function downloadImage(imageUrl: string, fileName?: string) {
-  fetch(imageUrl)
-    .then((response) => response.blob())
+  fetch(imageUrl, { mode: "cors" }) // Ensure it's a CORS request
+    .then((response) => {
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.blob();
+    })
     .then((blob) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const a = document.createElement("a");
-        a.href = reader.result as string;
-        a.download = fileName || `downloaded-image-${Date.now()}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      };
-      reader.readAsDataURL(blob);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName || `downloaded-image-${Date.now()}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     })
     .catch((error) => console.error("Error downloading image:", error));
 }
@@ -148,9 +150,11 @@ export const formatMoney = (value: number) => {
 };
 
 export function formatNumber(num: number): string {
-  if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
-  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
-  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+  if (num >= 1_000_000_000)
+    return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";
+  if (num >= 1_000_000)
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "k";
   return num.toString();
 }
 
