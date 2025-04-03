@@ -58,7 +58,7 @@ export const getImage = (
           "/" +
           fileName +
           imageOptions
-      : cidOrUrl; // fetch from Cloudflare
+      : `${process.env.NEXT_PUBLIC_CF_URL}/${author}/${fileName}`; //cidOrUrl; // fetch from Cloudflare TODO: get direct from Cloudflare
   } catch (error) {
     console.error("Error fetching image:", error);
     return "/fallback.png"; // Fallback if there's an error
