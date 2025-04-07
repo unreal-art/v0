@@ -246,7 +246,7 @@ export default function Generation() {
         </div>
 
         <div className="overflow-y-auto w-full">
-          <div className="grid grid-cols-1 md:grid-cols-12 w-full md:h-[calc(100vh_-_220px)]">
+          <div className="grid grid-cols-1 md:grid-cols-12 w-full ">
             <div className="flex flex-col justify-between items-center col-span-9">
               <div className="flex justify-between h-24 p-6 gap-5 w-full">
                 <Link
@@ -364,7 +364,7 @@ export default function Generation() {
             </div>
           </div>
 
-          <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10">
+          <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10 ">
             {a ? "Drafts" : "Other posts"} by{"  "}
             <Link href={`/home/profile/${post?.author}`}>
               <strong className="text-primary-5 pl-1">{authorUsername}</strong>
@@ -372,7 +372,8 @@ export default function Generation() {
           </p>
 
           <div>
-            <PhotoGallaryTwo />
+            {" "}
+            <PhotoGallaryTwo />{" "}
           </div>
         </div>
       </div>

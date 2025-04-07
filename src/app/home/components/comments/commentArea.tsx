@@ -43,7 +43,7 @@ export default function CommentArea({
   };
 
   return (
-    <div className="md:flex md:flex-col">
+    <div className="md:flex md:flex-col ">
       <div className="md:p-[2px]">
         <div className="flex justify-between h-18 py-2 px-2 md:px-5 gap-5 w-full text-sm lg:text-base">
           <div className="flex gap-1 items-center">
