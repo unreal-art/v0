@@ -32,7 +32,7 @@ export default function ImageView({
         currentImage.src?.split("/").pop()?.split("?")[0] || "unknown"
       }`,
       "image-visibility",
-      { imageUrl: currentImage.src }
+      { imageUrl: currentImage.src },
     );
 
     // Use Intersection Observer to detect when image enters viewport
@@ -46,7 +46,7 @@ export default function ImageView({
           }
         });
       },
-      { threshold: 0.1 } // Trigger when 10% of the image is visible
+      { threshold: 0.1 }, // Trigger when 10% of the image is visible
     );
 
     if (imgRef.current) {
@@ -69,16 +69,16 @@ export default function ImageView({
     <>
       <div
         onClick={handleClose}
-        className="relative  top-0 left-0 h-screen w-full bg-gray-950/50 inset-0"
+        className="fixed z-50 h-dvh   top-0 left-0   w-full bg-gray-950/50 inset-0"
       ></div>
 
-      <div className="fixed z-50 flex justify-center items-center top-0 left-0 h-screen w-full ">
+      <div className="fixed z-50 flex justify-center items-center top-0 left-0 h-dvh  w-full ">
         <div
           onClick={handleClose}
-          className="absolute flex justify-center items-center top-0 left-0 h-screen w-full "
+          className="absolute flex justify-center items-center top-0 left-0 h-dvh  w-full "
         ></div>
 
-        <div className="z-10 w-full md:w-11/12 xl:w-8/12 max-w-[968px] h-[100dvh]  md:h-[643px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
+        <div className="z-10 w-full md:w-11/12 xl:w-8/12 max-w-[968px] h-dvh  md:h-[643px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
           <div className="bg-primary-13 h-full w-full rounded-md">
             <div className="grid grid-cols-1 h-full md:grid-cols-2">
               <div className="h-full col-span-1 hidden md:block">
@@ -99,7 +99,7 @@ export default function ImageView({
                 </div>
               </div>
 
-              <div className="h-full">
+              <div className="h-full ">
                 <CommentArea
                   image={image as string}
                   imageLoading={imageLoading}
