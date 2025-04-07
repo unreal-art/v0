@@ -31,11 +31,12 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import { capitalizeFirstAlpha } from "@/utils";
 
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first 8 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -83,7 +84,7 @@ export default function SearchPhotoGallary({
 }) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState(
-    window?.innerWidth < MD_BREAKPOINT ? 2 : 4
+    window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
   );
 
   // Use Zustand store for tab state
@@ -191,18 +192,22 @@ function PhotoWithAuthor({
           <>
             <div className="rounded-full">
               {image ? (
-                <Image
-                  className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                <OptimizedImage
+                  className="rounded-full drop-shadow-lg"
                   src={image}
                   width={24}
                   height={24}
-                  alt="profile"
+                  alt={`${userName}'s profile picture`}
+                  trackPerformance={true}
+                  imageName={`profile-${authorId}`}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
-            <p className="font-semibold text-sm drop-shadow-lg">{userName}</p>
+            <p className="font-semibold text-sm drop-shadow-lg">
+              {capitalizeFirstAlpha(userName)}
+            </p>
           </>
         )}
       </div>

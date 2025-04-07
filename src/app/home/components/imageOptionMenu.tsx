@@ -21,6 +21,7 @@ import Link from "next/link";
 import { usePost } from "@/hooks/usePost";
 import ShareModal from "./modals/shareModal";
 import { toast } from "sonner";
+import { Following } from "./followingBtn";
 
 interface ImageOptionMenuProps {
   children: ReactNode;
@@ -41,7 +42,7 @@ export default function ImageOptionMenu({
 
   const { isPinned, setPinned } = useIsPostPinned(
     Number(postId),
-    userId as string
+    userId as string,
   );
   const { data: post } = usePost(Number(postId));
   const pinPostMutation = usePinPost(userId as string);
@@ -143,10 +144,14 @@ export default function ImageOptionMenu({
               <MenuItem
                 onClick={handleCreator}
                 icon={<UserIcon width={16} height={16} color="#8F8F8F" />}
-                text="Go to creator profile"
+                text="Creator profile"
                 underlineOff={true}
               />
             </Link>
+
+            <div className="w-full lg:hidden">
+              <Following authorId={image.author || ""} isList={true} />
+            </div>
             {/* <MenuItem
               onClick={handleClose}
               icon={<FlagIcon width={16} height={16} color="#FDA29B" />}

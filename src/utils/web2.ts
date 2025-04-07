@@ -56,17 +56,6 @@ export function isHighQualityImage(filename: string): boolean {
   return highQExt.includes(filename.toLowerCase().split(".").pop() || "");
 }
 
-export function truncateText(
-  text: string | undefined | null,
-  wordLimit: number = 10,
-): string {
-  if (!text) return "";
-  const words = text.split(" ");
-  return words.length > wordLimit
-    ? words.slice(0, wordLimit).join(" ") + "..."
-    : text;
-}
-
 export const getNotificationMessage = (
   type: string,
   senderName: string | null | undefined,
@@ -163,4 +152,28 @@ export function splitName(fullName: string) {
   let firstName = parts[0];
   let lastName = parts.slice(1).join(" "); // Handles cases with middle names
   return { firstName, lastName };
+}
+
+export function capitalizeFirstAlpha(str: string) {
+  if (!str) return str;
+
+  const firstChar = str.charAt(0);
+  if (/[a-zA-Z]/.test(firstChar)) {
+    return firstChar.toUpperCase() + str.slice(1);
+  }
+
+  return str;
+}
+
+export function truncateText(
+  text: string | undefined | null,
+  wordLimit: number = 10,
+): string {
+  if (!text) return "";
+  const words = text.split(" ");
+  const mainWord =
+    words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  return capitalizeFirstAlpha(mainWord);
 }

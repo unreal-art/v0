@@ -70,7 +70,7 @@ export default function CommentArea({
               <p className="text-primary-7 nasalization">Creator</p>
             </div>
 
-            <div className=" h-full pl-2">
+            <div className=" h-full pl-2 hidden lg:block">
               <Following authorId={authorId} />
             </div>
           </div>
