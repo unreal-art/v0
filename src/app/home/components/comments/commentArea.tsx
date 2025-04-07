@@ -11,6 +11,7 @@ import ImageOptionMenu from "../imageOptionMenu";
 import { IPhoto } from "@/app/libs/interfaces";
 import { Following } from "../followingBtn";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import { capitalizeFirstAlpha } from "@/utils";
 
 interface CommentAreaProps {
   image: string;
@@ -52,7 +53,7 @@ export default function CommentArea({
               </button>
               {!imageLoading && (
                 <OptimizedImage
-                  className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                  className="rounded-full  drop-shadow-lg"
                   src={image || ""}
                   width={48}
                   height={48}
@@ -65,7 +66,9 @@ export default function CommentArea({
 
             <div>
               <p className="font-semibold text-lg leading-6 text-primary-2">
-                {isLoading ? "Loading..." : userName || "Unknown"}
+                {isLoading
+                  ? "Loading..."
+                  : capitalizeFirstAlpha(userName) || "Unknown"}
               </p>
               <p className="text-primary-7 nasalization">Creator</p>
             </div>
