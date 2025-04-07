@@ -32,6 +32,7 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import { capitalizeFirstAlpha } from "@/utils";
 
 // Dynamically import ImageView component to reduce initial bundle size
 const ImageView = dynamic(() => import("./imageView"), {
@@ -42,7 +43,7 @@ const ImageView = dynamic(() => import("./imageView"), {
 // Define renderNextImage as a regular function since it's used as a render prop
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -107,14 +108,14 @@ function PhotoGallaryTwo({}) {
           supabase,
           pageParam,
           Number(postId),
-          post?.author
+          post?.author,
         );
       } else {
         result = await getOtherPostsByUser(
           supabase,
           pageParam,
           Number(postId),
-          post?.author
+          post?.author,
         );
       }
 
@@ -123,7 +124,7 @@ function PhotoGallaryTwo({}) {
         nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
       };
     },
-    [a, postId, post?.author]
+    [a, postId, post?.author],
   );
 
   // Use a stable query key that won't change structure between renders
@@ -134,7 +135,7 @@ function PhotoGallaryTwo({}) {
       a ? "drafts" : "public",
       postId,
     ],
-    [post?.author, a, postId]
+    [post?.author, a, postId],
   );
 
   const {
@@ -180,7 +181,7 @@ function PhotoGallaryTwo({}) {
   // Memoize formatted photos to prevent recalculation on each render
   const photos = useMemo(
     () => formattedPhotos(data?.pages ?? []),
-    [data?.pages]
+    [data?.pages],
   );
 
   // Early return after all hooks have been called
@@ -254,7 +255,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
             <div className="rounded-full">
               {image ? (
                 <OptimizedImage
-                  className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                  className="rounded-full drop-shadow-lg"
                   src={image}
                   width={24}
                   height={24}
@@ -266,7 +267,9 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
-            <p className="font-semibold text-sm drop-shadow-lg">{userName}</p>
+            <p className="font-semibold text-sm drop-shadow-lg">
+              {capitalizeFirstAlpha(userName)}
+            </p>
           </>
         )}
       </div>

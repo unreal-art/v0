@@ -32,6 +32,7 @@ import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import { capitalizeFirstAlpha } from "@/utils";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
@@ -244,7 +245,7 @@ function PhotoWithAuthor({
             <div className="rounded-full">
               {image ? (
                 <OptimizedImage
-                  className="rounded-full border-[1px] border-primary-3 drop-shadow-lg"
+                  className="rounded-full drop-shadow-lg"
                   src={image}
                   width={24}
                   height={24}
@@ -257,7 +258,9 @@ function PhotoWithAuthor({
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
-            <p className="font-light text-sm drop-shadow-lg">{userName}</p>
+            <p className="font-light text-sm drop-shadow-lg">
+              {capitalizeFirstAlpha(userName)}
+            </p>
           </Link>
         )}
       </div>

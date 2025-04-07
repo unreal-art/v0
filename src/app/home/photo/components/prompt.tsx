@@ -1,5 +1,6 @@
 import { CopyIcon, PlusIcon } from "@/app/components/icons";
 import CopyToClipboard from "../../components/copyToclipboard";
+import { capitalizeFirstAlpha } from "@/utils";
 
 interface PromptProps {
   title: string;
@@ -16,7 +17,7 @@ export default function Prompt({ title, fullText, children }: PromptProps) {
           {/* <button>
             <PlusIcon color="#5D5D5D" />
           </button> */}
-          <CopyToClipboard text={fullText} />
+          <CopyToClipboard text={capitalizeFirstAlpha(fullText)} />
         </div>
       </div>
       <p className="line-clamp-3">{children}</p>

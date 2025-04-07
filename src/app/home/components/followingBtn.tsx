@@ -2,8 +2,16 @@
 import { useDoesUserFollow } from "@/hooks/useDoesUserFollow";
 import { useUser } from "@/hooks/useUser";
 import { useToggleFollow } from "@/hooks/useToggleFollow";
+import { MenuItem } from "@/app/menu";
+import { UserAddIcon, UserIcon } from "@/app/components/icons";
 
-export function Following({ authorId }: { authorId: string }) {
+export function Following({
+  authorId,
+  isList,
+}: {
+  authorId: string;
+  isList?: boolean;
+}) {
   const { userId } = useUser();
   const { data: isFollowing, isLoading } = useDoesUserFollow(
     userId as string,
@@ -12,12 +20,24 @@ export function Following({ authorId }: { authorId: string }) {
   const toggleFollowMutation = useToggleFollow();
 
   const handleFollowToggle = () => {
+    if (toggleFollowMutation.isPending) return;
+
     toggleFollowMutation.mutate({
       followerId: userId as string,
       followeeId: authorId,
     });
   };
 
+  if (isList && userId !== authorId) {
+    return (
+      <MenuItem
+        onClick={handleFollowToggle}
+        icon={<UserAddIcon width={16} height={18} color="#8F8F8F" />}
+        text={isFollowing ? "Unfollow" : "Follow"}
+        underlineOff={true}
+      />
+    );
+  }
   return (
     <div className=" rounded-t-3xl my-3">
       {userId !== authorId && (
