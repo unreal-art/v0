@@ -7,7 +7,7 @@ import { ExtendedUser } from "$/types/data.types";
 import { logError } from "@/utils/sentryUtils";
 
 export const getUser = async (
-  client?: Client
+  client?: Client,
 ): Promise<Partial<ExtendedUser> | null> => {
   const supabase = await createClient();
 
@@ -47,7 +47,7 @@ export const getUser = async (
   }
 
   const user = {
-    ...userData,
+    ...userData.user,
     wallet: profileData[0].wallet as WalletObject | undefined,
     bio: profileData[0].bio as string,
     location: profileData[0].location as string,

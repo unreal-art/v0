@@ -47,7 +47,7 @@ const fetchUser = async (): Promise<{
       });
 
       return { userId, user };
-    }
+    },
   );
 };
 
@@ -55,7 +55,7 @@ const fetchUser = async (): Promise<{
 export const useUser = () => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: fetchUser,
     staleTime: 1000 * 60 * 10, // Cache for 10 minutes
@@ -64,6 +64,13 @@ export const useUser = () => {
     refetchOnWindowFocus: false, // Prevent unnecessary refetches
     refetchOnMount: false, // Use cached data when component remounts
   });
+
+  // Refetch the user data manually
+  const refetchUser = () => {
+    console.log("Invalidating and refetching user...");
+    queryClient.invalidateQueries({ queryKey: ["user"] });
+    refetch();
+  };
 
   // Prefetch wrapper for user profiles
   const prefetchUserProfile = useCallback(
@@ -95,13 +102,14 @@ export const useUser = () => {
         staleTime: 1000 * 60 * 5, // 5 minutes
       });
     },
-    [queryClient]
+    [queryClient],
   );
 
   return {
     userId: data?.userId || null,
     loading: isLoading,
     user: data?.user || null,
+    refetchUser,
     prefetchUserProfile, // Expose prefetch capability
   };
 };

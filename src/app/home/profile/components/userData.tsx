@@ -32,7 +32,7 @@ type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
 );
 
 // Add this placeholder function at the top of the file, outside the component
@@ -68,10 +68,11 @@ export default function UserData() {
     userId: authUserId,
     user: authUser,
     loading: authUserLoading,
+    refetchUser,
   } = useUser();
 
   // Get the update function for profile data
-  const { updateViewedProfile } = useUpdateUserDetails();
+  //const { updateViewedProfile } = useUpdateUserDetails();
 
   //fetch follow stats
   const { followeeCount, followerCount } = useFollowStats(profileId);
@@ -224,7 +225,7 @@ export default function UserData() {
           <p className="text-primary-7 my-4"> {profileData?.bio} </p>
         </div>
 
-        <Topup open={topup} setOpen={setTopup} refetch={refetch} />
+        <Topup open={topup} setOpen={setTopup} refetch={refetchUser} />
 
         <div className="hidden md:block">
           {isOwnProfile && (
@@ -237,11 +238,11 @@ export default function UserData() {
               </div>
               <p>
                 {(() => {
-                  const profileBalance = profileData?.creditBalance ?? 0;
+                  const profileBalance = authUser?.creditBalance ?? 0;
                   const dartConvertedBalance = dartBalance
                     ? Number(formatEther(dartBalance)) / 3 // divide by 3 cos 1 credit == 3 darts
                     : 0;
-                  const totalBalance = profileBalance + dartConvertedBalance;
+                  const totalBalance = profileBalance;
                   return `${totalBalance.toFixed(2)} Credit${
                     totalBalance !== 1 ? "s" : ""
                   }`;

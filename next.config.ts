@@ -2,8 +2,12 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 import type { Event } from "@sentry/core";
 
+const isMobileBuild = process.env.BUILD_TARGET === "mobile";
 // Performance optimized config
 const nextConfig: NextConfig = {
+  output: isMobileBuild ? "export" : undefined,
+  trailingSlash: isMobileBuild,
+
   // Image optimization settings
   images: {
     remotePatterns: [

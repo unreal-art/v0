@@ -4,7 +4,7 @@ import Payment from "../home/components/payment";
 import { formatMoney, getContractInstance } from "@/utils";
 import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { useReadContract } from "thirdweb/react";
-import { formatEther } from "ethers";
+import { BigNumberish, formatEther } from "ethers";
 
 interface TopupProps {
   open: boolean;
@@ -21,26 +21,29 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
   const [credit, setCredit] = useState<number>(0);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
-  const [rate, setRate] = useState<number>(0);
+  const [rate, setRate] = useState<number>(
+    Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0")),
+  );
+
   const [openPayment, setOpenPayment] = useState(false);
 
-  const { data: exchangeRate } = useReadContract({
-    contract: exchangeContract,
-    method: "function rate() returns (uint256)",
-    // params: [credit],
-  });
+  // const { data: exchangeRate } = useReadContract({
+  //   contract: exchangeContract,
+  //   method: "function rate() returns (uint256)",
+  //   // params: [credit],
+  // });
 
-  useEffect(() => {
-    if (exchangeRate) {
-      setRate(Number(formatEther(exchangeRate)));
-    }
-  }, [exchangeRate]);
+  // useEffect(() => {
+  //   if (exchangeRate) {
+  //     setRate(Number(formatEther(exchangeRate)));
+  //   }
+  // }, [exchangeRate]);
 
   useEffect(() => {
     // const price = Number(credit) || 0;
     // setAmount(price);
     //console.log(rate);
-    setCost(Math.round(Number(credit) * rate * 3)); // 1 credit == 3 dart == odp per dart * 3 round up to whole number
+    setCost(Math.round(Number(credit) * rate)); // 1 credit == 500 odp
     setAmount(Number(credit));
   }, [credit]);
 

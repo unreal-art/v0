@@ -67,6 +67,7 @@ type WalletObject = {
 
 export type ExtendedUser = SupabaseUser & {
   // is_anonymous: boolean;
+
   wallet?: WalletObject;
   bio: string;
   location: string;

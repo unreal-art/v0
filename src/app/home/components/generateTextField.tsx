@@ -24,7 +24,7 @@ export default function GenerateTextField({
   open,
   setOpen,
 }: GenerateTextFieldProps) {
-  const { user } = useUser();
+  const { user, refetchUser } = useUser();
   const { mutate, isGenerating, progress, cancelJob } = useCreateJob(user);
   const [prompt, setPrompt] = useState<string | null>(null);
   const [topup, setTopup] = useState(false);
@@ -109,11 +109,9 @@ export default function GenerateTextField({
                 Close
               </button>
 
-              <Topup open={topup} setOpen={setTopup} refetch={refetch} />
+              <Topup open={topup} setOpen={setTopup} refetch={refetchUser} />
 
-              {(user?.creditBalance ?? 0) +
-                (dartBalance ? Number(formatEther(dartBalance)) / 3 : 0) <
-                1 && (
+              {(user?.creditBalance ?? 0) < 1 && (
                 <button
                   onClick={() => setTopup(true)}
                   className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
@@ -122,9 +120,7 @@ export default function GenerateTextField({
                 </button>
               )}
 
-              {(user?.creditBalance ?? 0) +
-                (dartBalance ? Number(formatEther(dartBalance)) / 3 : 0) >=
-                1 && (
+              {(user?.creditBalance ?? 0) >= 1 && (
                 <button
                   onClick={generate}
                   className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"

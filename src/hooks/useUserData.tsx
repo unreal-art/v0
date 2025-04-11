@@ -64,7 +64,7 @@ export default function useUserData(profileId: string | undefined | null) {
             const result = await getUserById(profileId, supabase);
             fetchSpan();
             return result;
-          }
+          },
         );
 
         if (userData) {
@@ -89,6 +89,21 @@ export default function useUserData(profileId: string | undefined | null) {
     retry: 1, // Retry once on failure
   });
 
+  // Refetch the user data manually
+  const refetchUser = () => {
+    if (!profileId) {
+      console.error("profileId is required to refetch user data");
+      return;
+    }
+    console.log("Invalidating and refetching user...");
+
+    // Invalidate queries with correct key
+    queryClient.invalidateQueries({ queryKey: ["profile_data", profileId] });
+
+    // Refetch the query
+    result.refetch();
+  };
+
   // Helper function to update user data optimistically
   const updateUserDataOptimistically = useCallback(
     (updates: Partial<UserData>) => {
@@ -100,13 +115,13 @@ export default function useUserData(profileId: string | undefined | null) {
         {
           profileId,
           updateFields: Object.keys(updates),
-        }
+        },
       );
 
       // Log current data and updates for debugging
       log(
         "Current data in cache",
-        queryClient.getQueryData(["profile_data", profileId])
+        queryClient.getQueryData(["profile_data", profileId]),
       );
       log("Applying updates", updates);
 
@@ -152,12 +167,12 @@ export default function useUserData(profileId: string | undefined | null) {
           });
 
           return newData;
-        }
+        },
       );
 
       finishSpan();
     },
-    [profileId, queryClient]
+    [profileId, queryClient],
   );
 
   // Check if the profile being viewed is the current user's profile
@@ -169,6 +184,7 @@ export default function useUserData(profileId: string | undefined | null) {
     ...result,
     updateUserDataOptimistically,
     isOwnProfile,
+    refetchUser,
     profileId, // Include the profileId for reference
   };
 }
@@ -180,7 +196,7 @@ export default function useUserData(profileId: string | undefined | null) {
  */
 export const prefetchUserData = async (
   queryClient: QueryClient,
-  userId: string
+  userId: string,
 ) => {
   if (!userId) return;
 
