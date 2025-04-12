@@ -175,6 +175,11 @@ self.addEventListener("fetch", (event) => {
   // Ignore other API requests
   if (event.request.url.includes("/api/")) return;
 
+  // Check if this is a navigation request (page load)
+  const isNavigationRequest = event.request.mode === 'navigate' || 
+                             (event.request.method === 'GET' && 
+                              event.request.headers.get('accept')?.includes('text/html'));
+
   // Use different strategies for different content
   if (
     CRITICAL_ASSETS.some(
@@ -189,6 +194,15 @@ self.addEventListener("fetch", (event) => {
   ) {
     // For static assets: Stale-while-revalidate
     event.respondWith(staleWhileRevalidateStrategy(event.request));
+  } else if (isNavigationRequest) {
+    // Handle navigation requests with a network-first approach
+    // This ensures offline navigation shows the offline page
+    event.respondWith(
+      fetch(event.request)
+        .catch(error => {
+          return serveOfflinePage(url.pathname.replace(/^\/+|\/+$/g, ""));
+        })
+    );
   }
   // Let other requests go to the network directly
 });
@@ -218,24 +232,14 @@ async function cacheFirstStrategy(request) {
       const cachedFallback = await cache.match(request);
       if (cachedFallback) return cachedFallback;
 
-      // If homepage request fails and we have no cache, serve offline fallback
+      // If it's a navigation request and we're offline, serve offline page
       if (
+        request.mode === 'navigate' || 
+        request.headers.get("Accept")?.includes("text/html") ||
         request.url.endsWith("/") ||
-        request.url.endsWith("/index.html") ||
-        path
+        request.url.endsWith("/index.html")
       ) {
-        // Create offline URL with 'from' parameter
-        const offlineUrl = new URL("/offline.html", self.location.origin);
-
-        // Add the source path as a parameter
-        if (path && path !== "offline.html") {
-          offlineUrl.searchParams.set("from", path);
-        }
-
-        const fallbackCache =
-          (await cache.match(offlineUrl.toString())) ||
-          (await cache.match("/offline.html"));
-        if (fallbackCache) return fallbackCache;
+        return await serveOfflinePage(path);
       }
 
       // No fallback available
@@ -244,101 +248,14 @@ async function cacheFirstStrategy(request) {
   } catch (error) {
     // For HTML requests, try to serve a specific offline page
     if (request.headers.get("Accept")?.includes("text/html")) {
-      try {
-        const url = new URL(request.url);
-        const path = url.pathname.replace(/^\/+|\/+$/g, "");
-        const cache = await caches.open(`static-${buildVersion}`);
-
-        // Create offline URL with 'from' parameter
-        const offlineUrl = new URL("/offline.html", self.location.origin);
-
-        // Add the source path as a parameter
-        if (path && path !== "offline.html") {
-          offlineUrl.searchParams.set("from", path);
-        }
-
-        const fallbackResponse =
-          (await cache.match(offlineUrl.toString())) ||
-          (await cache.match("/offline.html"));
-        if (fallbackResponse) return fallbackResponse;
-      } catch (fallbackError) {
-        // Fallback failed
-      }
+      return await serveOfflinePage(new URL(request.url).pathname.replace(/^\/+|\/+$/g, ""));
     }
 
-    // Return a simple offline response for non-HTML requests
-    return new Response(
-      `<!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Unreal - Offline</title>
-          <style>
-            body {
-              background-color: #050505;
-              color: #ffffff;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              margin: 0;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            }
-            .message {
-              text-align: center;
-              padding: 2rem;
-              max-width: 90%;
-              width: 450px;
-              background-color: #191919;
-              border-radius: 16px;
-              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-              border: 1px solid #232323;
-            }
-            h1 {
-              margin-bottom: 1rem;
-              font-weight: 600;
-            }
-            p {
-              margin-bottom: 1.5rem;
-              color: #c1c1c1;
-            }
-            .button {
-              display: inline-block;
-              background-color: #5d5d5d;
-              color: #ffffff;
-              text-decoration: none;
-              padding: 0.75rem 1.5rem;
-              border-radius: 8px;
-              font-weight: 500;
-              border: none;
-              cursor: pointer;
-            }
-          </style>
-          <script>
-            // Redirect to offline page if available
-            window.addEventListener('DOMContentLoaded', function() {
-              try {
-                window.location.href = '/offline.html';
-              } catch (e) {
-                // Silent fail
-              }
-            });
-          </script>
-        </head>
-        <body>
-          <div class="message">
-            <h1>You're Offline</h1>
-            <p>We can't connect to Unreal right now. Check your internet connection and try again.</p>
-            <button class="button" onclick="window.location.reload()">Retry</button>
-          </div>
-        </body>
-      </html>`,
-      {
-        status: 503,
-        headers: { "Content-Type": "text/html" },
-      },
-    );
+    // For non-HTML requests that fail, return a simple offline response
+    return new Response("Offline - Resource not available", {
+      status: 503,
+      headers: { "Content-Type": "text/plain" },
+    });
   }
 }
 
@@ -410,8 +327,19 @@ async function handleAuthRequest(request) {
 // Helper function to serve offline page with path parameter
 async function serveOfflinePage(path = "") {
   try {
+    // Wait for buildVersion to be available
+    try {
+      await waitForBuildVersion();
+    } catch (versionError) {
+      console.error("[SW] Error waiting for build version:", versionError);
+      // Continue with a safer approach if buildVersion isn't available
+    }
+    
+    // Use version if available, otherwise use a fixed cache name
+    const CACHE_NAME = buildVersion ? `static-${buildVersion}` : "static-fallback";
+    
     // If offline, try to serve offline page with source path
-    const cache = await caches.open(`static-${buildVersion}`);
+    const cache = await caches.open(CACHE_NAME);
     const offlineUrl = new URL("/offline.html", self.location.origin);
 
     // Add the 'from' parameter if we have a path
@@ -427,8 +355,20 @@ async function serveOfflinePage(path = "") {
     if (fallbackResponse) {
       return fallbackResponse;
     }
+    
+    // If we couldn't find offline.html in the current cache, try all caches
+    const cacheKeys = await caches.keys();
+    for (const key of cacheKeys) {
+      const otherCache = await caches.open(key);
+      const otherCacheResponse = await otherCache.match("/offline.html");
+      if (otherCacheResponse) {
+        // Found it in another cache
+        return otherCacheResponse;
+      }
+    }
   } catch (error) {
-    // Fallback failed, return a basic offline response
+    // Log the error for debugging
+    console.error("[SW] Error serving offline page:", error);
   }
 
   // Return a simple offline response if all else fails
