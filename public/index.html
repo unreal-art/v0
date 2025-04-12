@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Unreal Art</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        #app-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="app-frame" src="https://unreal.art" allow="camera; microphone; geolocation"></iframe>
+    <script>
+        // Basic error handling
+        window.addEventListener('error', function(e) {
+            console.error('App Error:', e.message);
+        });
+
+        // Handle offline status
+        window.addEventListener('offline', function() {
+            // TODO: Show offline message
+            console.log('App is offline');
+        });
+
+        // Handle online status
+        window.addEventListener('online', function() {
+            // Reload the frame when we're back online
+            document.getElementById('app-frame').src = 'https://unreal.art';
+        });
+    </script>
+</body>
+</html>

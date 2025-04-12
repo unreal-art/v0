@@ -330,14 +330,18 @@ export default function Generation() {
               </div>
 
               <hr className="border-[1px] border-primary-10 my-2" />
+              {/* only creator sees the prompt */}
+              {post?.author == userId && (
+                <Prompt title="Prompt" fullText={post?.prompt || ""}>
+                  {truncateText(post?.prompt || "", 100)}
+                </Prompt>
+              )}
 
-              <Prompt title="Prompt" fullText={post?.prompt || ""}>
-                {truncateText(post?.prompt || "", 100)}
-              </Prompt>
-
-              <Prompt title="Magic Prompt" fullText={post?.prompt || ""}>
-                {truncateText(post?.prompt || "", 100)}
-              </Prompt>
+              {post?.author == userId && (
+                <Prompt title="Magic Prompt" fullText={post?.prompt || ""}>
+                  {truncateText(post?.prompt || "", 100)}
+                </Prompt>
+              )}
 
               <div className="grid grid-cols-2 gap-6">
                 <Feature title="Model" content="Dart 2.0" />

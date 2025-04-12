@@ -20,11 +20,11 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string
+  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
 );
 
 export default function Menu({ children }: INotificationProps) {
-  const { userId, user } = useUser();
+  const { userId, user, refetchUser } = useUser();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [topup, setTopup] = useState(false);
@@ -97,7 +97,7 @@ export default function Menu({ children }: INotificationProps) {
                 const dartConvertedBalance = dartBalance
                   ? Number(formatEther(dartBalance)) / 3 // divide by 3 cos 1 credit == 3 darts
                   : 0;
-                const totalBalance = userBalance + dartConvertedBalance;
+                const totalBalance = userBalance;
                 return `${totalBalance.toFixed(2)} Credit${
                   totalBalance !== 1 ? "s" : ""
                 }`;
@@ -174,7 +174,7 @@ export default function Menu({ children }: INotificationProps) {
         </>
       )}
 
-      <Topup open={topup} setOpen={setTopup} refetch={refetch} />
+      <Topup open={topup} setOpen={setTopup} refetch={refetchUser} />
     </>
   );
 }
