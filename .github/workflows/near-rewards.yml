@@ -6,6 +6,9 @@ on:
   push:
     branches: [main] # Start on main branch updates
 
+  pull_request:
+    types: [opened, synchronize, reopened] # Start on PR updates
+
 jobs:
   calculate-rewards:
     runs-on: ubuntu-latest
