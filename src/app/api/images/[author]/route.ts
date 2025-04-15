@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { author: string } },
-) {
-  const { author } = await context.params;
+type Params = Promise<{ author: string }>;
+
+export async function GET(req: Request, segmentData: { params: Params }) {
+  const params = await segmentData.params;
+  const author = params.author;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
   const private_SRK = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
@@ -19,7 +19,6 @@ export async function GET(
       .eq("author", author);
 
     if (error) {
-      console.error("Error fetching post count:", error);
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 },
