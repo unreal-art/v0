@@ -1,12 +1,30 @@
 import OpenAI from "openai";
 import * as dotenv from "dotenv";
+import { signNearLoginMessage } from "./near";
 
+
+const nonce = String(Date.now());
+const recipient = 'unreal.near';
+const callbackUrl = 'https://your.app/auth/callback';
+
+ const auth = await signNearLoginMessage({
+    message: 'Login to NEAR AI',
+    nonce,
+    recipient,
+    callbackUrl
+  });
+
+
+console.log('Auth response:', auth);
 
 process.env.OPENAI_BASE_URL = "https://api.near.ai/v1"; // Set the base URL for the OpenAI API
+process.env.OPENAI_API_KEY = `Bearer ${JSON.stringify(auth)}`
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Ensure your API key is stored in the .env file
 });
+
+
 
 async function generateImage(prompt: string): Promise<void> {
   try {
@@ -25,4 +43,6 @@ async function generateImage(prompt: string): Promise<void> {
 
 // Example usage
 const prompt = "A futuristic cityscape with flying cars and neon lights";
+
+console.log("Prompt is "+prompt)
 generateImage(prompt);
