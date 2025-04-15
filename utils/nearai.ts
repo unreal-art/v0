@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import * as dotenv from "dotenv";
 
 
+process.env.OPENAI_BASE_URL = "https://api.near.ai/v1"; // Set the base URL for the OpenAI API
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Ensure your API key is stored in the .env file
 });
