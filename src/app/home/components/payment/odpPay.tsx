@@ -4,7 +4,7 @@ import { getContractInstance, logError } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { parseEther } from "ethers";
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import { prepareContractCall } from "thirdweb";
 import { useActiveAccount, useSendAndConfirmTransaction } from "thirdweb/react";
 import PaymentStatus from "./status";
@@ -12,6 +12,9 @@ import { toast } from "sonner";
 import { setMaxListeners } from "stream";
 import { transform } from "framer-motion";
 import { axiosInstanceLocal } from "@/lib/axiosInstance";
+import { chain } from "lodash";
+import { getChainId } from "thirdweb/extensions/multicall3";
+import { useActiveWalletChain } from "thirdweb/react";
 
 interface OdpPayProps {
   amount: number;
@@ -30,6 +33,7 @@ const exchangeContract = getContractInstance(
 
 export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const activeAccount = useActiveAccount();
+  const activeChain = useActiveWalletChain();
   const [mainLoadingState, setMainLoadingState] = useState(false);
   const [mainTransaction, setMainTransaction] = useState<boolean>(false);
 
@@ -88,6 +92,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
       expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
       expectedAmount: amount.toString(), //amount paid
       decimals: 18,
+      chainId: activeChain?.id,
     };
 
     axiosInstanceLocal
