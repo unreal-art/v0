@@ -3,9 +3,6 @@ import { ethers } from "ethers";
 import { getUser } from "@/queries/user";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Set  RPC URL (Infura, Alchemy, or other provider)
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-
 // ERC-20 Transfer event topic
 const transferTopic = ethers.id("Transfer(address,address,uint256)");
 
@@ -23,7 +20,6 @@ export async function POST(req: NextRequest) {
   );
 
   const user = await getUser();
-  console.log("User ID:", user?.id);
 
   try {
     const {
@@ -33,7 +29,15 @@ export async function POST(req: NextRequest) {
       expectedTo,
       expectedAmount,
       decimals,
+      chainId,
     } = await req.json();
+
+    // Set  RPC URL where mainnet is 8192
+    const provider = new ethers.JsonRpcProvider(
+      chainId == 8192
+        ? process.env.MAINNET_RPC_URL
+        : process.env.TESTNET_RPC_URL,
+    );
 
     const receipt = await provider.getTransactionReceipt(txHash);
 

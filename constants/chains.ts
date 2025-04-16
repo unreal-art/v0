@@ -1,5 +1,6 @@
 import { defineChain } from "thirdweb";
 
+// testnet
 export const torusTestnet = defineChain({
   id: 8194,
   name: "Torus Testnet",
@@ -17,6 +18,7 @@ export const torusTestnet = defineChain({
   testnet: true,
 });
 
+// mainnet
 export const torusMainnet = defineChain({
   id: 8192,
   name: "Torus Mainnet",
