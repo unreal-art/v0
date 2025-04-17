@@ -1,11 +1,11 @@
 "use client";
-import { torusTestnet } from "$/constants/chains";
+import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { getContractInstance, logError } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { parseEther } from "ethers";
 import { act, useEffect, useState } from "react";
-import { prepareContractCall } from "thirdweb";
+import { prepareContractCall, PreparedTransaction } from "thirdweb";
 import { useActiveAccount, useSendAndConfirmTransaction } from "thirdweb/react";
 import PaymentStatus from "./status";
 import { toast } from "sonner";
@@ -21,21 +21,22 @@ interface OdpPayProps {
   handleClose: () => void;
   refetch: () => void;
 }
-const odpContract = getContractInstance(
-  torusTestnet,
-  process.env.NEXT_PUBLIC_ODP_ADDRESS as string,
-);
+// const odpContract = getContractInstance(
+//   torusTestnet,
+//   process.env.NEXT_PUBLIC_ODP_ADDRESS as string,
+// );
 
-const exchangeContract = getContractInstance(
-  torusTestnet,
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
-);
+// const exchangeContract = getContractInstance(
+//   torusTestnet,
+//   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+// );
 
 export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const activeAccount = useActiveAccount();
   const activeChain = useActiveWalletChain();
   const [mainLoadingState, setMainLoadingState] = useState(false);
   const [mainTransaction, setMainTransaction] = useState<boolean>(false);
+  const [odpContract, setOdpContract] = useState<any | null>(null);
 
   const { user } = useUser();
   const { mutate: approveTransaction, isPending: approveLoading } =
@@ -87,7 +88,10 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const verify = (transactionHash: string) => {
     const data = {
       txHash: transactionHash,
-      tokenAddress: process.env.NEXT_PUBLIC_ODP_ADDRESS as string,
+      tokenAddress:
+        activeChain?.id == 8192
+          ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string)
+          : (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string),
       expectedFrom: activeAccount?.address,
       expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
       expectedAmount: amount.toString(), //amount paid
@@ -125,7 +129,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
         parseEther(amount.toString()),
       ],
     });
-    transferTransaction(transaction, {
+    transferTransaction(transaction as PreparedTransaction, {
       onSuccess: (data) => {
         console.log("hash", data.transactionHash);
         verify(data.transactionHash);
@@ -167,6 +171,23 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   //     //show loading modal
   //   }
   // }, [swapLoading, approveLoading]);
+
+  useEffect(() => {
+    if (!activeChain) return;
+
+    const initContract = async () => {
+      const isMainnet = activeChain.id == 8192;
+      const contract = getContractInstance(
+        isMainnet ? torusMainnet : torusTestnet,
+        isMainnet
+          ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string)
+          : (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string),
+      );
+      setOdpContract(contract);
+    };
+
+    initContract();
+  }, [activeChain]);
 
   return (
     <>
