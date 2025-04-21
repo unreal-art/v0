@@ -114,7 +114,7 @@ export default function GenerateTextField({
               {(user?.creditBalance ?? 0) < 1 && (
                 <button
                   onClick={() => setTopup(true)}
-                  className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
+                  className="basis-1/6 text-primary-11 bg-primary-5 font-semibold whitespace-nowrap rounded-full px-6"
                 >
                   Top Up
                 </button>
