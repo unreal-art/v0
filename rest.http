@@ -1,6 +1,8 @@
 ### Options
 OPTIONS {{u}}/darts
 ###
+GET https://api.near.ai/openapi.json
+###
 
 POST {{u}}/api/darts
 Content-Type: application/json
