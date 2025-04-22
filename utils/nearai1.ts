@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import * as dotenv from "dotenv";
-import { signNearLoginMessage } from "./near";
-
+import {signNearLoginMessage} from "./near-sign"
 
 const nonce = String(Date.now());
 const recipient = 'unreal.near';

@@ -1,24 +1,54 @@
 import { KeyPair } from 'near-api-js';
-import { encode } from 'bs58';
+import bs58 from 'bs58';
 
-/**
- * Signs a message with a NEAR private key.
- * @param privateKey - NEAR private key (e.g. "ed25519:...")
- * @param message - Message to sign
- * @returns Base58-encoded signature
- */
-export function signMessageWithNearKey(privateKey: string, message: string): string {
-  // Convert message to bytes
-  const messageBuffer = Buffer.from(message);
+const encode = bs58.encode;
 
-  // Load KeyPair from private key string
-  const keyPair = KeyPair.fromString(privateKey);
-
-  // Sign message
-  const { signature } = keyPair.sign(messageBuffer);
-
-  // Return base58-encoded signature
-  return encode(signature);
+interface SignMessageParams {
+  message: string;
+  nonce: string;
+  recipient: string;
+  callbackUrl: string;
 }
 
+interface AuthResponse {
+  signature: string;
+  accountId: string;
+  publicKey: string;
+  message: string;
+  nonce: string;
+  recipient: string;
+  callbackUrl: string;
+}
 
+// Replace with your NEAR credentials
+const PRIVATE_KEY = process.env.NEAR_PRIVATE_KEY;
+const ACCOUNT_ID = 'hirocoin.testnet';
+
+// Create KeyPair once for reuse
+const keyPair = KeyPair.fromString(PRIVATE_KEY);
+
+/**
+ * Signs a NEAR login message with your wallet private key.
+ */
+export async function signNearLoginMessage({
+  message,
+  nonce,
+  recipient,
+  callbackUrl 
+}: SignMessageParams): Promise<AuthResponse> {
+  const fullMessage = `${message}:${nonce}:${recipient}:${callbackUrl}`;
+  const messageBytes = Buffer.from(fullMessage);
+
+  const { signature } = keyPair.sign(messageBytes);
+  const publicKey = keyPair.getPublicKey();
+
+  return {
+    signature: encode(signature),
+    accountId: ACCOUNT_ID,
+    publicKey: publicKey.toString(), // base58 format
+    message,
+    nonce,
+    recipient,
+    callbackUrl
+  };
+}
