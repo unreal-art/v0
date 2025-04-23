@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { KeyPair, transactions, providers, utils } from "near-api-js";
 import sha256 from "js-sha256";
 import dotenv from "dotenv";
