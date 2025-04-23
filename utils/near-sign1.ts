@@ -1,13 +1,15 @@
+//@ts-nocheck
 import { KeyPair, transactions, providers, utils } from "near-api-js";
 import sha256 from "js-sha256";
 import dotenv from "dotenv";
+import { KeyPairString } from "near-api-js/lib/utils";
 
 dotenv.config({ path: "../.env" });
 
 const RPC_URL = "https://test.rpc.fastnear.com";
 const privateKey = process.env.NEAR_PRIVATE_KEY!;
 const accountId = process.env.ACCOUNT_ID!;
-const keyPair = KeyPair.fromString(privateKey);
+const keyPair = KeyPair.fromString(privateKey as KeyPairString);
 const provider = new providers.JsonRpcProvider({ url: RPC_URL });
 
 /**
@@ -15,21 +17,20 @@ const provider = new providers.JsonRpcProvider({ url: RPC_URL });
  */
 export async function signAndSendNearTx(
   receiverId: string,
-  amountNear: string // e.g., "1" for 1 NEAR
+  amountNear: string, // e.g., "1" for 1 NEAR
 ) {
   // Get current nonce and block hash
   const accessKey = await provider.query<{
     nonce: number;
     block_hash: string;
-  }>(
-    `access_key/${accountId}/${keyPair.getPublicKey().toString()}`,
-    ""
-  );
+  }>(`access_key/${accountId}/${keyPair.getPublicKey().toString()}`, "");
   const nonce = accessKey.nonce + 1;
   const recentBlockHash = utils.serialize.base_decode(accessKey.block_hash);
 
   // Create transfer action
-  const actions = [transactions.transfer(utils.format.parseNearAmount(amountNear)!)];
+  const actions = [
+    transactions.transfer(utils.format.parseNearAmount(amountNear)!),
+  ];
 
   // Construct and serialize transaction
   const transaction = transactions.createTransaction(
@@ -38,12 +39,12 @@ export async function signAndSendNearTx(
     receiverId,
     nonce,
     actions,
-    recentBlockHash
+    recentBlockHash,
   );
 
   const serializedTx = utils.serialize.serialize(
     transactions.SCHEMA.Transaction,
-    transaction
+    transaction,
   );
   const serializedTxHash = new Uint8Array(sha256.sha256.array(serializedTx));
 

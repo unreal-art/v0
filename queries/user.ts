@@ -41,15 +41,14 @@ export const getUser = async (client?: Client) => {
   }
 
   const user = {
-    ...userData,
-    wallet: profileData[0].wallet,
-    bio: profileData[0].bio,
-    // followerCount: profileData[0].follower_count,
-    // followingCount: profileData[0].following_count,
-    location: profileData[0].location,
-    likesReceived: profileData[0].likes_received,
-    creditBalance: profileData[0].credit_balance,
+    ...userData.user,
+    wallet: profileData[0].wallet as WalletObject | undefined,
+    bio: profileData[0].bio as string,
+    location: profileData[0].location as string,
+    creditBalance: profileData[0].credit_balance as number,
+    full_name: profileData[0].full_name as string,
     username: profileData[0].display_name || profileData[0].full_name,
+    avatar_url: profileData[0].avatar_url as string,
   };
   return user;
 };

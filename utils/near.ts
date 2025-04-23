@@ -1,5 +1,6 @@
-import { KeyPair } from 'near-api-js';
-import bs58 from 'bs58';
+import { KeyPair } from "near-api-js";
+import bs58 from "bs58";
+import { KeyPairString } from "near-api-js/lib/utils";
 
 const encode = bs58.encode;
 
@@ -22,10 +23,10 @@ interface AuthResponse {
 
 // Replace with your NEAR credentials
 const PRIVATE_KEY = process.env.NEAR_PRIVATE_KEY;
-const ACCOUNT_ID = 'hirocoin.testnet';
+const ACCOUNT_ID = "hirocoin.testnet";
 
 // Create KeyPair once for reuse
-const keyPair = KeyPair.fromString(PRIVATE_KEY);
+const keyPair = KeyPair.fromString(PRIVATE_KEY as KeyPairString);
 
 /**
  * Signs a NEAR login message with your wallet private key.
@@ -34,7 +35,7 @@ export async function signNearLoginMessage({
   message,
   nonce,
   recipient,
-  callbackUrl 
+  callbackUrl,
 }: SignMessageParams): Promise<AuthResponse> {
   const fullMessage = `${message}:${nonce}:${recipient}:${callbackUrl}`;
   const messageBytes = Buffer.from(fullMessage);
@@ -49,6 +50,6 @@ export async function signNearLoginMessage({
     message,
     nonce,
     recipient,
-    callbackUrl
+    callbackUrl,
   };
 }

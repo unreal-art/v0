@@ -26,7 +26,8 @@ export async function POST(req: Request) {
     //get user
     const user = await getUser();
 
-    if (!user || !user.creditBalance || !user.wallet?.privateKey) return;
+    // if (!user || !user.creditBalance || !user.wallet?.privateKey) return;
+    if (!user || !user.creditBalance) return;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -34,7 +35,9 @@ export async function POST(req: Request) {
 
     // Add Authorization only when `creditBalance <= 0`
     if (user.creditBalance <= 0) {
-      headers.Authorization = `Bearer ${user.wallet.privateKey}`;
+      // headers.Authorization = `Bearer ${user.wallet.privateKey}`;
+      // changed to throw error
+      throw new Error("Insufficient credit balance");
     }
 
     //send to queue.
