@@ -18,14 +18,14 @@ export const sendJobRequest = ({
   if (!user) {
     logError(
       "User is undefined, cannot send job request",
-      new Error("No user")
+      new Error("No user"),
     );
     return;
   }
   if (!user.wallet?.privateKey) {
     logError(
       "Missing private key, cannot proceed",
-      new Error("No private key")
+      new Error("No private key"),
     );
     return;
   }
@@ -60,8 +60,7 @@ export const sendJobRequest = ({
   axiosInstanceLocal.post("/api/darts", dto, { headers }).catch((error) => {
     stopGeneration();
     toast.error(
-      "Error sending job request:",
-      error.response?.data || error.message
+      "Error sending job request:" + error.response?.data || error.message,
     );
     logError("Error sending job request", error);
   });

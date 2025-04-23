@@ -18,7 +18,7 @@ const exchangeContract = getContractInstance(
 );
 
 export default function Topup({ open, setOpen, refetch }: TopupProps) {
-  const [credit, setCredit] = useState<number>(0);
+  const [credit, setCredit] = useState<number>(2);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
   const [rate, setRate] = useState<number>(
@@ -54,7 +54,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
 
   const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Math.floor(Number(e.target.value)); // Ensure it's a whole number
-    if (value >= 1) {
+    if (value >= 2) {
       setCredit(value);
     } else {
       setCredit(0);
@@ -100,9 +100,9 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
 
                   <input
                     type="number"
-                    placeholder="0"
+                    placeholder="0 (minimum value of 2)"
                     value={credit}
-                    min={1}
+                    min={2}
                     step={1}
                     onChange={handleCreditChange}
                     className="absolute text-primary-3 placeholder:text-primary-6 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0 hide-arrow"
