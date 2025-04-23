@@ -107,10 +107,12 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
         setMainLoadingState(false);
       })
       .catch((error) => {
-        toast.error(
-          "Error completing payment:",
-          error.response?.data || error.message,
-        );
+        const errMsg =
+          error.response?.data?.error?.message ||
+          error.message ||
+          "Unknown error";
+        toast.error(" Error completing payment: " + errMsg);
+
         logError("Error sending job request", error);
         setMainLoadingState(false);
         setMainTransaction(false);
@@ -131,14 +133,10 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
     });
     transferTransaction(transaction as PreparedTransaction, {
       onSuccess: (data) => {
-        console.log("hash", data.transactionHash);
         verify(data.transactionHash);
-
-        // console.log("Approved");
-        // swapTokens();
       },
       onError: (error) => {
-        toast.error("Approval failed:");
+        toast.error("Transaction failed:" + error.message);
         setMainLoadingState(false);
         setMainTransaction(false);
       },
