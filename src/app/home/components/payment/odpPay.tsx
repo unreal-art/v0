@@ -110,7 +110,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
         const errMsg =
           error.response?.data?.error?.message ||
           error.message ||
-          "Unknown error";
+          "Payment confirmation failed";
         toast.error(" Error completing payment: " + errMsg);
 
         logError("Error sending job request", error);
