@@ -9,7 +9,9 @@ export const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID as string,
 });
 
-const chains = [torusMainnet, torusTestnet];
+const chains = [
+  process.env.NODE_ENV === "development" ? torusTestnet : torusMainnet,
+];
 const metadata = {
   name: "unreal",
   url: "https://unreal.art",
