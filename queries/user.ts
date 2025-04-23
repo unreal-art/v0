@@ -15,7 +15,7 @@ export const getUser = async (client?: Client) => {
   }
 
   //get data from profile data
-  const { data: profileData, error: profileError } = await supabase
+  const { data: profileData, error: profileError } = await authClient
     .from("profiles")
     .select("*")
     .eq("id", userData?.user?.id);
@@ -29,7 +29,7 @@ export const getUser = async (client?: Client) => {
     const wallet = generateEthereumWallet();
     console.log(wallet);
 
-    const { error: walletError } = await supabase
+    const { error: walletError } = await authClient
       .from("profiles")
       .update({ wallet }) // Set new wallet
       .eq("id", profileData[0].id) // Where the user_id matches
@@ -39,6 +39,8 @@ export const getUser = async (client?: Client) => {
       return null;
     }
   }
+
+  console.log(profileData[0].wallet);
 
   const user = {
     ...userData.user,
