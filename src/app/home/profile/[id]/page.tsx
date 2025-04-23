@@ -14,7 +14,6 @@ import {
   getPrivatePostsByUser,
   getUserLikedPosts,
 } from "@/queries/post/getPostsByUser";
-import { getUser } from "$/queries/user";
 import UserData from "../components/userData";
 import { Metadata } from "next";
 import useUserData from "@/hooks/useUserData";
