@@ -1,12 +1,13 @@
 import { KeyPair, transactions, providers, utils } from "near-api-js";
 import sha256 from "js-sha256";
 import dotenv from "dotenv";
+import { KeyPairString } from "near-api-js/lib/utils";
 
 dotenv.config({ path: "../.env" });
 const privateKey = process.env.NEAR_PRIVATE_KEY;
 const accountId = process.env.ACCOUNT_ID;
 
-const keyPair = KeyPair.fromString(privateKey);
+const keyPair = KeyPair.fromString(privateKey as KeyPairString);
 
 const provider = new providers.JsonRpcProvider({
   url: "https://test.rpc.fastnear.com",
@@ -23,11 +24,15 @@ const nonce = ++accessKey.nonce;
 const recentBlockHash = utils.serialize.base_decode(accessKey.block_hash);
 
 // Construct actions
-const actions = [transactions.transfer(utils.format.parseNearAmount("1"))];
+// const actions = [transactions.transfer(utils.format.parseNearAmount("1"))];
+const amount = utils.format.parseNearAmount("1");
+if (!amount) throw new Error("Invalid transfer amount");
+
+const actions = [transactions.transfer(BigInt(amount))];
 
 // Construct transaction
 const transaction = transactions.createTransaction(
-  accountId,
+  accountId as string,
   keyPair.getPublicKey(),
   "receiver-account.testnet",
   nonce,
