@@ -3,10 +3,15 @@ import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { getContractInstance, logError } from "@/utils";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
-import { parseEther } from "ethers";
+import { BigNumberish, formatEther, parseEther, parseUnits } from "ethers";
 import { act, useEffect, useState } from "react";
 import { prepareContractCall, PreparedTransaction } from "thirdweb";
-import { useActiveAccount, useSendAndConfirmTransaction } from "thirdweb/react";
+import {
+  useActiveAccount,
+  useReadContract,
+  useSendAndConfirmTransaction,
+  useWalletInfo,
+} from "thirdweb/react";
 import PaymentStatus from "./status";
 import { toast } from "sonner";
 import { setMaxListeners } from "stream";
@@ -15,16 +20,21 @@ import { axiosInstanceLocal } from "@/lib/axiosInstance";
 import { chain } from "lodash";
 import { getChainId } from "thirdweb/extensions/multicall3";
 import { useActiveWalletChain } from "thirdweb/react";
+import { createTokenSignature } from "@/utils/createTokenSignature";
+
+import { useTokenTransfer } from "@/hooks/useTokenTransfer";
 
 interface OdpPayProps {
   amount: number;
   handleClose: () => void;
   refetch: () => void;
 }
-// const odpContract = getContractInstance(
-//   torusTestnet,
-//   process.env.NEXT_PUBLIC_ODP_ADDRESS as string,
-// );
+const defaultOdpContract = getContractInstance(
+  process.env.NODE_ENV === "development" ? torusTestnet : torusMainnet,
+  process.env.NODE_ENV == "development"
+    ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string)
+    : (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string),
+);
 
 // const exchangeContract = getContractInstance(
 //   torusTestnet,
@@ -38,6 +48,8 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const [mainTransaction, setMainTransaction] = useState<boolean>(false);
   const [odpContract, setOdpContract] = useState<any | null>(null);
 
+  const tokenTransfer = useTokenTransfer();
+
   const { user } = useUser();
   const { mutate: approveTransaction, isPending: approveLoading } =
     useSendAndConfirmTransaction();
@@ -46,6 +58,12 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
 
   const { mutate: swapTransaction, isPending: swapLoading } =
     useSendAndConfirmTransaction();
+
+  const { data: balance } = useReadContract({
+    contract: defaultOdpContract,
+    method: "function balanceOf(address owner) returns (uint256)",
+    params: [activeAccount?.address as string],
+  });
 
   // const swapTokens = () => {
   //   try {
@@ -85,83 +103,83 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   //   }
   // };
 
-  const verify = (transactionHash: string) => {
-    const data = {
-      txHash: transactionHash,
-      tokenAddress:
-        activeChain?.id == 8192
-          ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string)
-          : (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string),
-      expectedFrom: activeAccount?.address,
-      expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
-      expectedAmount: amount.toString(), //amount paid
-      decimals: 18,
-      chainId: activeChain?.id,
-    };
+  // const verify = (transactionHash: string) => {
+  //   const data = {
+  //     txHash: transactionHash,
+  //     tokenAddress:
+  //       activeChain?.id == 8192
+  //         ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string)
+  //         : (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string),
+  //     expectedFrom: activeAccount?.address,
+  //     expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
+  //     expectedAmount: amount.toString(), //amount paid
+  //     decimals: 18,
+  //     chainId: activeChain?.id,
+  //   };
 
-    axiosInstanceLocal
-      .post("/api/bridge", data)
-      .then(() => {
-        // Trigger refetch only after the request was successful
-        refetch();
-        setMainLoadingState(false);
-      })
-      .catch((error) => {
-        const errMsg =
-          error.response?.data?.error?.message ||
-          error.message ||
-          "Payment confirmation failed";
-        toast.error(" Error completing payment: " + errMsg);
+  //   axiosInstanceLocal
+  //     .post("/api/bridge", data)
+  //     .then(() => {
+  //       // Trigger refetch only after the request was successful
+  //       refetch();
+  //       setMainLoadingState(false);
+  //     })
+  //     .catch((error) => {
+  //       const errMsg =
+  //         error.response?.data?.error?.message ||
+  //         error.message ||
+  //         "Payment confirmation failed";
+  //       toast.error(" Error completing payment: " + errMsg);
 
-        logError("Error sending job request", error);
-        setMainLoadingState(false);
-        setMainTransaction(false);
-      });
-  };
+  //       logError("Error sending job request", error);
+  //       setMainLoadingState(false);
+  //       setMainTransaction(false);
+  //     });
+  // };
 
-  const completePayment = () => {
-    setMainLoadingState(true);
-    setMainTransaction(true);
-    const transaction = prepareContractCall({
-      contract: odpContract,
-      method:
-        "function transfer(address recipient, uint256 amount) public returns (bool)",
-      params: [
-        process.env.NEXT_PUBLIC_TREASURY as string,
-        parseEther(amount.toString()),
-      ],
-    });
-    transferTransaction(transaction as PreparedTransaction, {
-      onSuccess: (data) => {
-        verify(data.transactionHash);
-      },
-      onError: (error) => {
-        toast.error("Transaction failed:" + error.message);
-        setMainLoadingState(false);
-        setMainTransaction(false);
-      },
-    });
-    // const transaction = prepareContractCall({
-    //   contract: odpContract,
-    //   method:
-    //     "function approve(address spender, uint256 value) external returns (bool)",
-    //   params: [
-    //     process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
-    //     parseEther(amount.toString()),
-    //   ],
-    // });
-    // approveTransaction(transaction, {
-    //   onSuccess: () => {
-    //     // console.log("Approved");
-    //     swapTokens();
-    //   },
-    //   onError: (error) => {
-    //     toast.error("Approval failed:");
-    //     setMainLoadingState(false);
-    //     setMainTransaction(false);
-    //   },
-    // });
-  };
+  // const completePayment = () => {
+  //   setMainLoadingState(true);
+  //   setMainTransaction(true);
+  //   const transaction = prepareContractCall({
+  //     contract: odpContract,
+  //     method:
+  //       "function transfer(address recipient, uint256 amount) public returns (bool)",
+  //     params: [
+  //       process.env.NEXT_PUBLIC_TREASURY as string,
+  //       parseEther(amount.toString()),
+  //     ],
+  //   });
+  //   transferTransaction(transaction as PreparedTransaction, {
+  //     onSuccess: (data) => {
+  //       verify(data.transactionHash);
+  //     },
+  //     onError: (error) => {
+  //       toast.error("Transaction failed:" + error.message);
+  //       setMainLoadingState(false);
+  //       setMainTransaction(false);
+  //     },
+  //   });
+  //   // const transaction = prepareContractCall({
+  //   //   contract: odpContract,
+  //   //   method:
+  //   //     "function approve(address spender, uint256 value) external returns (bool)",
+  //   //   params: [
+  //   //     process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+  //   //     parseEther(amount.toString()),
+  //   //   ],
+  //   // });
+  //   // approveTransaction(transaction, {
+  //   //   onSuccess: () => {
+  //   //     // console.log("Approved");
+  //   //     swapTokens();
+  //   //   },
+  //   //   onError: (error) => {
+  //   //     toast.error("Approval failed:");
+  //   //     setMainLoadingState(false);
+  //   //     setMainTransaction(false);
+  //   //   },
+  //   // });
+  // };
 
   // useEffect(() => {
   //   if (swapLoading || approveLoading) {
@@ -169,6 +187,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   //     //show loading modal
   //   }
   // }, [swapLoading, approveLoading]);
+  //
 
   useEffect(() => {
     if (!activeChain) return;
@@ -187,6 +206,87 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
     initContract();
   }, [activeChain]);
 
+  const handleTransferTokens = async () => {
+    if (!activeChain || !amount || !activeAccount || !balance) {
+      toast.error("Missing required parameters. Please check your inputs.");
+      return;
+    }
+
+    if (Number(formatEther(balance)) < Number(amount)) {
+      toast.error("Insufficient balance");
+      return;
+    }
+
+    try {
+      setMainLoadingState(true);
+      setMainTransaction(true);
+      toast.loading("Creating signature...");
+
+      // Convert amount to wei (assuming 18 decimals, adjust if different)
+      const amountInWei = parseUnits(amount.toString(), 18).toString();
+
+      // Create deadline (1 hour from now in seconds)
+      const now = Math.floor(Date.now() / 1000);
+      const deadline = now + 3600;
+
+      // Create the signature using our utility function
+      const signature = await createTokenSignature(activeAccount, {
+        owner: activeAccount?.address as string,
+        spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS as string,
+        value: amountInWei,
+        deadline: deadline.toString(), // Convert to string for compatibility
+        tokenAddress: process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string,
+        chainId: activeChain.id,
+      });
+
+      toast.dismiss(); // Clear the loading toast
+
+      // Use the React Query mutation to execute the API call
+      toast.loading("Processing transfer...");
+
+      tokenTransfer.mutate(
+        {
+          owner: activeAccount?.address as string,
+          signature: signature,
+          value: amountInWei,
+          deadline: deadline,
+          spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS as string,
+          partnerwallet: process.env.NEXT_PUBLIC_TREASURY as string,
+          vendor: "UNREAL",
+        },
+        {
+          onSuccess: (data) => {
+            refetch();
+            setMainLoadingState(false);
+            toast.dismiss(); // Clear the loading toast
+            toast.success(
+              data.transactionhash
+                ? `Transfer successful! Transaction: ${data.transactionhash.substring(
+                    0,
+                    6,
+                  )}...`
+                : "Transfer completed successfully",
+            );
+          },
+          onError: (error) => {
+            setMainLoadingState(false);
+            setMainTransaction(false);
+
+            toast.dismiss(); // Clear the loading toast
+            toast.error(`Transfer failed: ${error.message || "Unknown error"}`);
+          },
+        },
+      );
+    } catch (error: any) {
+      setMainLoadingState(false);
+      setMainTransaction(false);
+
+      toast.dismiss(); // Clear any loading toasts
+      toast.error(
+        `Signature creation failed: ${error.message || "Unknown error"}`,
+      );
+    }
+  };
   return (
     <>
       <div className="bg-[#232323] p-4 rounded-lg">
@@ -245,7 +345,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
         <button
           className="bg-primary-6 w-40 rounded-full hover:bg-primary-5 text-primary-13"
           disabled={!activeAccount?.address || amount === 0}
-          onClick={completePayment}
+          onClick={handleTransferTokens}
         >
           Confirm & Pay
         </button>
