@@ -10,7 +10,9 @@ export const client = createThirdwebClient({
 });
 
 const chains = [
-  process.env.NODE_ENV === "development" ? torusTestnet : torusMainnet,
+  // process.env.NODE_ENV === "development" ? torusTestnet : torusMainnet,
+  torusMainnet,
+  torusTestnet,
 ];
 const metadata = {
   name: "unreal",

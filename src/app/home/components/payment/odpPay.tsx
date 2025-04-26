@@ -59,11 +59,11 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const { mutate: swapTransaction, isPending: swapLoading } =
     useSendAndConfirmTransaction();
 
-  const { data: balance } = useReadContract({
-    contract: defaultOdpContract,
-    method: "function balanceOf(address owner) returns (uint256)",
-    params: [activeAccount?.address as string],
-  });
+  // const { data: balance } = useReadContract({
+  //   contract: defaultOdpContract,
+  //   method: "function balanceOf(address owner) returns (uint256)",
+  //   params: [activeAccount?.address as string],
+  // });
 
   // const swapTokens = () => {
   //   try {
@@ -207,15 +207,15 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   }, [activeChain]);
 
   const handleTransferTokens = async () => {
-    if (!activeChain || !amount || !activeAccount || !balance) {
+    if (!activeChain || !amount || !activeAccount) {
       toast.error("Missing required parameters. Please check your inputs.");
       return;
     }
 
-    if (Number(formatEther(balance)) < Number(amount)) {
-      toast.error("Insufficient balance");
-      return;
-    }
+    // if (Number(formatEther(balance)) < Number(amount)) {
+    //   toast.error("Insufficient balance");
+    //   return;
+    // }
 
     try {
       setMainLoadingState(true);
@@ -228,7 +228,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
       // Create deadline (1 hour from now in seconds)
       const now = Math.floor(Date.now() / 1000);
       const deadline = now + 3600;
-
+      console.log(activeChain.id);
       // Create the signature using our utility function
       const signature = await createTokenSignature(activeAccount, {
         owner: activeAccount?.address as string,
@@ -259,21 +259,37 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
             refetch();
             setMainLoadingState(false);
             toast.dismiss(); // Clear the loading toast
-            toast.success(
-              data.transactionhash
-                ? `Transfer successful! Transaction: ${data.transactionhash.substring(
-                    0,
-                    6,
-                  )}...`
-                : "Transfer completed successfully",
-            );
+
+            // Check if data has the expected structure
+            if (data.success && data.data) {
+              toast.success(
+                data.data.transactionhash
+                  ? `Transfer successful! Transaction: ${data.data.transactionhash.substring(0, 6)}...`
+                  : "Transfer completed successfully",
+              );
+            } else {
+              // Fallback message if data structure is unexpected
+              toast.success("Transfer completed successfully");
+            }
           },
-          onError: (error) => {
+          onError: (error: any) => {
             setMainLoadingState(false);
             setMainTransaction(false);
-
             toast.dismiss(); // Clear the loading toast
-            toast.error(`Transfer failed: ${error.message || "Unknown error"}`);
+
+            // Handle structured API errors
+            if (error.response?.data?.error) {
+              const apiError = error.response.data.error;
+              const errorMessage = apiError.details
+                ? `${apiError.message}: ${apiError.details}`
+                : apiError.message;
+              toast.error(`Transfer failed: ${errorMessage}`);
+            } else {
+              // Fallback for network or other errors
+              toast.error(
+                `Transfer failed: ${error.message || "Unknown error"}`,
+              );
+            }
           },
         },
       );

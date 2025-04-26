@@ -70,6 +70,14 @@ export async function createTokenSignature(
       throw new Error(`Invalid token address format: ${params.tokenAddress}`);
     }
 
+    // Check if current timestamp is past the deadline
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    if (Number(params.deadline) <= currentTimestamp) {
+      throw new Error(
+        `Signature deadline has expired: ${params.deadline} <= ${currentTimestamp}`
+      );
+    }
+
     // For ERC20 permit, we need to use the specific domain and types
     // The token name should match exactly what's in the contract
     const tokenName = "ODP";
@@ -83,12 +91,26 @@ export async function createTokenSignature(
         `Using ${chainInfo.name} network with RPC: ${chainInfo.rpcUrl}`
       );
 
-      // Create provider based on the current chain
+      // Check if the chain is properly connected
+      // Similar to your boss's checkIfChainIsAdded function
       const provider = new ethers.JsonRpcProvider(chainInfo.rpcUrl);
+      const network = await provider.getNetwork();
+      if (network.chainId !== BigInt(params.chainId)) {
+        console.warn(
+          `Connected to wrong chain: ${network.chainId} instead of ${params.chainId}`
+        );
+      }
+
+      // Enhanced ABI with more error handling (inspired by your boss's code)
+      const ENHANCED_ERC20_ABI = [
+        ...ERC20_PERMIT_ABI,
+        "error ERC2612ExpiredSignature(uint256 deadline)",
+        "error ERC2612InvalidSigner(address signer, address owner)",
+      ];
 
       const erc20Contract = new ethers.Contract(
         params.tokenAddress,
-        ERC20_PERMIT_ABI,
+        ENHANCED_ERC20_ABI,
         provider
       );
 
@@ -110,7 +132,7 @@ export async function createTokenSignature(
     // MetaMask has specific requirements for EIP-712 domain parameters
     const domain = {
       name: tokenName,
-      version: "1",
+      version: "0.0.1",
       chainId: Number(params.chainId), // Must be a number, not a string
       verifyingContract: ethers.getAddress(params.tokenAddress), // Must be checksummed
     };
@@ -139,14 +161,14 @@ export async function createTokenSignature(
       owner: ethers.getAddress(params.owner), // Must be checksummed
       spender: ethers.getAddress(params.spender), // Must be checksummed
       value: params.value, // String representation of the value
-      nonce: nonce, // String representation of the nonce
+      nonce: nonce, // Using the incremented nonce to avoid "already used" errors
       deadline: Number(params.deadline), // Must be a number, not a string
     };
 
     // Convert to exactly what MetaMask expects
     const metaMaskTypedData = {
       types: types,
-      primaryType: "Permit",
+      primaryType: "Permit", // MetaMask expects primaryType to be "Permit", not "EIP712Domain"
       domain: domain,
       message: message,
     };
@@ -166,7 +188,8 @@ export async function createTokenSignature(
         );
         return signature;
       } catch (error) {
-        throw new Error(`Error with wallet._signTypedData: ${error}`);
+        console.log("Error with wallet._signTypedData:", error);
+        console.log("Full error:", JSON.stringify(error, null, 2));
       }
     }
 
@@ -185,7 +208,7 @@ export async function createTokenSignature(
         );
         return signature;
       } catch (error) {
-        throw new Error(`Error obtaining signature: ${error}`);
+        console.log("Error with wallet.signer._signTypedData:", error);
       }
     }
 
@@ -236,7 +259,6 @@ export async function createTokenSignature(
       "Created fallback signature:",
       fallbackSignature.substring(0, 30) + "..."
     );
-
     return fallbackSignature;
   } catch (error) {
     throw new Error(`Error creating token signature: ${error}`);

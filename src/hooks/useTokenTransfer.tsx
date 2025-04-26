@@ -1,3 +1,4 @@
+import { axiosInstanceLocal } from "@/lib/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -12,24 +13,25 @@ interface TokenTransferParams {
 }
 
 interface TokenTransferResponse {
-  message: string;
-  transactionhash?: string;
-}
-
-interface TokenTransferError {
-  message: string;
+  success: boolean;
+  data?: {
+    message: string;
+    transactionhash?: string;
+  };
+  error?: {
+    message: string;
+    details?: string;
+    statusCode?: number;
+  };
+  warning?: string;
 }
 
 export const useTokenTransfer = () => {
-  return useMutation<
-    TokenTransferResponse,
-    TokenTransferError,
-    TokenTransferParams
-  >({
+  return useMutation<TokenTransferResponse, Error, TokenTransferParams>({
     mutationFn: async (transferData: TokenTransferParams) => {
       try {
-        const response = await axios.post<TokenTransferResponse>(
-          "/api/transfer-tokens",
+        const response = await axiosInstanceLocal.post<TokenTransferResponse>(
+          "api/transfer-tokens",
           transferData,
           {
             headers: {
@@ -38,14 +40,36 @@ export const useTokenTransfer = () => {
           }
         );
 
-        return response.data;
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
+        // Check if the response indicates an error
+        if (!response.data.success && response.data.error) {
           throw new Error(
-            error.response.data.message || "Token transfer failed"
+            response.data.error.details
+              ? `${response.data.error.message}: ${response.data.error.details}`
+              : response.data.error.message
           );
         }
-        throw new Error("Token transfer failed");
+
+        return response.data;
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.data) {
+          // Handle structured API errors
+          const responseData = error.response.data;
+
+          if (responseData.error) {
+            throw new Error(
+              responseData.error.details
+                ? `${responseData.error.message}: ${responseData.error.details}`
+                : responseData.error.message
+            );
+          }
+
+          throw new Error(responseData.message || "Token transfer failed");
+        }
+
+        // Handle network or other errors
+        throw error instanceof Error
+          ? error
+          : new Error("Token transfer failed");
       }
     },
   });
