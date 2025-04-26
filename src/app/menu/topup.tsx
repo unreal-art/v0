@@ -14,15 +14,15 @@ interface TopupProps {
 
 const exchangeContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string
+  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
 );
 
 export default function Topup({ open, setOpen, refetch }: TopupProps) {
-  const [credit, setCredit] = useState<number>(5);
+  const [credit, setCredit] = useState<number>(1);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
   const [rate, setRate] = useState<number>(
-    Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0"))
+    Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0")),
   );
 
   const [openPayment, setOpenPayment] = useState(false);
