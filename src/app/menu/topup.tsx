@@ -14,15 +14,15 @@ interface TopupProps {
 
 const exchangeContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string
 );
 
 export default function Topup({ open, setOpen, refetch }: TopupProps) {
-  const [credit, setCredit] = useState<number>(2);
+  const [credit, setCredit] = useState<number>(5);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
   const [rate, setRate] = useState<number>(
-    Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0")),
+    Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0"))
   );
 
   const [openPayment, setOpenPayment] = useState(false);
@@ -54,7 +54,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
 
   const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Math.floor(Number(e.target.value)); // Ensure it's a whole number
-    if (value >= 2) {
+    if (value >= 5) {
       setCredit(value);
     } else {
       setCredit(0);

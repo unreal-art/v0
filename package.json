@@ -31,6 +31,7 @@
     "@capacitor/android": "^7.2.0",
     "@capacitor/core": "^7.2.0",
     "@capacitor/ios": "^7.2.0",
+    "@ethersproject/abstract-signer": "^5.8.0",
     "@gsap/react": "^2.1.2",
     "@highlight-run/next": "^7.9.3",
     "@react-three/drei": "^9.121.4",
