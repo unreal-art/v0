@@ -18,7 +18,7 @@ const exchangeContract = getContractInstance(
 );
 
 export default function Topup({ open, setOpen, refetch }: TopupProps) {
-  const [credit, setCredit] = useState<number>(1);
+  const [credit, setCredit] = useState<number>(5);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
   const [rate, setRate] = useState<number>(
