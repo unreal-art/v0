@@ -59,11 +59,11 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   const { mutate: swapTransaction, isPending: swapLoading } =
     useSendAndConfirmTransaction();
 
-  // const { data: balance } = useReadContract({
-  //   contract: defaultOdpContract,
-  //   method: "function balanceOf(address owner) returns (uint256)",
-  //   params: [activeAccount?.address as string],
-  // });
+  const { data: balance } = useReadContract({
+    contract: defaultOdpContract,
+    method: "function balanceOf(address owner) returns (uint256)",
+    params: [activeAccount?.address as string],
+  });
 
   // const swapTokens = () => {
   //   try {
@@ -207,15 +207,15 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   }, [activeChain]);
 
   const handleTransferTokens = async () => {
-    if (!activeChain || !amount || !activeAccount) {
-      toast.error("Missing required parameters. Please check your inputs.");
+    if (!activeChain || !amount || !activeAccount || !balance) {
+      toast.error("Missing required data. Please check your inputs.");
       return;
     }
 
-    // if (Number(formatEther(balance)) < Number(amount)) {
-    //   toast.error("Insufficient balance");
-    //   return;
-    // }
+    if (Number(formatEther(balance)) < Number(amount)) {
+      toast.error("Insufficient balance");
+      return;
+    }
 
     try {
       setMainLoadingState(true);
