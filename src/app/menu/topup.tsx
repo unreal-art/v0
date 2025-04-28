@@ -91,7 +91,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
 
           <form onSubmit={handleSubmit} method="post" className="">
             <div className="text-primary-2 my-10">
-              <label>Number of credits</label>
+              <label>Number of credits (Minimum = 5)</label>
               <div>
                 <div className="relative h-14 w-full rounded-xl bg-primary-10">
                   <button className="absolute top-[18px] right-3 z-10">
