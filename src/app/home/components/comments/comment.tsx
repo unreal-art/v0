@@ -15,6 +15,8 @@ import { useState } from "react";
 import { formatNumber } from "@/utils";
 import OptimizedImage from "@/app/components/OptimizedImage";
 
+import { useEffect, useRef } from "react";
+
 export default function Comment({
   data,
   setReplyTo,
@@ -28,6 +30,35 @@ export default function Comment({
   const likeComment = useLikeComment(data.post_id.toString());
   const unlikeComment = useUnlikeComment(data.post_id.toString());
   const [seeMore, setSeeMore] = useState(false);
+
+  // --- Optimistic UI state ---
+  const [optimisticLiked, setOptimisticLiked] = useState(data.user_liked);
+  const [optimisticLikeCount, setOptimisticLikeCount] = useState(data.like_count);
+  const prevDataRef = useRef({ user_liked: data.user_liked, like_count: data.like_count });
+
+  // Sync local state when props change (e.g., after parent re-render)
+  useEffect(() => {
+    if (
+      data.user_liked !== prevDataRef.current.user_liked ||
+      data.like_count !== prevDataRef.current.like_count
+    ) {
+      setOptimisticLiked(data.user_liked);
+      setOptimisticLikeCount(data.like_count);
+      prevDataRef.current = { user_liked: data.user_liked, like_count: data.like_count };
+    }
+  }, [data.user_liked, data.like_count]);
+
+  const handleLikeClick = () => {
+    if (optimisticLiked) {
+      setOptimisticLiked(false);
+      setOptimisticLikeCount((c) => Math.max(0, c - 1));
+      unlikeComment.mutate(data.id);
+    } else {
+      setOptimisticLiked(true);
+      setOptimisticLikeCount((c) => c + 1);
+      likeComment.mutate(data.id);
+    }
+  };
 
   const { data: replies } = useReplies(data.id);
   useRealtimeReplies(data.id);
@@ -72,19 +103,15 @@ export default function Comment({
             <div className="justify-end">
               <button
                 className="flex gap-1 items-center"
-                onClick={() =>
-                  data.user_liked
-                    ? unlikeComment.mutate(data.id)
-                    : likeComment.mutate(data.id)
-                }
+                onClick={handleLikeClick}
               >
-                {data.user_liked ? (
+                {optimisticLiked ? (
                   <HeartFillIcon color="#FFFFFF" />
                 ) : (
                   <HeartIcon color="#FFFFFF" />
                 )}
               </button>
-              <p className="text-center">{formatNumber(data.like_count)}</p>
+              <p className="text-center">{formatNumber(optimisticLikeCount)}</p>
             </div>
           </div>
         </div>

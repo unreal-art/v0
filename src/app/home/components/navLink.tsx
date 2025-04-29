@@ -8,6 +8,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import OptimizedImage from "@/app/components/OptimizedImage";
 
 import { usePathname } from "next/navigation";
+import { pad } from "lodash";
 
 interface NavLinkProps {
   href: string;
@@ -21,7 +22,11 @@ function NavLink({ href, text, icon }: NavLinkProps) {
   const pathname = usePathname();
 
   // Determine active state based on pathname
-  const active = useMemo(() => pathname === href, [pathname, href]);
+  // const active = useMemo(() => pathname === href, [pathname, href]);
+  const active = useMemo(
+    () => pathname === href.split("?")[0],
+    [pathname, href],
+  );
 
   // Memoized color to avoid recalculation
   const iconColor = useMemo(() => {
@@ -141,7 +146,11 @@ function NavLink({ href, text, icon }: NavLinkProps) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       href={href}
-      prefetch={href === "/home" || href === "/home/creations"}
+      prefetch={
+        href === "/home" ||
+        href === "/home?s=explore" ||
+        href === "/home/creations"
+      }
     >
       <div className="h-8 flex items-center justify-center">{iconSvg}</div>
       <p
