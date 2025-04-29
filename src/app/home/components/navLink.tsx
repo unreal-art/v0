@@ -22,6 +22,7 @@ function NavLink({ href, text, icon }: NavLinkProps) {
   const pathname = usePathname();
 
   // Determine active state based on pathname
+  // const active = useMemo(() => pathname === href, [pathname, href]);
   const active = useMemo(
     () => pathname === href.split("?")[0],
     [pathname, href],

@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "$/supabase/client";
 import { IPhoto } from "@/app/libs/interfaces";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import { Following } from "../../components/followingBtn";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
@@ -269,10 +270,11 @@ export default function Generation() {
                     <p className="text-primary-7 nasalization">Creator</p>
                   </div>
                 </Link>
-
                 {/* <ImageOptionMenu postId={String(postId)} image={post as any}>
                   <OptionMenuIcon color="#C1C1C1" />
                 </ImageOptionMenu> */}
+
+                {post && post.author && <Following authorId={post?.author} />}
               </div>
 
               <div className="flex justify-center w-full relative">
