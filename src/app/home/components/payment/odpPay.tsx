@@ -208,7 +208,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
 
   const handleTransferTokens = async () => {
     if (!activeChain || !amount || !activeAccount || !balance) {
-      toast.error("Missing required data. Please check your inputs.");
+      console.error("Missing required data. Please check your inputs.");
       return;
     }
 

@@ -26,7 +26,7 @@ function getChainInfo(chainId: number) {
 
   if (!isMainnet && !isTestnet) {
     console.warn(
-      `Chain ID ${chainId} is not one of our supported chains, using testnet as fallback`
+      `Chain ID ${chainId} is not one of our supported chains, using testnet as fallback`,
     );
   }
 
@@ -48,7 +48,7 @@ function getChainInfo(chainId: number) {
  */
 export async function createTokenSignature(
   wallet: any, // Using any type for wallet as it's a thirdweb wallet
-  params: SignatureParams
+  params: SignatureParams,
 ): Promise<string> {
   try {
     console.log("Creating EIP-712 signature with params:", params);
@@ -74,7 +74,7 @@ export async function createTokenSignature(
     const currentTimestamp = Math.floor(Date.now() / 1000);
     if (Number(params.deadline) <= currentTimestamp) {
       throw new Error(
-        `Signature deadline has expired: ${params.deadline} <= ${currentTimestamp}`
+        `Signature deadline has expired: ${params.deadline} <= ${currentTimestamp}`,
       );
     }
 
@@ -88,7 +88,7 @@ export async function createTokenSignature(
       // Create a read-only contract instance to query the nonce
       const chainInfo = getChainInfo(params.chainId);
       console.log(
-        `Using ${chainInfo.name} network with RPC: ${chainInfo.rpcUrl}`
+        `Using ${chainInfo.name} network with RPC: ${chainInfo.rpcUrl}`,
       );
 
       // Check if the chain is properly connected
@@ -97,7 +97,7 @@ export async function createTokenSignature(
       const network = await provider.getNetwork();
       if (network.chainId !== BigInt(params.chainId)) {
         console.warn(
-          `Connected to wrong chain: ${network.chainId} instead of ${params.chainId}`
+          `Connected to wrong chain: ${network.chainId} instead of ${params.chainId}`,
         );
       }
 
@@ -111,7 +111,7 @@ export async function createTokenSignature(
       const erc20Contract = new ethers.Contract(
         params.tokenAddress,
         ENHANCED_ERC20_ABI,
-        provider
+        provider,
       );
 
       // Fetch the current nonce for the owner address
@@ -184,7 +184,7 @@ export async function createTokenSignature(
         const signature = await wallet._signTypedData(domain, types, message);
         console.log(
           "Signature created successfully:",
-          signature.substring(0, 10) + "..."
+          signature.substring(0, 10) + "...",
         );
         return signature;
       } catch (error) {
@@ -200,11 +200,11 @@ export async function createTokenSignature(
         const signature = await wallet.signer._signTypedData(
           domain,
           types,
-          message
+          message,
         );
         console.log(
           "Signature created successfully:",
-          signature.substring(0, 10) + "..."
+          signature.substring(0, 10) + "...",
         );
         return signature;
       } catch (error) {
@@ -231,7 +231,7 @@ export async function createTokenSignature(
         }
         console.log(
           "Signature created successfully:",
-          signature.substring(0, 10) + "..."
+          signature.substring(0, 10) + "...",
         );
         return signature;
       } catch (error) {
@@ -257,7 +257,7 @@ export async function createTokenSignature(
       "EIP712_FALLBACK:" + btoa(JSON.stringify(fallbackMessage));
     console.log(
       "Created fallback signature:",
-      fallbackSignature.substring(0, 30) + "..."
+      fallbackSignature.substring(0, 30) + "...",
     );
     return fallbackSignature;
   } catch (error) {
