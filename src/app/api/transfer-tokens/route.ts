@@ -31,16 +31,16 @@ const REQUIRED_ENV_VARS = [
 ];
 
 const missingEnvVars = REQUIRED_ENV_VARS.filter(
-  (varName) => !process.env[varName]
+  (varName) => !process.env[varName],
 );
 if (missingEnvVars.length > 0) {
   console.error(
-    `Missing required environment variables: ${missingEnvVars.join(", ")}`
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`,
   );
 }
 
 export async function POST(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<TokenTransferResponse>> {
   // Initialize required configuration
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -60,14 +60,14 @@ export async function POST(
     console.error("Missing server configuration");
     return NextResponse.json(
       { success: false, error: { message: "Server configuration error" } },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   // Create Supabase client only once
   const supabase: SupabaseClient = createClient(
     supabaseUrl,
-    privateServiceRoleKey
+    privateServiceRoleKey,
   );
 
   try {
@@ -76,7 +76,7 @@ export async function POST(
     if (!user) {
       return NextResponse.json(
         { success: false, error: { message: "User authentication failed" } },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -88,11 +88,11 @@ export async function POST(
       console.error("Request parsing error:", parseError);
       return NextResponse.json(
         { success: false, error: { message: "Invalid request format" } },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.log(body)
+    // console.log(body)
 
     // Validate required fields
     const requiredFields = [
@@ -106,7 +106,7 @@ export async function POST(
     ];
 
     const missingFields = requiredFields.filter(
-      (field) => !body[field as keyof TokenTransferRequest]
+      (field) => !body[field as keyof TokenTransferRequest],
     );
 
     if (missingFields.length > 0) {
@@ -117,7 +117,7 @@ export async function POST(
             message: `Missing required fields: ${missingFields.join(", ")}`,
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -139,7 +139,7 @@ export async function POST(
             statusCode,
           },
         },
-        { status: response.status === 404 ? 404 : 502 }
+        { status: response.status === 404 ? 404 : 502 },
       );
     }
 
@@ -171,7 +171,7 @@ export async function POST(
             warning: "Token transfer successful but balance update failed",
             data,
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
     } catch (balanceError) {
@@ -182,7 +182,7 @@ export async function POST(
           warning: "Token transfer successful but balance update failed",
           data,
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -192,7 +192,7 @@ export async function POST(
     console.error("Token transfer unexpected error:", error);
     return NextResponse.json(
       { success: false, error: { message: "Internal server error" } },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -203,7 +203,7 @@ export async function POST(
 async function fetchTokenService(
   payload: TokenTransferRequest,
   endpoint: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<Response> {
   try {
     return await fetch(endpoint, {
