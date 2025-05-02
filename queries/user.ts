@@ -27,7 +27,7 @@ export const getUser = async (client?: Client) => {
   //check if user has a wallet
   if (!profileData[0].wallet) {
     const wallet = generateEthereumWallet();
-    console.log(wallet);
+    // console.log(wallet);
 
     const { error: walletError } = await authClient
       .from("profiles")
@@ -40,7 +40,7 @@ export const getUser = async (client?: Client) => {
     }
   }
 
-  console.log(profileData[0].wallet);
+  // console.log(profileData[0].wallet);
 
   const user = {
     ...userData.user,
@@ -51,6 +51,7 @@ export const getUser = async (client?: Client) => {
     full_name: profileData[0].full_name as string,
     username: profileData[0].display_name || profileData[0].full_name,
     avatar_url: profileData[0].avatar_url as string,
+    torus_id: profileData[0].torus_id as string,
   };
   return user;
 };
