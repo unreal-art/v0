@@ -4,23 +4,38 @@ import { createClient } from "@supabase/supabase-js";
 type Params = Promise<{ author: string }>;
 
 export async function GET(req: Request, segmentData: { params: Params }) {
-  const params = await segmentData.params;
-  const author = params.author;
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-  const private_SRK = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
-
-  const supabase = createClient(supabaseUrl, private_SRK);
-
   try {
-    const { count, error } = await supabase
+    // Extract author parameter
+    const { author } = await segmentData.params;
+
+    // Initialize Supabase client once
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+    const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+    const supabase = createClient(supabaseUrl, privateKey);
+
+    // Get author's profile
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("torus_id", author)
+      .single();
+
+    if (profileError) {
+      return NextResponse.json(
+        { success: false, error: profileError.message },
+        { status: profileError.code === "PGRST116" ? 404 : 500 },
+      );
+    }
+
+    // Count posts by author
+    const { count, error: countError } = await supabase
       .from("posts")
       .select("*", { count: "exact", head: true })
-      .eq("author", author);
+      .eq("author", profile.id);
 
-    if (error) {
+    if (countError) {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: countError.message },
         { status: 500 },
       );
     }

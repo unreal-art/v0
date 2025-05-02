@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import TabBtn from "./components/tabBtn";
 import GenerateInput from "./components/generateInput";
@@ -8,6 +8,9 @@ import dynamic from "next/dynamic";
 import Search from "./components/search";
 import Skeleton from "react-loading-skeleton";
 import PostsProvider from "./components/PostsProvider";
+
+import { createClient } from "$/supabase/client";
+import { updateUserTorusId } from "@/queries/torus";
 
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: true,
@@ -30,6 +33,21 @@ const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
 export default function HomePage() {
   const searchParams = useSearchParams();
   const searchType = searchParams?.get("s") || "";
+  const supabase = createClient();
+
+  const checkTorusUser = async () => {
+    // read to torusUser from local storage
+    const torusUser = localStorage.getItem("torusUser");
+    if (torusUser) {
+      //update user
+      await updateUserTorusId(torusUser);
+    }
+    console.log(torusUser);
+  };
+
+  useEffect(() => {
+    checkTorusUser();
+  }, []);
 
   return (
     <PostsProvider searchType={searchType}>

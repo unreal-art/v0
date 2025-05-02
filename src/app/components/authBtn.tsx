@@ -3,7 +3,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { createClient } from "$/supabase/client";
 import config from "$/config";
 import { Provider } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface AuthBtnProps {
   icon: ReactNode;
@@ -15,10 +15,17 @@ export default function AuthBtn({ icon, children, provider }: AuthBtnProps) {
   const [loading, setLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const torusUser = searchParams?.get("torus_user") || null;
 
   useEffect(() => {
     // Initialize online status
     setIsOnline(navigator.onLine);
+
+    if (torusUser) {
+      //set it in local storage
+      localStorage.setItem("torusUser", torusUser);
+    }
 
     // Set up listeners for online/offline status
     const handleOnline = () => setIsOnline(true);
@@ -40,15 +47,32 @@ export default function AuthBtn({ icon, children, provider }: AuthBtnProps) {
       return;
     }
 
-    const redirectTo = `${config.domainName}/api/auth/callback`;
-    setLoading(true);
+    // First, create a state object that includes your torus user
+    const state = {
+      torusUser: torusUser ? torusUser : "",
+      // Any other state you want to persist
+    };
 
+    // Encode it to base64
+    const encodedState = btoa(JSON.stringify(state));
+
+    //${torusUser ? `?torus_user=${encodeURIComponent(torusUser)}` : ""}`;
+    const redirectTo = `${config.domainName}/api/auth/callback`;
+
+    setLoading(true);
     try {
       const supabase = createClient();
       supabase.auth.signInWithOAuth({
         provider: provider ? provider : ("" as Provider),
         options: {
-          redirectTo: `${redirectTo}`,
+          redirectTo: redirectTo,
+          // Use the supabase-specific parameter for passing custom data
+          // queryParams: {
+          //   // This is a special parameter that Supabase will pass through
+          //   // It will be available in the final redirect URL
+          //   torus_user: torusUser ? encodeURIComponent(torusUser) : "",
+
+          // },
         },
       });
     } catch (error) {
