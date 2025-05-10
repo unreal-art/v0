@@ -21,6 +21,8 @@ export default function PathnameProvider({
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setLoading(true); // Ensure loading is set to true at the start
+
         // Get both user and session data
         const {
           data: { user },
@@ -37,8 +39,14 @@ export default function PathnameProvider({
 
         // Log for debugging purposes
         console.log("Auth check:", {
-          user: user ? "exists" : "null",
-          session: session ? "exists" : "null",
+          pathname,
+          user: user ? { id: user.id, email: user.email } : "null",
+          session: session
+            ? {
+                id: session.access_token ? "exists" : "empty",
+                expires_at: session.expires_at,
+              }
+            : "null",
           isProtectedRoute,
           userError: userError?.message,
           sessionError: sessionError?.message,
@@ -48,17 +56,16 @@ export default function PathnameProvider({
         if (!user && !session && isProtectedRoute) {
           console.log("Redirecting to /auth due to failed authentication");
           router.replace("/auth");
-        } else {
-          setLoading(false);
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
         // If there's an unexpected error and we're on a protected route, redirect
         if (protectedRoutes.some((route) => pathname.startsWith(route))) {
           router.replace("/auth");
-        } else {
-          setLoading(false);
         }
+      } finally {
+        // Always set loading to false when done, regardless of outcome
+        setLoading(false);
       }
     };
 
