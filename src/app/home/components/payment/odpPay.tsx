@@ -5,7 +5,7 @@ import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { BigNumberish, formatEther, parseEther, parseUnits } from "ethers";
 import { act, useEffect, useState } from "react";
-import { prepareContractCall, PreparedTransaction } from "thirdweb";
+import { Chain, prepareContractCall, PreparedTransaction } from "thirdweb";
 import {
   useActiveAccount,
   useReadContract,
@@ -23,9 +23,19 @@ import { useActiveWalletChain } from "thirdweb/react";
 import { createTokenSignature } from "@/utils/createTokenSignature";
 
 import { useTokenTransfer } from "@/hooks/useTokenTransfer";
+import {
+  bsc,
+  bscTestnet,
+  ChainOptions,
+  mainnet,
+  polygon,
+  polygonAmoy,
+  sepolia,
+} from "thirdweb/chains";
 
 interface OdpPayProps {
   amount: number;
+  token: string;
   handleClose: () => void;
   refetch: () => void;
 }
@@ -41,12 +51,17 @@ const defaultOdpContract = getContractInstance(
 //   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
 // );
 
-export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
+export default function OdpPay({
+  amount,
+  token,
+  handleClose,
+  refetch,
+}: OdpPayProps) {
   const activeAccount = useActiveAccount();
   const activeChain = useActiveWalletChain();
   const [mainLoadingState, setMainLoadingState] = useState(false);
   const [mainTransaction, setMainTransaction] = useState<boolean>(false);
-  const [odpContract, setOdpContract] = useState<any | null>(null);
+  const [tokenContract, setTokenContract] = useState<any | null>(null);
 
   const tokenTransfer = useTokenTransfer();
 
@@ -103,116 +118,169 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
   //   }
   // };
 
-  // const verify = (transactionHash: string) => {
-  //   const data = {
-  //     txHash: transactionHash,
-  //     tokenAddress:
-  //       activeChain?.id == 8192
-  //         ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string)
-  //         : (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string),
-  //     expectedFrom: activeAccount?.address,
-  //     expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
-  //     expectedAmount: amount.toString(), //amount paid
-  //     decimals: 18,
-  //     chainId: activeChain?.id,
-  //   };
+  const getTokenAddress = (token: string) => {
+    const sepoliaUSDC = process.env.NEXT_PUBLIC_SEPOLIA_USDC;
+    const polygonAmoyUSDC = process.env.NEXT_PUBLIC_POLYGON_AMOY_USDC;
+    const bnbTestnetUSDC = process.env.NEXT_PUBLIC_BNB_TESTNET_USDC;
+    const ethereumUSDC = process.env.NEXT_PUBLIC_ETHEREUM_USDC;
+    const polygonUSDC = process.env.NEXT_PUBLIC_POLYGON_USDC;
+    const bnbUSDC = process.env.NEXT_PUBLIC_BNB_USDC;
+    const ethereumUSDT = process.env.NEXT_PUBLIC_ETHEREUM_USDT;
+    const polygonUSDT = process.env.NEXT_PUBLIC_POLYGON_USDT;
+    const bnbUSDT = process.env.NEXT_PUBLIC_BNB_USDT;
 
-  //   axiosInstanceLocal
-  //     .post("/api/bridge", data)
-  //     .then(() => {
-  //       // Trigger refetch only after the request was successful
-  //       refetch();
-  //       setMainLoadingState(false);
-  //     })
-  //     .catch((error) => {
-  //       const errMsg =
-  //         error.response?.data?.error?.message ||
-  //         error.message ||
-  //         "Payment confirmation failed";
-  //       toast.error(" Error completing payment: " + errMsg);
+    if (!activeChain) return;
 
-  //       logError("Error sending job request", error);
-  //       setMainLoadingState(false);
-  //       setMainTransaction(false);
-  //     });
-  // };
+    const testnetChainIds: Record<string, number> = {
+      polygonAmoy: polygonAmoy.id,
+      sepolia: sepolia.id,
+      bscTestnet: bscTestnet.id,
+    };
 
-  // const completePayment = () => {
-  //   setMainLoadingState(true);
-  //   setMainTransaction(true);
-  //   const transaction = prepareContractCall({
-  //     contract: odpContract,
-  //     method:
-  //       "function transfer(address recipient, uint256 amount) public returns (bool)",
-  //     params: [
-  //       process.env.NEXT_PUBLIC_TREASURY as string,
-  //       parseEther(amount.toString()),
-  //     ],
-  //   });
-  //   transferTransaction(transaction as PreparedTransaction, {
-  //     onSuccess: (data) => {
-  //       verify(data.transactionHash);
-  //     },
-  //     onError: (error) => {
-  //       toast.error("Transaction failed:" + error.message);
-  //       setMainLoadingState(false);
-  //       setMainTransaction(false);
-  //     },
-  //   });
-  //   // const transaction = prepareContractCall({
-  //   //   contract: odpContract,
-  //   //   method:
-  //   //     "function approve(address spender, uint256 value) external returns (bool)",
-  //   //   params: [
-  //   //     process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
-  //   //     parseEther(amount.toString()),
-  //   //   ],
-  //   // });
-  //   // approveTransaction(transaction, {
-  //   //   onSuccess: () => {
-  //   //     // console.log("Approved");
-  //   //     swapTokens();
-  //   //   },
-  //   //   onError: (error) => {
-  //   //     toast.error("Approval failed:");
-  //   //     setMainLoadingState(false);
-  //   //     setMainTransaction(false);
-  //   //   },
-  //   // });
-  // };
+    const testnetTokenAddresses: Record<
+      string,
+      Record<string, string | undefined>
+    > = {
+      USDC: {
+        [polygonAmoy.id]: polygonAmoyUSDC,
+        [sepolia.id]: sepoliaUSDC,
+        [bscTestnet.id]: bnbTestnetUSDC,
+      },
+    };
 
-  // useEffect(() => {
-  //   if (swapLoading || approveLoading) {
-  //     console.log(approveLoading, swapLoading);
-  //     //show loading modal
-  //   }
-  // }, [swapLoading, approveLoading]);
-  //
+    const mainnetChainIds: Record<string, number> = {
+      polygon: polygon.id,
+      bsc: bsc.id,
+      mainnet: mainnet.id,
+    };
+
+    const mainnetTokenAddresses: Record<
+      string,
+      Record<number, string | undefined>
+    > = {
+      USDC: {
+        [polygon.id]: polygonUSDC,
+        [bsc.id]: bnbUSDC,
+        [mainnet.id]: ethereumUSDC,
+      },
+      USDT: {
+        [polygon.id]: polygonUSDT,
+        [bsc.id]: bnbUSDT,
+        [mainnet.id]: ethereumUSDT,
+      },
+    };
+
+    // Check if the active chain ID is one of the testnet chain IDs
+    const isTestnet = Object.values(testnetChainIds).includes(activeChain.id);
+    if (isTestnet) {
+      return testnetTokenAddresses[token]?.[activeChain.id];
+    }
+
+    // Check if the active chain ID is one of the mainnet chain IDs
+    const isMainnet = Object.values(mainnetChainIds).includes(activeChain.id);
+    if (isMainnet) {
+      return mainnetTokenAddresses[token]?.[activeChain.id];
+    }
+
+    return undefined;
+  };
+
+  const verify = (transactionHash: string) => {
+    const data = {
+      txHash: transactionHash,
+      tokenAddress: getTokenAddress(token),
+      expectedFrom: activeAccount?.address,
+      expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
+      expectedAmount: amount.toString(), //amount paid
+      decimals: 6,
+      chainId: activeChain?.id,
+    };
+
+    axiosInstanceLocal
+      .post("/api/bridge", data)
+      .then(() => {
+        // Trigger refetch only after the request was successful
+        refetch();
+        setMainLoadingState(false);
+      })
+      .catch((error) => {
+        const errMsg =
+          error.response?.data?.error?.message ||
+          error.message ||
+          "Payment confirmation failed";
+        toast.error(" Error completing payment: " + errMsg);
+
+        logError("Error sending job request", error);
+        setMainLoadingState(false);
+        setMainTransaction(false);
+      });
+  };
+
+  const completePayment = () => {
+    const parsedAmount =
+      token == "USDT" || token == "USDC"
+        ? parseUnits(amount.toString(), 6)
+        : parseEther(amount.toString());
+    setMainLoadingState(true);
+    setMainTransaction(true);
+    const prepareTransfer = prepareContractCall({
+      contract: tokenContract,
+      method:
+        "function transfer(address recipient, uint256 amount) public returns (bool)",
+      params: [process.env.NEXT_PUBLIC_TREASURY as string, parsedAmount],
+    });
+    transferTransaction(prepareTransfer as PreparedTransaction, {
+      onSuccess: (data) => {
+        verify(data.transactionHash);
+      },
+      onError: (error) => {
+        toast.error("Transaction failed:" + error.message);
+        setMainLoadingState(false);
+        setMainTransaction(false);
+      },
+    });
+    // const transaction = prepareContractCall({
+    //   contract: odpContract,
+    //   method:
+    //     "function approve(address spender, uint256 value) external returns (bool)",
+    //   params: [
+    //     process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+    //     parsedAmount,
+    //   ],
+    // });
+    // approveTransaction(transaction as PreparedTransaction, {
+    //   onSuccess: () => {
+    //     // console.log("Approved");
+    //     swapTokens();
+    //   },
+    //   onError: (error) => {
+    //     toast.error("Approval failed:");
+    //     setMainLoadingState(false);
+    //     setMainTransaction(false);
+    //   },
+    // });
+  };
 
   useEffect(() => {
     if (!activeChain) return;
+    const tokenAddress = getTokenAddress(token);
 
+    if (!tokenAddress) return;
     const initContract = async () => {
-      const isMainnet = activeChain.id == 8192;
-      const contract = getContractInstance(
-        isMainnet ? torusMainnet : torusTestnet,
-        isMainnet
-          ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string)
-          : (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string),
-      );
-      setOdpContract(contract);
+      const contract = getContractInstance(activeChain, tokenAddress);
+      setTokenContract(contract);
     };
 
     initContract();
-  }, [activeChain]);
+  }, [activeChain, token]);
 
   const handleTransferTokens = async () => {
-    if (!activeChain || !amount || !activeAccount || !balance) {
+    if (!activeChain || !amount || !activeAccount) {
       console.error("Missing required data. Please check your inputs.");
       return;
     }
 
-    if (Number(formatEther(balance)) < Number(amount)) {
+    if (!balance || Number(formatEther(balance)) < Number(amount)) {
       toast.error("Insufficient balance");
       return;
     }
@@ -264,7 +332,10 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
             if (data.success && data.data) {
               toast.success(
                 data.data.transactionhash
-                  ? `Transfer successful! Transaction: ${data.data.transactionhash.substring(0, 6)}...`
+                  ? `Transfer successful! Transaction: ${data.data.transactionhash.substring(
+                      0,
+                      6,
+                    )}...`
                   : "Transfer completed successfully",
               );
             } else {
@@ -303,6 +374,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
       );
     }
   };
+
   return (
     <>
       <div className="bg-[#232323] p-4 rounded-lg">
@@ -324,7 +396,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
             <input
               type="text"
               placeholder="0"
-              value={"ODP"}
+              value={token}
               disabled
               className="text-sm text-primary-1 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-primary-10 border-[1px] outline-none"
             />
@@ -361,7 +433,7 @@ export default function OdpPay({ amount, handleClose, refetch }: OdpPayProps) {
         <button
           className="bg-primary-6 w-40 rounded-full hover:bg-primary-5 text-primary-13"
           disabled={!activeAccount?.address || amount === 0}
-          onClick={handleTransferTokens}
+          onClick={token == "ODP" ? handleTransferTokens : completePayment}
         >
           Confirm & Pay
         </button>

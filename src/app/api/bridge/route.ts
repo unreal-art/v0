@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   const secretSupabaseClient: SupabaseClient = createClient(
     supabaseUrl,
-    private_SRK,
+    private_SRK
   );
 
   const user = await getUser();
@@ -31,11 +31,24 @@ export async function POST(req: NextRequest) {
       chainId,
     } = await req.json();
 
-    const provider = new ethers.JsonRpcProvider(
-      chainId == 8192
-        ? process.env.MAINNET_RPC_URL
-        : process.env.TESTNET_RPC_URL,
-    );
+    const rpcUrl =
+      chainId == 1
+        ? process.env.ETHEREUM_RPC_URL
+        : chainId == 8192
+        ? process.env.TORUS_MAINNET_RPC_URL
+        : chainId == 137
+        ? process.env.POLYGON_RPC_URL
+        : chainId == 56
+        ? process.env.BSC_RPC_URL
+        : chainId == 11155111
+        ? process.env.SEPOLIA_RPC_URL
+        : chainId == 80002
+        ? process.env.POLYGON_AMOY_RPC_URL
+        : chainId == 97
+        ? process.env.BSC_TESTNET_RPC_URL
+        : "";
+
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
 
     const receipt = await provider.getTransactionReceipt(txHash);
 
@@ -45,14 +58,14 @@ export async function POST(req: NextRequest) {
           success: false,
           error: { message: "Transaction failed or not found" },
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     const iface = new ethers.Interface(ERC20_ABI);
 
     const logs = receipt.logs.filter(
-      (log) => log.address.toLowerCase() === tokenAddress.toLowerCase(),
+      (log) => log.address.toLowerCase() === tokenAddress.toLowerCase()
     );
 
     for (const log of logs) {
@@ -63,11 +76,12 @@ export async function POST(req: NextRequest) {
         const to = parsed?.args[1];
         const value = parsed?.args[2];
 
-        const formattedAmount = ethers.formatUnits(value, decimals || 18);
+        const formattedAmount = ethers.formatUnits(value, decimals || 6);
 
+        //parse expected amount to units
         const expectedValue = ethers.parseUnits(
           expectedAmount.toString(),
-          decimals,
+          decimals || 6
         );
 
         if (
@@ -76,11 +90,12 @@ export async function POST(req: NextRequest) {
           value.toString() === expectedValue.toString()
         ) {
           const userBalance = user?.creditBalance || 0;
-          const rate = Number(process.env.NEXT_PUBLIC_RATE);
+          const rate = Number(process.env.NEXT_PUBLIC_STABLE_COIN_RATE);
+          // divide formatted amount by rate to get added balance
           const addedBalance =
             Number(formattedAmount) /
-            Number(ethers.formatUnits(rate.toString(), decimals));
-
+            Number(ethers.formatUnits(rate.toString(), 18));
+          // console.log("addedBalance", addedBalance);
           const newBalance = userBalance + addedBalance;
 
           const { error } = await secretSupabaseClient
@@ -91,7 +106,7 @@ export async function POST(req: NextRequest) {
           if (error) {
             return NextResponse.json(
               { success: false, error: { message: error.message } },
-              { status: 500 },
+              { status: 500 }
             );
           }
 
@@ -105,12 +120,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: { message: "Matching transfer not found" } },
-      { status: 404 },
+      { status: 404 }
     );
   } catch (err: any) {
     return NextResponse.json(
       { success: false, error: { message: err.message || "Unknown error" } },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

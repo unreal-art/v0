@@ -5,6 +5,7 @@ import OdpPay from "./odpPay";
 interface TopupProps {
   amount: number;
   open: boolean;
+  token: string;
   setOpen: (open: boolean) => void;
   close: () => void;
   refetch: () => void;
@@ -13,6 +14,7 @@ interface TopupProps {
 export default function Payment({
   open,
   amount,
+  token,
   setOpen,
   close,
   refetch,
@@ -54,6 +56,7 @@ export default function Payment({
           <div className="mt-6 h-full">
             <OdpPay
               amount={amount}
+              token={token}
               handleClose={handleClose}
               refetch={refetch}
             />

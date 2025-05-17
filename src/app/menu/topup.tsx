@@ -12,18 +12,25 @@ interface TopupProps {
   refetch: () => void;
 }
 
-const exchangeContract = getContractInstance(
-  torusTestnet,
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
-);
+// const exchangeContract = getContractInstance(
+//   torusTestnet,
+//   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+// );
 
 export default function Topup({ open, setOpen, refetch }: TopupProps) {
   const [credit, setCredit] = useState<number>(5);
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
-  const [rate, setRate] = useState<number>(
-    Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0")),
-  );
+  // const [rate, setRate] = useState<number>(
+  //   Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0"))
+  // );
+  type Token = "USDT" | "USDC" | "ODP";
+  const [selectedToken, setSelectedToken] = useState<Token>("ODP");
+  const [tokenRates, setTokenRates] = useState<Record<Token, number>>({
+    USDT: Number(formatEther(process.env.NEXT_PUBLIC_STABLE_COIN_RATE || "0")),
+    USDC: Number(formatEther(process.env.NEXT_PUBLIC_STABLE_COIN_RATE || "0")),
+    ODP: Number(formatEther(process.env.NEXT_PUBLIC_ODP_RATE || "0")),
+  });
 
   const [openPayment, setOpenPayment] = useState(false);
 
@@ -40,12 +47,10 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
   // }, [exchangeRate]);
 
   useEffect(() => {
-    // const price = Number(credit) || 0;
-    // setAmount(price);
-    //console.log(rate);
-    setCost(Math.round(Number(credit) * rate)); // 1 credit == 500 odp
+    // console.log(Number(credit) * tokenRates[selectedToken]);
+    setCost(Number(credit) * tokenRates[selectedToken]);
     setAmount(Number(credit));
-  }, [credit]);
+  }, [credit, selectedToken]);
 
   const handleClose = () => {
     setOpen(false);
@@ -54,11 +59,14 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
 
   const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Math.floor(Number(e.target.value)); // Ensure it's a whole number
-    if (value >= 5) {
-      setCredit(value);
-    } else {
-      setCredit(0);
-    }
+    setCredit(value);
+    // if (selectedToken === "ODP" && value >= 5) {
+    //   setCredit(value);
+    // } else if (selectedToken !== "ODP" && value >= 0) {
+    //   setCredit(value);
+    // } else {
+    //   setCredit(0);
+    // }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -81,7 +89,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
           className={"absolute z-30 top-0 left-0 h-screen w-full"}
         ></div>
 
-        <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 h-[394px] w-[98p%] max-w-[520px] flex flex-col">
+        <div className="absolute z-50 rounded-[20px] border-primary-8 border-[1px] p-6 bg-primary-12 h-[500px] w-[98p%] max-w-[520px] flex flex-col">
           <div className="flex justify-between">
             <p className="text-2xl text-primary-3 nasalization">Top up</p>
             <button onClick={handleClose}>
@@ -91,8 +99,30 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
 
           <form onSubmit={handleSubmit} method="post" className="">
             <div className="text-primary-2 my-10">
-              <label>Number of credits (Minimum = 5)</label>
-              <div>
+              {/* select with options of usdt, usdc and odp */}
+              <label className="text-xs">
+                Minimum credit (ODP = 5, others = 1)
+              </label>
+
+              <div className="flex flex-col gap-4">
+                <div className="relative h-14 w-full rounded-xl bg-primary-10 ">
+                  <select
+                    value={selectedToken}
+                    onChange={(e) => {
+                      const newToken = e.target.value as Token;
+                      setSelectedToken(newToken);
+                      setCost(
+                        Math.round(Number(credit) * tokenRates[newToken]),
+                      );
+                    }}
+                    className="absolute text-primary-3 bg-inherit cursor-pointer left-0 top-0 w-full h-14 px-2  rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0"
+                  >
+                    <option value="USDT">USDT</option>
+                    <option value="USDC">USDC</option>
+                    <option value="ODP">ODP</option>
+                  </select>
+                </div>
+
                 <div className="relative h-14 w-full rounded-xl bg-primary-10">
                   <button className="absolute top-[18px] right-3 z-10">
                     <FlashIcon width={20} height={20} color="#8F8F8F" />
@@ -102,9 +132,15 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
                     type="number"
                     placeholder="0 (minimum value of 2)"
                     value={credit}
-                    min={2}
                     step={1}
-                    onChange={handleCreditChange}
+                    onChange={(e) => {
+                      handleCreditChange(e);
+                      setCost(
+                        Math.round(
+                          Number(e.target.value) * tokenRates[selectedToken],
+                        ),
+                      );
+                    }}
                     className="absolute text-primary-3 placeholder:text-primary-6 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0 hide-arrow"
                   />
                 </div>
@@ -117,7 +153,8 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
             <div className="flex justify-between h-11 my-10">
               <p className="text-primary-6">Amount</p>{" "}
               <p className="text-primary-3 text-xl flex space-x-2">
-                <span className="">ODP</span> <span>{formatMoney(cost)}</span>
+                <span className="">{selectedToken}</span>{" "}
+                <span>{formatMoney(cost)}</span>
               </p>
             </div>
 
@@ -131,7 +168,10 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
               <button
                 onClick={() => setOpenPayment(true)}
                 className="bg-primary-11 w-40 rounded-full hover:bg-primary-10"
-                disabled={cost < 1}
+                disabled={
+                  (selectedToken === "ODP" && credit < 5) ||
+                  (selectedToken !== "ODP" && credit < 1)
+                }
               >
                 Proceed
               </button>
@@ -141,6 +181,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
       </div>
 
       <Payment
+        token={selectedToken}
         amount={cost}
         open={openPayment}
         close={handleClose}
