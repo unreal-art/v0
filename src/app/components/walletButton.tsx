@@ -4,6 +4,14 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { createThirdwebClient } from "thirdweb";
 import { ConnectButton } from "thirdweb/react";
+import {
+  bsc,
+  bscTestnet,
+  mainnet,
+  polygon,
+  polygonAmoy,
+  sepolia,
+} from "thirdweb/chains";
 
 export const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID as string,
@@ -11,8 +19,8 @@ export const client = createThirdwebClient({
 
 const chains =
   process.env.NODE_ENV === "development"
-    ? [torusTestnet, torusMainnet]
-    : [torusMainnet];
+    ? [torusTestnet, torusMainnet, bscTestnet, polygonAmoy, sepolia]
+    : [torusMainnet, mainnet, bsc, polygon];
 
 const metadata = {
   name: "unreal",
