@@ -1,10 +1,9 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { supabase } from "$/supabase/client";
+import Image from "next/image";
 
 const protectedRoutes = ["/home"];
 
@@ -15,56 +14,44 @@ export default function PathnameProvider({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        setLoading(true); // Ensure loading is set to true at the start
+        setLoading(true);
 
-        // Get both user and session data
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
+        // Get session data first (this is more reliable for checking auth status)
+        const { data: sessionData } = await supabase.auth.getSession();
+        const session = sessionData.session;
 
+        // Check if we're on a protected route
         const isProtectedRoute = protectedRoutes.some((route) =>
-          pathname.startsWith(route)
+          pathname.startsWith(route),
         );
 
-        // Log for debugging purposes
+        // Log state for debugging
         console.log("Auth check:", {
           pathname,
-          user: user ? { id: user.id, email: user.email } : "null",
-          session: session
-            ? {
-                id: session.access_token ? "exists" : "empty",
-                expires_at: session.expires_at,
-              }
-            : "null",
           isProtectedRoute,
-          userError: userError?.message,
-          sessionError: sessionError?.message,
+          session: session ? "exists" : "null",
         });
 
-        // Only redirect if both checks fail AND we're on a protected route
-        if (!user && !session && isProtectedRoute) {
+        // Only redirect if no session AND we're on a protected route
+        if (!session && isProtectedRoute) {
           console.log("Redirecting to /auth due to failed authentication");
           router.replace("/auth");
         }
+
+        setAuthChecked(true);
       } catch (error) {
         console.error("Authentication check failed:", error);
-        // If there's an unexpected error and we're on a protected route, redirect
-        if (protectedRoutes.some((route) => pathname.startsWith(route))) {
-          router.replace("/auth");
-        }
+        // On error, redirect to auth page if on protected route
+        // if (protectedRoutes.some(route => pathname.startsWith(route))) {
+        //   router.replace("/auth");
+        // }
       } finally {
-        // Always set loading to false when done, regardless of outcome
         setLoading(false);
       }
     };
@@ -72,26 +59,10 @@ export default function PathnameProvider({
     checkAuth();
   }, [pathname, router]);
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     const { error } = await supabase.auth.getUser();
-
-  //     if (
-  //       error &&
-  //       protectedRoutes.some((route) => pathname.startsWith(route))
-  //     ) {
-  //       router.replace("/auth"); // Redirect if not authenticated
-  //     } else {
-  //       setLoading(false); // Auth check is done, allow rendering
-  //     }
-  //   };
-
-  //   checkAuth();
-  // }, [pathname, router, supabase]);
-
-  if (loading) {
+  // Show loader while checking authentication
+  if (loading && !authChecked) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-primary-13">
+      <div className="flex items-center justify-center h-screen">
         <Image
           src="/Icon-White.png"
           alt="unreal"
@@ -100,7 +71,7 @@ export default function PathnameProvider({
           priority
         />
       </div>
-    ); // Show loader until auth is checked
+    );
   }
 
   return <>{children}</>;
