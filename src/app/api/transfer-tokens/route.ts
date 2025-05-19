@@ -27,7 +27,7 @@ const REQUIRED_ENV_VARS = [
   "SUPABASE_SERVICE_ROLE_KEY",
   "ODP_API_KEY",
   "ODP_API_ENDPOINT",
-  "NEXT_PUBLIC_RATE",
+  "NEXT_PUBLIC_ODP_RATE",
 ];
 
 const missingEnvVars = REQUIRED_ENV_VARS.filter(
@@ -47,7 +47,7 @@ export async function POST(
   const privateServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const odpApiKey = process.env.ODP_API_KEY;
   const odpApiEndpoint = process.env.ODP_API_ENDPOINT;
-  const rateStr = process.env.NEXT_PUBLIC_RATE;
+  const rateStr = process.env.NEXT_PUBLIC_ODP_RATE;
 
   // Check configuration
   if (
@@ -157,7 +157,7 @@ export async function POST(
         Number(formattedValue) /
         Number(ethers.formatUnits(rate.toString(), 18));
       const newBalance = (user?.creditBalance || 0) + addedBalance;
-
+      console.log(newBalance, user.creditBalance);
       const { error } = await supabase
         .from("profiles")
         .update({ credit_balance: newBalance })
