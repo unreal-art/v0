@@ -22,7 +22,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
   // const [rate, setRate] = useState<number>(
-  //   Number(formatEther(process.env.NEXT_PUBLIC_RATE || "0"))
+  //   Number(formatEther(process.env.NEXT_PUBLIC_ODP_RATE || "0"))
   // );
   type Token = "USDT" | "USDC" | "ODP";
   const [selectedToken, setSelectedToken] = useState<Token>("ODP");
