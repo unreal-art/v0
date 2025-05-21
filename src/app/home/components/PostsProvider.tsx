@@ -54,7 +54,7 @@ export default function PostsProvider({
           queryKey: ["posts", normalizedSearchType.toLowerCase()],
           queryFn: async ({ pageParam = 0 }) => {
             try {
-              //@ts-ignore
+              // @ts-ignore
               let result = [];
 
               // Select the right query function based on search type
@@ -76,7 +76,7 @@ export default function PostsProvider({
               if (!Array.isArray(result)) {
                 console.warn(
                   "Expected array result from API but got:",
-                  typeof result,
+                  typeof result
                 );
                 result = [];
               }
@@ -93,8 +93,7 @@ export default function PostsProvider({
             }
           },
           initialPageParam: 0,
-          // @ts-ignore
-          getNextPageParam: (lastPage) => {
+          getNextPageParam: (lastPage: QueryResponse) => {
             // Safe access with type checking
             if (!lastPage || typeof lastPage !== "object") return undefined;
             return "nextCursor" in lastPage ? lastPage.nextCursor : undefined;

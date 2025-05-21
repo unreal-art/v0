@@ -23,7 +23,7 @@ import { capitalizeFirstAlpha } from "@/utils";
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 8 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -138,7 +138,7 @@ export default function SearchPhotoGallary({
   }
 
   // Check if we have no data to display
-  if (!data || data.pages.length === 0 || data.pages[0].length === 0) {
+  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center w-full p-8">
         <p className="text-center text-lg">
