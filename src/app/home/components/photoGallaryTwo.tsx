@@ -8,12 +8,10 @@ import {
 import "react-photo-album/masonry.css";
 import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
-//import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-// import { usePostsQuery } from "@/hooks/usePostsQuery";
 import { supabase } from "$/supabase/client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -21,14 +19,12 @@ import InfiniteScroll from "./InfiniteScroll";
 import { formattedPhotos } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useParams, useSearchParams } from "next/navigation";
-// import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import { useUser } from "@/hooks/useUser";
 import {
   getOtherIsDraftPostsByUser,
   getOtherPostsByUser,
-  getPostsByUser,
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
 import OptimizedImage from "@/app/components/OptimizedImage";
@@ -37,7 +33,7 @@ import { capitalizeFirstAlpha } from "@/utils";
 // Dynamically import ImageView component to reduce initial bundle size
 const ImageView = dynamic(() => import("./imageView"), {
   ssr: false,
-  loading: () => null,
+  loading: () => <div className="w-full h-64 bg-gray-200 animate-pulse"></div>,
 });
 
 // Define renderNextImage as a regular function since it's used as a render prop
@@ -45,15 +41,18 @@ function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
   { photo, width, height, index = 0 }: RenderImageContext,
 ) {
+  // Validate photo object
+  if (!photo || typeof photo !== "object") {
+    return <div className="w-full h-64 bg-gray-200">Image data missing</div>;
+  }
+
   // Use priority loading for the first images (eagerly loaded)
-  // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 8;
 
-  // Extract image name for tracking
+  // Extract image name for tracking with safe fallback
   const imageName =
-    typeof photo === "object" && photo !== null && "src" in photo
-      ? String(photo.src).split("/").pop()?.split("?")[0] ||
-        `gallery-img-${index}`
+    typeof photo === "object" && "src" in photo && typeof photo.src === "string"
+      ? photo.src.split("/").pop()?.split("?")[0] || `gallery-img-${index}`
       : `gallery-img-${index}`;
 
   // Responsive size hints for optimal loading
@@ -79,50 +78,84 @@ function renderNextImage(
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
         trackPerformance={process.env.NODE_ENV === "development"}
         imageName={imageName}
+        onError={(e) => {
+          // Handle image loading failures
+          const target = e.target as HTMLImageElement;
+          if (target) {
+            target.onerror = null; // Prevent infinite error loop
+            target.src = "/placeholder-image.jpg";
+          }
+        }}
       />
     </div>
   );
 }
 
-function PhotoGallaryTwo({}) {
+function PhotoGallaryTwo() {
   const [imageIndex, setImageIndex] = useState(-1);
-  const [columns, setColumns] = useState<number | null>(null);
+  const [columns, setColumns] = useState<number | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
   const { userId } = useUser();
   const searchParams = useSearchParams();
-  const { id } = useParams();
-  const a = searchParams.get("a");
+  const params = useParams();
 
-  // Always calculate postId in the same way for consistent hook ordering
-  const postId = useMemo(() => (id ? parseInt(id as string) : null), [id]);
-  const { data: post } = usePost(postId);
+  // Safely extract and validate ID parameter
+  const id = params?.id ? String(params.id) : null;
+  const a = searchParams?.get("a") || null;
+
+  // Safely parse postId with validation
+  const postId = useMemo(() => {
+    if (!id) return null;
+    const parsed = parseInt(id, 10);
+    return isNaN(parsed) ? null : parsed;
+  }, [id]);
+
+  // Fetch post data safely
+  const {
+    data: post,
+    isLoading: isPostLoading,
+    error: postError,
+  } = usePost(postId);
 
   // Memoize query function to avoid recreating on each render
   const queryFn = useCallback(
     async ({ pageParam = 0 }) => {
-      let result: Post[] = [];
+      try {
+        // Ensure we have the required data before querying
+        if (!post?.author) {
+          return { data: [], nextCursor: undefined };
+        }
 
-      // Always call the appropriate function based on the value of 'a'
-      if (a) {
-        result = await getOtherIsDraftPostsByUser(
-          supabase,
-          pageParam,
-          Number(postId),
-          post?.author,
-        );
-      } else {
-        result = await getOtherPostsByUser(
-          supabase,
-          pageParam,
-          Number(postId),
-          post?.author,
-        );
+        let result: Post[] = [];
+
+        // Always call the appropriate function based on the value of 'a'
+        if (a) {
+          result = await getOtherIsDraftPostsByUser(
+            supabase,
+            pageParam,
+            postId ?? 0,
+            post.author,
+          );
+        } else {
+          result = await getOtherPostsByUser(
+            supabase,
+            pageParam,
+            postId ?? 0,
+            post.author,
+          );
+        }
+
+        return {
+          data: result ?? [],
+          nextCursor:
+            (result?.length ?? 0) === LIST_LIMIT ? pageParam + 1 : undefined,
+        };
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        setError(err instanceof Error ? err.message : "Failed to fetch posts");
+        return { data: [], nextCursor: undefined };
       }
-
-      return {
-        data: result ?? [],
-        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
-      };
     },
     [a, postId, post?.author],
   );
@@ -139,9 +172,9 @@ function PhotoGallaryTwo({}) {
   );
 
   const {
-    isLoading,
+    isLoading: isQueryLoading,
     isError,
-    error,
+    error: queryError,
     data,
     isFetchingNextPage,
     hasNextPage,
@@ -151,82 +184,140 @@ function PhotoGallaryTwo({}) {
     queryFn,
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
-      if (!lastPage?.data || !Array.isArray(lastPage.data)) {
+      // Safely access data with null checks
+      if (
+        !lastPage?.data ||
+        !Array.isArray(lastPage.data) ||
+        lastPage.data.length === 0
+      ) {
         return undefined;
       }
-      return lastPage.data.length < 10 ? undefined : lastPage.nextCursor;
+      return lastPage.data.length < LIST_LIMIT
+        ? undefined
+        : lastPage.nextCursor;
     },
+    // Only enable the query when we have the necessary dependencies
+    enabled: !!post?.author && postId !== null,
   });
 
   // Optimize resize handling with useCallback to prevent recreation
   const handleResize = useCallback(() => {
-    setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+    if (typeof window !== "undefined") {
+      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+    }
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Set columns initially
     handleResize();
-    window.addEventListener("resize", handleResize);
 
+    // Add resize listener with cleanup
+    window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, [handleResize]);
 
   const handleImageIndex = useCallback((context: RenderPhotoContext) => {
-    setImageIndex(context.index);
+    if (context && typeof context.index === "number") {
+      setImageIndex(context.index);
+    }
   }, []);
 
   // Memoize formatted photos to prevent recalculation on each render
-  const photos = useMemo(
-    () => formattedPhotos(data?.pages ?? []),
-    [data?.pages],
-  );
+  const photos = useMemo(() => {
+    try {
+      if (!data?.pages) return [];
+      return formattedPhotos(data.pages);
+    } catch (err) {
+      console.error("Error formatting photos:", err);
+      setError(err instanceof Error ? err.message : "Failed to format photos");
+      return [];
+    }
+  }, [data?.pages]);
 
-  // Early return after all hooks have been called
-  if (isError) {
+  // Handle loading state
+  const isLoading = isPostLoading || isQueryLoading;
+
+  // Handle all possible error states
+  const errorMessage =
+    error ||
+    (isError && queryError
+      ? typeof queryError === "object" &&
+        queryError !== null &&
+        "message" in queryError
+        ? String(queryError.message)
+        : "An error occurred"
+      : null) ||
+    (postError ? String(postError) : null);
+
+  // Handle error state after all hooks run
+  if (errorMessage) {
     return (
-      <p className="wrapper">{"message" in error ? error.message : error}</p>
+      <div className="p-4 text-red-500 bg-red-50 rounded">
+        <p className="font-medium">Error:</p>
+        <p>{errorMessage}</p>
+      </div>
     );
   }
 
+  // Handle empty state after all hooks run
   if (
     !isLoading &&
-    (!data || data.pages.length === 0 || data.pages[0].data.length === 0)
+    (!data ||
+      !data.pages ||
+      data.pages.length === 0 ||
+      (data.pages[0] &&
+        (!data.pages[0].data || data.pages[0].data.length === 0)))
   ) {
-    return <p className="text-center">No Data found.</p>;
+    return <p className="text-center p-4">No images found.</p>;
   }
 
-  if (!columns) return null;
+  // Wait for column setup (from resize handler)
+  if (columns === undefined) {
+    return <div className="w-full h-64 bg-gray-100 animate-pulse"></div>;
+  }
 
   return (
     <div className="w-full">
-      <InfiniteScroll
-        isLoadingInitial={isLoading || (!data && !error)}
-        isLoadingMore={isFetchingNextPage}
-        loadMore={() => hasNextPage && fetchNextPage()}
-        hasNextPage={hasNextPage}
-      >
-        <MasonryPhotoAlbum
-          photos={photos}
-          columns={columns}
-          spacing={4}
-          render={{
-            extras: (_, context) => (
-              <PhotoWithAuthor
-                context={context as ExtendedRenderPhotoContext}
-                handleImageIndex={handleImageIndex}
-              />
-            ),
-            image: renderNextImage,
-          }}
-        />
-      </InfiniteScroll>
-      <ImageView
-        photo={imageIndex > -1 && photos[imageIndex]}
-        setImageIndex={setImageIndex}
-      />
+      {isLoading ? (
+        <div className="flex flex-wrap gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-1/2 sm:w-1/3 md:w-1/4 aspect-square bg-gray-200 animate-pulse"
+            ></div>
+          ))}
+        </div>
+      ) : (
+        <InfiniteScroll
+          isLoadingInitial={isLoading}
+          isLoadingMore={isFetchingNextPage}
+          loadMore={() => hasNextPage && fetchNextPage()}
+          hasNextPage={!!hasNextPage}
+        >
+          <MasonryPhotoAlbum
+            photos={photos}
+            columns={columns}
+            spacing={4}
+            render={{
+              extras: (_, context) => (
+                <PhotoWithAuthor
+                  context={context as ExtendedRenderPhotoContext}
+                  handleImageIndex={handleImageIndex}
+                />
+              ),
+              image: renderNextImage,
+            }}
+          />
+        </InfiniteScroll>
+      )}
+
+      {photos.length > 0 && imageIndex > -1 && imageIndex < photos.length && (
+        <ImageView photo={photos[imageIndex]} setImageIndex={setImageIndex} />
+      )}
     </div>
   );
 }
@@ -239,10 +330,15 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
   context: ExtendedRenderPhotoContext;
   handleImageIndex: (context: RenderPhotoContext) => void;
 }) {
-  const authorId = context.photo.author || ""; // Ensure it's always a string
+  // Default to empty string if author is not available
+  const authorId = context?.photo?.author || "";
 
-  const { data: userName, isLoading: isLoading } = useAuthorUsername(authorId);
-  const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
+  const { data: userName, isLoading: isUserNameLoading } =
+    useAuthorUsername(authorId);
+  const { data: image, isLoading: isImageLoading } = useAuthorImage(authorId);
+
+  // Only render content if we have context
+  if (!context) return null;
 
   return (
     <PhotoOverlay
@@ -250,7 +346,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
       context={context}
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
-        {!isLoading && !imageLoading && userName && (
+        {!isUserNameLoading && !isImageLoading && userName ? (
           <>
             <div className="rounded-full">
               {image ? (
@@ -262,15 +358,29 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
                   alt={`${userName}'s profile picture`}
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target) {
+                      target.onerror = null;
+                      target.src = "/default-avatar.jpg";
+                    }
+                  }}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">
-              {capitalizeFirstAlpha(userName)}
+              {typeof userName === "string"
+                ? capitalizeFirstAlpha(userName)
+                : "Unknown"}
             </p>
           </>
+        ) : (
+          <div className="flex items-center gap-1">
+            <div className="w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
+            <div className="w-16 h-4 bg-gray-300 rounded animate-pulse" />
+          </div>
         )}
       </div>
     </PhotoOverlay>

@@ -16,6 +16,8 @@ import { useUser } from "@/hooks/useUser";
 import { useToggleFollow } from "@/hooks/useToggleFollow";
 import Link from "next/link";
 
+const dummydata = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
 export default function UserSearch({ searchTerm }: { searchTerm: string }) {
   const {
     data,
@@ -27,33 +29,12 @@ export default function UserSearch({ searchTerm }: { searchTerm: string }) {
     isFetchingNextPage,
   } = useSearchUsersInfinite(searchTerm, 10);
 
-  if (isLoading) {
-    return <div className="p-4">Loading...</div>;
-  }
-
-  if (isError) {
-    return (
-      <div className="p-4">
-        Error loading results: {error?.message || "Unknown error"}
-      </div>
-    );
-  }
-
   return (
     <div>
       {data?.pages?.flatMap((page) =>
-        (page.data || []).map((details: ProfileWithPosts) => (
-          <User key={details.id} data={details} posts={details.posts || []} />
+        page.data.map((details: ProfileWithPosts) => (
+          <User key={details.id} data={details} posts={details.posts} />
         )),
-      ) || (
-        <div className="flex flex-col items-center justify-center w-full p-8">
-          <p className="text-center text-lg">
-            No results found for "{searchTerm}"
-          </p>
-          <p className="text-center text-sm mt-2 text-gray-500">
-            Try different keywords or check your spelling
-          </p>
-        </div>
       )}
     </div>
   );
@@ -69,17 +50,15 @@ export function User({
   const { data: followStats } = useFollowStats(data.id);
   const { data: likeCount } = useLikeStat(data.id);
   const { userId } = useUser();
-  const { data: isFollowing, isLoading: isFollowLoading } = useDoesUserFollow(
-    userId || "", // Provide default empty string instead of casting
+  const { data: isFollowing, isLoading } = useDoesUserFollow(
+    userId as string,
     data.id,
   );
   const toggleFollowMutation = useToggleFollow();
 
   const handleFollowToggle = () => {
-    if (!userId) return; // Guard against undefined userId
-
     toggleFollowMutation.mutate({
-      followerId: userId,
+      followerId: userId as string,
       followeeId: data.id,
     });
   };
@@ -105,22 +84,18 @@ export function User({
             href={`/home/profile/${data.id}`}
             className="text-primary-1 text-lg w-36 font-normal"
           >
-            {data.username || "Unknown user"}
+            {data.username}
           </Link>
 
-          {userId && userId !== data.id && (
+          {userId !== data.id && (
             <button
-              disabled={toggleFollowMutation.isPending || isFollowLoading}
+              disabled={toggleFollowMutation.isPending}
               onClick={handleFollowToggle}
               className={`flex items-center justify-center gap-1 rounded-full h-8 w-24 px-2 py-1 border-[1px] border-primary-8
-                ${isFollowing ? "bg-transparent" : "bg-primary-10"}`}
+    ${isFollowing ? "bg-transparent" : "bg-primary-10"}`}
             >
               <p className="text-primary-5 text-sm">
-                {isFollowLoading
-                  ? "Loading..."
-                  : isFollowing
-                    ? "Unfollow"
-                    : "Follow"}
+                {isLoading ? "Loading..." : isFollowing ? "Unfollow" : "Follow"}
               </p>
             </button>
           )}
@@ -128,77 +103,63 @@ export function User({
 
         <div className="flex gap-x-4 my-4">
           <ProfileInfo
-            value={(followStats?.followeeCount || 0).toString()}
+            value={followStats?.followeeCount?.toString() || "0"}
             title={followStats?.followeeCount === 1 ? "Follower" : "Followers"}
           />
           <ProfileInfo
-            value={(followStats?.followerCount || 0).toString()}
-            title="Following"
+            value={followStats?.followerCount?.toString() || "0"}
+            title={followStats?.followerCount === 1 ? "Following" : "Following"} // Stays the same
             leftBorder={true}
           />
           <ProfileInfo
-            value={(likeCount || 0).toString()}
-            title={(likeCount || 0) === 1 ? "Like" : "Likes"}
+            value={likeCount?.toString() || "0"}
+            title={likeCount === 1 ? "Like" : "Likes"} // Adjusts title dynamically
             leftBorder={true}
           />
         </div>
       </div>
 
       <div className="overflow-x-auto whitespace-nowrap">
-        {posts && posts.length > 0 ? (
-          posts.map((post, index) => (
-            <UserImage key={post.id || index} post={post} />
-          ))
-        ) : (
-          <div className="p-4 text-center text-primary-5">
-            No posts to display
-          </div>
-        )}
+        {posts.map((post, index) => (
+          <UserImage key={index} post={post} />
+        ))}
       </div>
     </div>
   );
 }
 
 export function UserImage({ post }: { post: Post }) {
-  // Default values to avoid errors
-  const imageHash = post.ipfsImages?.[0]?.hash || "";
-  const imageFileName = post.ipfsImages?.[0]?.fileNames?.[0] || "";
-  const author = post.author || "";
-  const caption = post.caption || post.prompt || "No caption";
-
-  // Only try to get image if we have the required data
-  const imageSrc =
-    imageHash && imageFileName && author
-      ? getImage(imageHash, imageFileName, author)
-      : "/placeholder-image.jpg"; // Fallback image
-
   return (
+    // <PhotoOverlay
+    //     //setImageIndex={() => handleImageIndex(context)}
+    //     //context={context as ExtendedRenderPhotoContext}
+    //     >
     <Link
-      href={`/home/photo/${post.id}`}
+      href={`home/photo/${post.id}`}
       className="relative inline-block w-[306px] cursor-pointer"
     >
       <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
-        <p>{post.createdAt ? timeAgo(post.createdAt) : "Unknown time"}</p>
+        <p>{timeAgo(post.createdAt)}</p>
         <button>
           <OptionMenuIcon color="#FFFFFF" />
         </button>
       </div>
 
       <Image
-        src={imageSrc}
+        src={getImage(
+          post.ipfsImages?.[0].hash as string,
+          post.ipfsImages?.[0].fileNames?.[0] as string,
+          post.author,
+        )}
         width={306}
         height={408}
-        alt={caption.slice(0, 50)}
-        onError={(e) => {
-          // Fallback for image loading errors
-          const target = e.target as HTMLImageElement;
-          target.src = "/placeholder-image.jpg";
-        }}
+        alt="generated"
       />
 
       <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
-        {truncateText(caption, 3)}
+        {truncateText(post.caption || (post.prompt as string), 3)}
       </p>
     </Link>
+    // </PhotoOverlay>
   );
 }
