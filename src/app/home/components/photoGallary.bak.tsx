@@ -8,8 +8,12 @@ import {
 import "react-photo-album/masonry.css";
 import { useEffect, useState } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
+//import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
+
+import Image from "next/image";
 import ImageView from "./imageView";
+// import { usePostsQuery } from "@/hooks/usePostsQuery";
 import { supabase } from "$/supabase/client";
 import {
   getFollowingPosts,
@@ -18,9 +22,10 @@ import {
 } from "@/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
-import { formattedPhotosForGallary } from "../formattedPhotos";
+import { formattedPhotos, formattedPhotosForGallary } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
+// import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
@@ -33,7 +38,8 @@ function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
   { photo, width, height, index = 0 }: RenderImageContext,
 ) {
-  // Use priority loading for the first 8 images (eagerly loaded)
+  // Use priority loading for the first 4 images (eagerly loaded)
+  // This provides fast initial rendering for visible content
   const shouldPrioritize = index < 8;
 
   // Extract image name for tracking
@@ -71,24 +77,18 @@ function renderNextImage(
   );
 }
 
-export default function PhotoGallary() {
+export default function PhotoGallary({}) {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState<number | null>(null);
-  const [isBrowser, setIsBrowser] = useState(false);
 
   // Use Zustand store for tab state
   const { activeTab, initFromUrl } = useGalleryStore();
 
   // Sync with URL on initial load (for direct URL access)
   const searchParams = useSearchParams();
-
   useEffect(() => {
-    setIsBrowser(true);
-
-    const urlParam = searchParams?.get("s");
-    if (initFromUrl && urlParam) {
-      initFromUrl(urlParam);
-    }
+    const urlParam = searchParams.get("s");
+    initFromUrl(urlParam);
   }, [searchParams, initFromUrl]);
 
   const {
@@ -100,28 +100,24 @@ export default function PhotoGallary() {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", activeTab?.toLowerCase() || "explore"],
+    queryKey: ["posts", activeTab.toLowerCase()],
     queryFn: async ({ pageParam = 0 }) => {
-      try {
-        let result: Post[] = [];
-        // Use activeTab from Zustand instead of URL param
-        if (activeTab === "FOLLOWING") {
-          result = await getFollowingPosts(supabase, pageParam);
-        } else if (activeTab === "TOP") {
-          result = await getTopPosts(supabase, pageParam);
-        } else {
-          // Default to explore
-          result = await getPosts(supabase, pageParam);
-        }
-
-        return {
-          data: result ?? [],
-          nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
-        };
-      } catch (err) {
-        console.error("Error fetching posts:", err);
-        return { data: [], nextCursor: undefined };
+      let result: Post[] = [];
+      // Use activeTab from Zustand instead of URL param
+      if (activeTab === "EXPLORE") {
+        result = await getPosts(supabase, pageParam);
+      } else if (activeTab === "FOLLOWING") {
+        result = await getFollowingPosts(supabase, pageParam);
+      } else if (activeTab === "TOP") {
+        result = await getTopPosts(supabase, pageParam);
+      } else {
+        result = await getPosts(supabase, pageParam);
       }
+
+      return {
+        data: result ?? [],
+        nextCursor: result.length === LIST_LIMIT ? pageParam + 1 : undefined,
+      };
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
@@ -139,24 +135,14 @@ export default function PhotoGallary() {
       });
     };
 
-    try {
-      const resizeObserver = new ResizeObserver(handleResize);
-      resizeObserver.observe(document.body);
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(document.body);
 
-      handleResize();
+    handleResize();
 
-      return () => {
-        resizeObserver.disconnect();
-      };
-    } catch (err) {
-      // Fallback if ResizeObserver is not supported
-      window.addEventListener("resize", handleResize);
-      handleResize();
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    }
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, []);
 
   const handleImageIndex = (context: RenderPhotoContext) => {
@@ -165,9 +151,7 @@ export default function PhotoGallary() {
 
   if (isError) {
     return (
-      <p className="wrapper">
-        {"message" in error ? error.message : String(error)}
-      </p>
+      <p className="wrapper">{"message" in error ? error.message : error}</p>
     );
   }
 
@@ -203,37 +187,35 @@ export default function PhotoGallary() {
     );
   }
 
-  // Safety check to ensure we have valid data before formatting
-  const photos = data?.pages ? formattedPhotosForGallary(data.pages) : [];
+  const photos = formattedPhotosForGallary(data?.pages ?? []);
 
   return (
     <div className="w-full">
-      {isBrowser && (
-        <InfiniteScroll
-          isLoadingInitial={isLoading}
-          isLoadingMore={isFetchingNextPage}
-          loadMore={() => hasNextPage && fetchNextPage()}
-          hasNextPage={!!hasNextPage}
-        >
-          <MasonryPhotoAlbum
-            photos={photos}
-            columns={columns || 2} // Provide fallback columns value
-            spacing={4}
-            render={{
-              extras: (_, context) => (
-                <PhotoWithAuthor
-                  context={context as ExtendedRenderPhotoContext}
-                  handleImageIndex={handleImageIndex}
-                />
-              ),
-              image: renderNextImage,
-            }}
-          />
-        </InfiniteScroll>
-      )}
-      {isBrowser && imageIndex > -1 && photos[imageIndex] && (
-        <ImageView photo={photos[imageIndex]} setImageIndex={setImageIndex} />
-      )}
+      <InfiniteScroll
+        isLoadingInitial={isLoading}
+        isLoadingMore={isFetchingNextPage}
+        loadMore={() => hasNextPage && fetchNextPage()}
+        hasNextPage={hasNextPage}
+      >
+        <MasonryPhotoAlbum
+          photos={photos}
+          columns={columns}
+          spacing={4}
+          render={{
+            extras: (_, context) => (
+              <PhotoWithAuthor
+                context={context as ExtendedRenderPhotoContext}
+                handleImageIndex={handleImageIndex}
+              />
+            ),
+            image: renderNextImage,
+          }}
+        />
+      </InfiniteScroll>
+      <ImageView
+        photo={imageIndex > -1 && photos[imageIndex]}
+        setImageIndex={setImageIndex}
+      />
     </div>
   );
 }
@@ -245,20 +227,17 @@ function PhotoWithAuthor({
   context: ExtendedRenderPhotoContext;
   handleImageIndex: (context: RenderPhotoContext) => void;
 }) {
-  // Ensure authorId is always a string and has a value
-  const authorId = context?.photo?.author || "";
+  const authorId = context.photo.author || ""; // Ensure it's always a string
 
-  const { data: userName, isLoading: isUserLoading } =
-    useAuthorUsername(authorId);
+  const { data: userName, isLoading: isLoading } = useAuthorUsername(authorId);
   const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
-
   return (
     <PhotoOverlay
       setImageIndex={() => handleImageIndex(context)}
       context={context}
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
-        {!isUserLoading && !imageLoading && userName && (
+        {!isLoading && !imageLoading && userName && (
           <Link
             href={`/home/profile/${authorId}`}
             className="flex items-center gap-2"
@@ -280,9 +259,7 @@ function PhotoWithAuthor({
               )}
             </div>
             <p className="font-light text-sm drop-shadow-lg">
-              {typeof capitalizeFirstAlpha === "function"
-                ? capitalizeFirstAlpha(userName)
-                : userName}
+              {capitalizeFirstAlpha(userName)}
             </p>
           </Link>
         )}

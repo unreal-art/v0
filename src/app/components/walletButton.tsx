@@ -19,7 +19,16 @@ export const client = createThirdwebClient({
 
 const chains =
   process.env.NODE_ENV === "development"
-    ? [torusTestnet, torusMainnet, bscTestnet, polygonAmoy, sepolia]
+    ? [
+        torusTestnet,
+        torusMainnet,
+        mainnet,
+        bsc,
+        polygon,
+        bscTestnet,
+        polygonAmoy,
+        sepolia,
+      ]
     : [torusMainnet, mainnet, bsc, polygon];
 
 const metadata = {

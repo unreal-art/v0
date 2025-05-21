@@ -8,11 +8,24 @@ import {
 import "react-photo-album/masonry.css";
 import { useEffect, useState } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
+//import { ChatIcon, HeartFillIcon, HeartIcon, OptionMenuIcon } from "@/app/components/icons";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "../photoOverlay";
+
+import Image from "next/image";
 import ImageView from "../imageView";
+// import { usePostsQuery } from "@/hooks/usePostsQuery";
+import { supabase } from "$/supabase/client";
+import {
+  getFollowingPosts,
+  getPosts,
+  getTopPosts,
+} from "@/queries/post/getPosts";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "../InfiniteScroll";
 import { formattedPhotos } from "../../formattedPhotos";
+import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
+// import { getAuthorUserName } from "@/queries/post/getAuthorUserName";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
@@ -70,23 +83,18 @@ export default function SearchPhotoGallary({
   searchTerm: string;
 }) {
   const [imageIndex, setImageIndex] = useState(-1);
-  const [columns, setColumns] = useState<number | undefined>(undefined);
-  const [isClient, setIsClient] = useState(false);
+  const [columns, setColumns] = useState(
+    window?.innerWidth < MD_BREAKPOINT ? 2 : 4,
+  );
 
   // Use Zustand store for tab state
   const { initFromUrl } = useGalleryStore();
 
   // Sync with URL on initial load
   const searchParams = useSearchParams();
-
   useEffect(() => {
-    setIsClient(true);
-
-    // Check if the function exists before calling it
-    if (initFromUrl && searchParams) {
-      const urlParam = searchParams.get("s");
-      initFromUrl(urlParam);
-    }
+    const urlParam = searchParams.get("s");
+    initFromUrl(urlParam);
   }, [searchParams, initFromUrl]);
 
   const {
@@ -100,14 +108,14 @@ export default function SearchPhotoGallary({
   } = useSearchPostsInfinite(searchTerm, 10);
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // Ensure it runs only on the client
+    if (typeof window === "undefined") return; // ✅ Ensure it runs only on the client
 
     const handleResize = () => {
       setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // Call initially to set correct columns
+    handleResize(); // ✅ Call initially to set correct columns
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -118,41 +126,17 @@ export default function SearchPhotoGallary({
     setImageIndex(context.index);
   };
 
-  // If still server-side or columns haven't been calculated, show a loading placeholder
-  if (!isClient || columns === undefined) {
-    return (
-      <div className="flex items-center justify-center h-48">
-        <p>Loading gallery...</p>
-      </div>
-    );
-  }
-
   if (isError) {
     return (
-      <p className="wrapper">
-        {error && typeof error === "object" && "message" in error
-          ? error.message
-          : "An error occurred while loading search results"}
-      </p>
+      <p className="wrapper">{"message" in error ? error.message : error}</p>
     );
   }
 
-  // Check if we have no data to display
-  if (!data || data.pages.length === 0 || data.pages[0].length === 0) {
+  if (!data || data.pages.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center w-full p-8">
-        <p className="text-center text-lg">
-          No results found for "{searchTerm}"
-        </p>
-        <p className="text-center text-sm mt-2 text-gray-500">
-          Try different keywords or check your spelling
-        </p>
-      </div>
+      <p>It looks like you haven&apos;t saved any books to this shelf yet.</p>
     );
   }
-
-  // Format photos safely
-  const photos = formattedPhotos(data?.pages ?? []);
 
   return (
     <div className="w-full">
@@ -160,10 +144,10 @@ export default function SearchPhotoGallary({
         isLoadingInitial={isLoading}
         isLoadingMore={isFetchingNextPage}
         loadMore={() => hasNextPage && fetchNextPage()}
-        hasNextPage={!!hasNextPage}
+        hasNextPage={hasNextPage}
       >
         <MasonryPhotoAlbum
-          photos={photos}
+          photos={formattedPhotos(data?.pages ?? [])}
           columns={columns}
           spacing={4}
           render={{
@@ -177,9 +161,12 @@ export default function SearchPhotoGallary({
           }}
         />
       </InfiniteScroll>
-      {imageIndex > -1 && photos[imageIndex] && (
-        <ImageView photo={photos[imageIndex]} setImageIndex={setImageIndex} />
-      )}
+      <ImageView
+        photo={
+          imageIndex > -1 && formattedPhotos(data?.pages ?? [])[imageIndex]
+        }
+        setImageIndex={setImageIndex}
+      />
     </div>
   );
 }
@@ -191,24 +178,17 @@ function PhotoWithAuthor({
   context: ExtendedRenderPhotoContext;
   handleImageIndex: (context: RenderPhotoContext) => void;
 }) {
-  // Safeguard against undefined context.photo
-  if (!context || !context.photo) {
-    return null;
-  }
-
   const authorId = context.photo.author || ""; // Ensure it's always a string
 
-  const { data: userName, isLoading: isUserLoading } =
-    useAuthorUsername(authorId);
+  const { data: userName, isLoading: isLoading } = useAuthorUsername(authorId);
   const { data: image, isLoading: imageLoading } = useAuthorImage(authorId);
-
   return (
     <PhotoOverlay
       setImageIndex={() => handleImageIndex(context)}
       context={context}
     >
       <div className="absolute flex items-center gap-1 bottom-2 left-2">
-        {!isUserLoading && !imageLoading && userName && (
+        {!isLoading && !imageLoading && userName && (
           <>
             <div className="rounded-full">
               {image ? (
@@ -220,16 +200,13 @@ function PhotoWithAuthor({
                   alt={`${userName}'s profile picture`}
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
-                  isProfile={true}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">
-              {typeof capitalizeFirstAlpha === "function"
-                ? capitalizeFirstAlpha(userName)
-                : userName}
+              {capitalizeFirstAlpha(userName)}
             </p>
           </>
         )}
