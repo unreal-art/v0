@@ -84,7 +84,7 @@ export default function PathnameProvider({
   // Only show loader while we're loading and haven't completed the auth check
   if (loading && !authChecked) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-[100dvh]">
         <Image
           src="/Icon-White.png"
           alt="unreal"

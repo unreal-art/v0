@@ -47,7 +47,6 @@ export default function HomePage() {
             // Update user
             await updateUserTorusId(torusUser);
           }
-          console.log("Torus user check:", torusUser || "Not found");
         }
       } catch (error) {
         console.error("Error checking Torus user:", error);
