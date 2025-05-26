@@ -38,7 +38,7 @@ export const sendJobRequest = ({
     inputs: {
       Prompt: prompt,
       Seed: random.int(1e3, 1e8),
-      N: 1, //TODO: we can do multiple images at once
+      N: 4,
       Format: "webp",
     },
     author,

@@ -60,6 +60,7 @@ export default function Generation() {
     // error: updateError,
   } = useUpdatePost();
   const { userId, loading: loadingUser } = useUser();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { data: authorImage } = useAuthorImage(post?.author);
   const { data: authorUsername } = useAuthorUsername(post?.author);
   const [caption, setCaption] = useState(post?.caption || "");
@@ -207,8 +208,8 @@ export default function Generation() {
   }
 
   const image = getImage(
-    (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+    (post?.ipfsImages as UploadResponse[])?.[selectedImageIndex]?.hash,
+    (post?.ipfsImages as UploadResponse[])?.[selectedImageIndex]?.fileNames[0],
     post?.author as string,
   );
 
@@ -314,11 +315,11 @@ export default function Generation() {
             </div>
 
             <div className="col-span-3 border-[1px] border-primary-11 bg-primary-12 rounded-r-[20px] p-6 overflow-y-auto">
-              <div className="h-48">
+              <div className="h-36">
                 <p className="text-primary-5 text-lg">Output quantity</p>
 
-                <div className="px-3 py-2 relative">
-                  <Image
+                <div className=" py-2 relative flex gap-2 overflow-x-auto ">
+                  {/* <Image
                     src={getImage(
                       (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
                       (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
@@ -327,7 +328,25 @@ export default function Generation() {
                     width={98}
                     height={128}
                     alt="generated"
-                  />
+                  /> */}
+
+                  {(post?.ipfsImages as UploadResponse[])?.map(
+                    (image, index) => (
+                      <Image
+                        key={index}
+                        src={getImage(
+                          image.hash,
+                          image.fileNames[0],
+                          post?.author as string,
+                        )}
+                        width={98}
+                        height={128}
+                        alt="generated"
+                        className={`opacity-20 hover:opacity-100 transition-opacity duration-200 cursor-pointer ${selectedImageIndex === index ? "opacity-100" : ""}`}
+                        onClick={() => setSelectedImageIndex(index)}
+                      />
+                    ),
+                  )}
                 </div>
               </div>
 
