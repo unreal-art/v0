@@ -12,15 +12,10 @@ export default function Loading() {
             height={50}
             width={50}
             priority
-            onError={(e) => {
-              console.error("Loading image failed:", e);
-              // Hide the image if it fails to load
-              e.currentTarget.style.display = "none";
-            }}
           />
         </div>
-        {/* Always show loading text as backup */}
-        <div className="text-white text-lg">Loading...</div>
+       
+
       </div>
     </div>
   );

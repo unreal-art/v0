@@ -23,7 +23,7 @@ export default function PathnameProvider({
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(
           () => reject(new Error("Authentication check timed out")),
-          AUTH_TIMEOUT_MS,
+          AUTH_TIMEOUT_MS
         );
       });
 
@@ -40,7 +40,7 @@ export default function PathnameProvider({
 
         // Check if we're on a protected route
         const isProtectedRoute = protectedRoutes.some((route) =>
-          pathname.startsWith(route),
+          pathname.startsWith(route)
         );
 
         // Log state for debugging
@@ -60,7 +60,7 @@ export default function PathnameProvider({
 
         // We'll treat timeout or network errors as auth failures for protected routes
         const isProtectedRoute = protectedRoutes.some((route) =>
-          pathname.startsWith(route),
+          pathname.startsWith(route)
         );
         if (isProtectedRoute) {
           console.log("Network issue detected, redirecting to auth page");
@@ -84,14 +84,33 @@ export default function PathnameProvider({
   // Only show loader while we're loading and haven't completed the auth check
   if (loading && !authChecked) {
     return (
-      <div className="flex items-center justify-center h-[100dvh]">
-        <Image
-          src="/Icon-White.png"
-          alt="unreal"
-          height={50}
-          width={50}
-          priority
-        />
+      <div
+        style={{
+          height: "100dvh",
+          width: "100vw",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          zIndex: 50,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "black",
+        }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          {/* Fallback in case image fails */}
+          <div className="relative">
+            <Image
+              src="/Icon-White.png"
+              alt="unreal"
+              height={50}
+              width={50}
+              priority
+
+            />
+          </div>
+        </div>
       </div>
     );
   }
