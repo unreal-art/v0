@@ -33,13 +33,10 @@ export const sendJobRequest = ({
   const author = user.id;
 
   const dto: Partial<JobSpec> = {
-    module: "isdxl",
-    version: "v1.6.0",
+    module: "nearai",
+    version: "v0.1.3",
     inputs: {
       Prompt: prompt,
-      cpu: 34,
-      ram: "70gb",
-      Device: "xpu",
       Seed: random.int(1e3, 1e8),
       N: 1,
       Format: "webp",
