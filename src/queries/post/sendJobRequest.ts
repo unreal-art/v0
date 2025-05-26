@@ -34,11 +34,11 @@ export const sendJobRequest = ({
 
   const dto: Partial<JobSpec> = {
     module: "nearai",
-    version: "v0.1.3",
+    version: "v0.2.1",
     inputs: {
       Prompt: prompt,
       Seed: random.int(1e3, 1e8),
-      N: 1,
+      N: 1, //TODO: we can do multiple images at once
       Format: "webp",
     },
     author,
