@@ -319,17 +319,6 @@ export default function Generation() {
                 <p className="text-primary-5 text-lg">Output quantity</p>
 
                 <div className=" py-2 relative flex gap-2 overflow-x-auto ">
-                  {/* <Image
-                    src={getImage(
-                      (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                      post?.author as string,
-                    )}
-                    width={98}
-                    height={128}
-                    alt="generated"
-                  /> */}
-
                   {(post?.ipfsImages as UploadResponse[])?.map(
                     (image, index) => (
                       <Image
@@ -342,7 +331,7 @@ export default function Generation() {
                         width={98}
                         height={128}
                         alt="generated"
-                        className={`opacity-20 hover:opacity-100 transition-opacity duration-200 cursor-pointer ${selectedImageIndex === index ? "opacity-100" : ""}`}
+                        className={` hover:opacity-100 transition-opacity duration-200 cursor-pointer ${selectedImageIndex == index ? "opacity-100" : "opacity-20"}`}
                         onClick={() => setSelectedImageIndex(index)}
                       />
                     ),

@@ -158,6 +158,7 @@ export default function UserData() {
               alt={`${profileData?.full_name}'s profile picture`}
               trackPerformance={true}
               imageName={`profile-${profileId}`}
+              isProfile={true}
             />
           </div>
 

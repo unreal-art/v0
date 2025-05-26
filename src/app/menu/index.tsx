@@ -8,7 +8,7 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 import { supabase } from "$/supabase/client";
 import { useRouter } from "next/navigation";
-import { getContractInstance } from "@/utils";
+import { getContractInstance, truncateEmail, truncateText } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { useReadContract } from "thirdweb/react";
 import { formatEther } from "ethers";
@@ -84,8 +84,19 @@ export default function Menu({ children }: INotificationProps) {
                 />
               </div>
               <div className="flex flex-col">
-                <p className="">{user?.full_name}</p>
-                <p className="">{user?.user_metadata.email}</p>
+                <p className="" title={user?.full_name ? user?.full_name : ""}>
+                  {user?.full_name}
+                </p>
+                {user?.user_metadata.email && (
+                  <p
+                    className=""
+                    title={
+                      user?.user_metadata.email ? user?.user_metadata.email : ""
+                    }
+                  >
+                    {truncateEmail(user?.user_metadata.email, 20)}
+                  </p>
+                )}
               </div>
             </Link>
 

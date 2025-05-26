@@ -177,3 +177,30 @@ export function truncateText(
       : text;
   return capitalizeFirstAlpha(mainWord);
 }
+
+export function truncateEmail(
+  email: string | undefined | null,
+  charLimit: number = 20,
+): string {
+  if (!email) return "";
+
+  if (email.length <= charLimit) return email;
+
+  const [username, domain] = email.split("@");
+
+  // If even the domain is too long, just truncate the whole thing
+  if (domain && domain.length >= charLimit - 3) {
+    return email.substring(0, charLimit - 3) + "...";
+  }
+
+  // Truncate username but keep full domain
+  if (domain) {
+    const availableForUsername = charLimit - domain.length - 4; // -4 for "@" and "..."
+    if (availableForUsername > 3) {
+      return username.substring(0, availableForUsername) + "...@" + domain;
+    }
+  }
+
+  // Fallback: just truncate the whole email
+  return email.substring(0, charLimit - 3) + "...";
+}
