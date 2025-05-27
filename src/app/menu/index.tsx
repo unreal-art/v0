@@ -8,11 +8,17 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import Link from "next/link";
 import { supabase } from "$/supabase/client";
 import { useRouter } from "next/navigation";
-import { getContractInstance, truncateEmail, truncateText } from "@/utils";
+import {
+  formatDisplayName,
+  getContractInstance,
+  truncateEmail,
+  truncateText,
+} from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { useReadContract } from "thirdweb/react";
 import { formatEther } from "ethers";
 import { log, logError } from "@/utils/sentryUtils";
+import OptimizedImage from "../components/OptimizedImage";
 
 interface INotificationProps {
   children: ReactNode;
@@ -71,21 +77,38 @@ export default function Menu({ children }: INotificationProps) {
           <div className="absolute w-full max-w-[240px] h-[270px] z-50 bottom-20 md:bottom-[5vh] right-4 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
             <Link
               onClick={handleClose}
-              href={`/home/profile/${userId}`}
+              href={userId ? `/home/profile/${userId}` : "/home"}
               className="flex items-center gap-2 text-primary-6 h-16 p-3 border-primary-8 border-b-[1px]"
             >
               <div>
-                <Image
+                {/* <Image
                   className="rounded-full"
                   src={user?.avatar_url || "/profile.jpg"}
                   width={40}
                   height={40}
                   alt=""
                 />
+                 */}
+                {user?.avatar_url ? (
+                  <OptimizedImage
+                    className="rounded-full drop-shadow-lg"
+                    src={user?.avatar_url + "ppp"}
+                    width={48}
+                    height={48}
+                    alt={`${user?.full_name || user?.username}'s profile`}
+                    isProfile={true}
+                    trackPerformance={true}
+                    username={user?.full_name || user?.username || ""}
+                    imageName={`profile-${user?.full_name || user?.username}`}
+                    isAvatar={true}
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
+                )}
               </div>
               <div className="flex flex-col">
                 <p className="" title={user?.full_name ? user?.full_name : ""}>
-                  {user?.full_name}
+                  {user?.full_name && formatDisplayName(user?.full_name)}
                 </p>
                 {user?.user_metadata.email && (
                   <p

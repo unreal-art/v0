@@ -366,6 +366,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
                       target.src = "/default-avatar.jpg";
                     }
                   }}
+                  username={userName || ""}
                   isAvatar={true}
                 />
               ) : (

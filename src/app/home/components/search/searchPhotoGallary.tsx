@@ -222,6 +222,7 @@ function PhotoWithAuthor({
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
                   isProfile={true}
+                  username={userName || ""}
                   isAvatar={true}
                 />
               ) : (

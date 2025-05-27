@@ -256,7 +256,11 @@ export default function UserData() {
       <ShareModal
         open={openShare}
         setOpen={setOpenShare}
-        link={"https://unreal.art/home/profile/" + profileId}
+        link={
+          profileId
+            ? "https://unreal.art/home/profile/" + profileId
+            : "https://unreal.art/home"
+        }
         isProfile={true}
       />
       <ModalWrapper

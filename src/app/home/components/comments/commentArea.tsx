@@ -60,6 +60,7 @@ export default function CommentArea({
                   alt={`${userName || "Unknown"}'s profile picture`}
                   imageName="comment-area-avatar"
                   trackPerformance={true}
+                  username={userName}
                   isAvatar={true}
                 />
               )}

@@ -48,7 +48,7 @@ function AppBase({ children }: { children: React.ReactNode }) {
             </Notifications>
             <div className="hidden md:block">
               <NavLink
-                href={"/home/profile/" + userId}
+                href={userId ? "/home/profile/" + userId : "#"}
                 text="Profile"
                 icon="profile"
               />

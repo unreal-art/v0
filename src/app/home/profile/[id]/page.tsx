@@ -46,7 +46,9 @@ export async function generateMetadata({
 
     const username = data?.username || data?.full_name || "Unreal Creator";
     const avatarUrl = data?.avatar_url || "";
-    const profileUrl = `https://unreal.art/home/profile/${paramsData.id}`;
+    const profileUrl = paramsData.id
+      ? `https://unreal.art/home/profile/${paramsData.id}`
+      : "https://unreal.art/home";
 
     return {
       title: `${username} | Unreal Profile`,
