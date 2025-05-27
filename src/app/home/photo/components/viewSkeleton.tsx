@@ -145,8 +145,8 @@ const PostLoadingSkeleton = () => {
         </div>
 
         {/* Photo Gallery */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 w-full">
-          {Array(4)
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-10 w-full">
+          {Array(5)
             .fill(null)
             .map((_, index) => (
               <Skeleton

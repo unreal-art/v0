@@ -46,8 +46,8 @@ function InfiniteScroll(props: Props) {
   return (
     <div className="mb-32 w-full">
       {isLoadingInitial && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full ">
-          {Array(12)
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-5  w-full ">
+          {Array(15)
             .fill(null)
             .map((_, index) => (
               <Skeleton
@@ -64,8 +64,8 @@ function InfiniteScroll(props: Props) {
 
       <div ref={observerElement} id="obs">
         {isLoadingMore && hasNextPage && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2  w-full p-2 ">
-            {Array(4)
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2  w-full p-2 ">
+            {Array(5)
               .fill(null)
               .map((_, index) => (
                 <Skeleton

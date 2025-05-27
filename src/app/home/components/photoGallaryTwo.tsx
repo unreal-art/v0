@@ -28,7 +28,7 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 
 // Dynamically import ImageView component to reduce initial bundle size
 const ImageView = dynamic(() => import("./imageView"), {
@@ -204,7 +204,7 @@ function PhotoGallaryTwo() {
   // Optimize resize handling with useCallback to prevent recreation
   const handleResize = useCallback(() => {
     if (typeof window !== "undefined") {
-      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 5);
     }
   }, []);
 
@@ -285,7 +285,7 @@ function PhotoGallaryTwo() {
     <div className="w-full">
       {isLoading ? (
         <div className="flex flex-wrap gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
               className="w-1/2 sm:w-1/3 md:w-1/4 aspect-square bg-gray-200 animate-pulse"
@@ -302,7 +302,7 @@ function PhotoGallaryTwo() {
           <MasonryPhotoAlbum
             photos={photos}
             columns={columns}
-            spacing={4}
+            spacing={10}
             render={{
               extras: (_, context) => (
                 <PhotoWithAuthor
@@ -366,6 +366,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
                       target.src = "/default-avatar.jpg";
                     }
                   }}
+                  isAvatar={true}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
@@ -373,7 +374,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">
               {typeof userName === "string"
-                ? capitalizeFirstAlpha(userName)
+                ? formatDisplayName(userName)
                 : "Unknown"}
             </p>
           </>

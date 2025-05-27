@@ -18,7 +18,7 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
@@ -104,7 +104,7 @@ export default function SearchPhotoGallary({
     if (typeof window === "undefined") return; // Ensure it runs only on the client
 
     const handleResize = () => {
-      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 5);
     };
 
     window.addEventListener("resize", handleResize);
@@ -166,7 +166,7 @@ export default function SearchPhotoGallary({
         <MasonryPhotoAlbum
           photos={photos}
           columns={columns}
-          spacing={4}
+          spacing={10}
           render={{
             extras: (_, context) => (
               <PhotoWithAuthor
@@ -222,15 +222,14 @@ function PhotoWithAuthor({
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
                   isProfile={true}
+                  isAvatar={true}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">
-              {typeof capitalizeFirstAlpha === "function"
-                ? capitalizeFirstAlpha(userName)
-                : userName}
+              {formatDisplayName(userName)}
             </p>
           </>
         )}

@@ -168,7 +168,7 @@ export default function PhotoOverlay({
           </div>
 
           <div
-            className={`flex flex-col ${section == "photoGridTwo" ? " mb-12" : "mb-6"}`}
+            className={`flex flex-col ${section == "photoGridTwo" ? " mb-12" : "mb-2"}`}
           >
             <div className="relative flex flex-col items-center">
               <button

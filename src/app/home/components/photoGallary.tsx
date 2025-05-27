@@ -29,7 +29,7 @@ import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 import { Color } from "three/src/Three.Core.js";
 
 function renderNextImage(
@@ -139,7 +139,7 @@ export default function PhotoGallary() {
 
     const handleResize = () => {
       requestAnimationFrame(() => {
-        setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+        setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 5);
       });
     };
 
@@ -178,8 +178,8 @@ export default function PhotoGallary() {
   // Show loading state during initial data fetch
   if (isLoading || !columns) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
-        {Array(12)
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
+        {Array(15)
           .fill(null)
           .map((_, index) => (
             <Skeleton
@@ -222,7 +222,7 @@ export default function PhotoGallary() {
           <MasonryPhotoAlbum
             photos={photos}
             columns={columns || 2}
-            spacing={4}
+            spacing={10}
             render={{
               extras: (_, context) => (
                 <PhotoWithAuthor
@@ -278,15 +278,14 @@ function PhotoWithAuthor({
                   isProfile={true}
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
+                  isAvatar={true}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
               )}
             </div>
             <p className="font-light text-sm drop-shadow-lg">
-              {typeof capitalizeFirstAlpha === "function"
-                ? capitalizeFirstAlpha(userName)
-                : userName}
+              {formatDisplayName(userName)}
             </p>
           </Link>
         )}

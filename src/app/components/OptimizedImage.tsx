@@ -1,4 +1,4 @@
-import { log } from "@/utils";
+import { getInitials, log } from "@/utils";
 import Image, { ImageProps } from "next/image";
 import { useState, useCallback, memo } from "react";
 
@@ -6,6 +6,7 @@ interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
   trackPerformance?: boolean;
   imageName?: string;
   isProfile?: boolean;
+  isAvatar?: boolean;
 }
 
 function OptimizedImage({
@@ -20,6 +21,7 @@ function OptimizedImage({
   sizes = "100vw",
   loading = "lazy",
   quality = 80,
+  isAvatar,
   ...props
 }: OptimizedImageProps) {
   const [loaded, setLoaded] = useState(false);
@@ -49,6 +51,16 @@ function OptimizedImage({
   }, [trackPerformance, imageIdentifier]);
 
   if (error) {
+    if (isAvatar) {
+      return (
+        <div
+          className="rounded-full text-xs flex justify-center items-center bg-gray-700 text-gray-200 font-semibold"
+          style={{ width: `${width}px`, height: `${width}px` }}
+        >
+          {getInitials(alt)}
+        </div>
+      );
+    }
     return (
       <Image
         src={"/fallback.png"}
