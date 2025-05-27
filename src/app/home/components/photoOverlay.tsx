@@ -83,7 +83,7 @@ export default function PhotoOverlay({
       <div
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        className="absolute top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm md:hover:bg-gray-900/50"
+        className="absolute cursor-pointer top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm md:hover:bg-gray-900/50"
       >
         {hover && (
           <div className="relative hidden md:flex flex-col text-primary-1 justify-between px-4 py-3 h-full">
@@ -116,7 +116,7 @@ export default function PhotoOverlay({
             )}
 
             {/* {!loadingLikes && !loadingComments && ( */}
-            <div className="flex justify-center gap-4 z-10">
+            <div className="flex justify-center  w-fit m-auto p-2 rounded-md hover:bg-black/30 gap-4 z-10">
               <button
                 className="flex gap-1 items-center"
                 onClick={() => toggleLike()}

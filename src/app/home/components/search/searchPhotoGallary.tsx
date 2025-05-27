@@ -11,7 +11,7 @@ import { MD_BREAKPOINT } from "@/app/libs/constants";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "../photoOverlay";
 import ImageView from "../imageView";
 import InfiniteScroll from "../InfiniteScroll";
-import { formattedPhotos } from "../../formattedPhotos";
+import { formattedPhotosForGallery } from "../../formattedPhotos";
 import { useSearchParams } from "next/navigation";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import useAuthorImage from "@/hooks/useAuthorImage";
@@ -23,7 +23,7 @@ import { capitalizeFirstAlpha } from "@/utils";
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first 8 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -54,6 +54,7 @@ function renderNextImage(
         alt={alt || "Search result"}
         title={title}
         sizes={responsiveSizes}
+        className="rounded-lg"
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
@@ -152,7 +153,7 @@ export default function SearchPhotoGallary({
   }
 
   // Format photos safely
-  const photos = formattedPhotos(data?.pages ?? []);
+  const photos = formattedPhotosForGallery(data?.pages ?? []);
 
   return (
     <div className="w-full">
