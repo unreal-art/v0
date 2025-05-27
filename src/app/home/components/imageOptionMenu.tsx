@@ -139,7 +139,7 @@ export default function ImageOptionMenu({
               />
             )}
 
-            <Link href={"/home/profile/" + image.author}>
+            <Link href={image.author ? "/home/profile/" + image.author : "#"}>
               <MenuItem
                 onClick={handleCreator}
                 icon={<UserIcon width={16} height={16} color="#8F8F8F" />}

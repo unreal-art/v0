@@ -89,7 +89,7 @@ export function User({
       <div className="flex justify-between items-center h-16 py-4 px-4">
         <div className="flex items-center gap-4">
           <Link
-            href={`/home/profile/${data.id}`}
+            href={data.id ? `/home/profile/${data.id}` : "#"}
             className="w-10 h-10 bg-primary-9 rounded-full"
           >
             <Image
@@ -102,7 +102,7 @@ export function User({
           </Link>
 
           <Link
-            href={`/home/profile/${data.id}`}
+            href={data.id ? `/home/profile/${data.id}` : "#"}
             className="text-primary-1 text-lg w-36 font-normal"
           >
             {data.username || "Unknown user"}

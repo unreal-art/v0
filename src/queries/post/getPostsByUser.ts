@@ -18,20 +18,25 @@ export async function getPostsByUser(
       logError("Error fetching user for posts", userError);
       throw new Error("Failed to retrieve authenticated user.");
     }
+
     id = userData?.user?.id;
-    if (!id) {
-      throw new Error("User ID is undefined.");
+    console.log("Retrieved ID:", id, "Type:", typeof id);
+
+    // Check for both undefined and string "null"
+    if (!id || id === "null" || id === "") {
+      // Instead of throwing an error, return an empty array
+      console.warn("No valid user ID provided, returning empty posts array");
+      return [];
     }
   }
 
   const { data, error } = await client
     .from("posts")
     .select("*")
-    .eq("author", id) // Filter posts by the author_id
+    .eq("author", id)
     .neq("isPrivate", true)
     .neq("isDraft", true)
-    .order("createdAt", { ascending: false }) // Order posts by creation date, descending
-
+    .order("createdAt", { ascending: false })
     .range(range[0], range[1]);
 
   if (error) {

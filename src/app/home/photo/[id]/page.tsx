@@ -257,7 +257,7 @@ export default function Generation() {
             <div className="flex flex-col justify-between items-center col-span-9">
               <div className="flex justify-between h-24 p-6 gap-5 w-full">
                 <Link
-                  href={`/home/profile/${post?.author}`}
+                  href={post?.author ? `/home/profile/${post?.author}` : "#"}
                   className="flex gap-1"
                 >
                   <div>
@@ -279,6 +279,7 @@ export default function Generation() {
                         isProfile={true}
                         trackPerformance={true}
                         imageName={`profile-${post?.author}`}
+                        username={authorUsername || ""}
                         isAvatar={true}
                       />
                     ) : (
@@ -402,7 +403,7 @@ export default function Generation() {
 
           <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10 ">
             {a ? "Drafts" : "Other posts"} by{"  "}
-            <Link href={`/home/profile/${post?.author}`}>
+            <Link href={post?.author ? `/home/profile/${post?.author}` : "#"}>
               <strong className="text-primary-5 pl-1">
                 {authorUsername && formatDisplayName(authorUsername)}
               </strong>

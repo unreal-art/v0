@@ -128,7 +128,7 @@ export default function RootLayout({
             <div className="h-1 bg-white/30 absolute top-0 left-0 w-full"></div>
           }
         >
-          <ProgressBar />
+          {/* <ProgressBar /> */}
         </Suspense>
         <Suspense fallback={<div className="min-h-screen bg-primary-1"></div>}>
           <PageTransitionProvider>{children}</PageTransitionProvider>

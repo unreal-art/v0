@@ -7,6 +7,7 @@ interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
   imageName?: string;
   isProfile?: boolean;
   isAvatar?: boolean;
+  username?: string;
 }
 
 function OptimizedImage({
@@ -22,6 +23,7 @@ function OptimizedImage({
   loading = "lazy",
   quality = 80,
   isAvatar,
+  username,
   ...props
 }: OptimizedImageProps) {
   const [loaded, setLoaded] = useState(false);
@@ -57,7 +59,7 @@ function OptimizedImage({
           className="rounded-full text-xs flex justify-center items-center bg-gray-700 text-gray-200 font-semibold"
           style={{ width: `${width}px`, height: `${width}px` }}
         >
-          {getInitials(alt)}
+          {username && getInitials(username)}
         </div>
       );
     }

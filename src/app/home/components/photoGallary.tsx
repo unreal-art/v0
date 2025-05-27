@@ -264,7 +264,7 @@ function PhotoWithAuthor({
       <div className="absolute flex items-center gap-1 bottom-2 left-2 ">
         {!isUserLoading && !imageLoading && userName && (
           <Link
-            href={`/home/profile/${authorId}`}
+            href={authorId ? `/home/profile/${authorId}` : "#"}
             className="flex items-center gap-2"
           >
             <div className="rounded-full">
@@ -278,6 +278,7 @@ function PhotoWithAuthor({
                   isProfile={true}
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
+                  username={userName || ""}
                   isAvatar={true}
                 />
               ) : (
