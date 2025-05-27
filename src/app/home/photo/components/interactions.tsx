@@ -33,9 +33,11 @@ import { IPhoto } from "@/app/libs/interfaces";
 export default function Interactions({
   postId,
   postDetails,
+  selectedImageIndex,
 }: {
   postId: number;
   postDetails: IPhoto;
+  selectedImageIndex: number;
 }) {
   const [openShare, setOpenShare] = useState(false);
   const [openComment, setOpenComment] = useState(false);
@@ -47,12 +49,12 @@ export default function Interactions({
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string,
+    post?.author as string
   );
   const userHasLiked = likes?.some((like) => like.author === userId);
   const { data: isPinned, setPinned } = useIsPostPinned(
     postId,
-    userId as string,
+    userId as string
   );
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
@@ -145,11 +147,14 @@ export default function Interactions({
             onClick={() =>
               downloadImage(
                 getImage(
-                  (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                  post?.author as string,
+                  (post?.ipfsImages as UploadResponse[])[selectedImageIndex]
+                    ?.hash,
+                  (post?.ipfsImages as UploadResponse[])[selectedImageIndex]
+                    ?.fileNames[0],
+                  post?.author as string
                 ),
-                (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                (post?.ipfsImages as UploadResponse[])[selectedImageIndex]
+                  ?.fileNames[0]
               )
             }
           >
