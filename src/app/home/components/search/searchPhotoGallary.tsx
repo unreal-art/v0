@@ -222,6 +222,7 @@ function PhotoWithAuthor({
                   trackPerformance={true}
                   imageName={`profile-${authorId}`}
                   isProfile={true}
+                  isAvatar={true}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar

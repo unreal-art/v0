@@ -15,7 +15,12 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import { getImage } from "../../formattedPhotos";
 import { UploadResponse } from "$/types/data.types";
-import { formatDate, getImageResolution, truncateText } from "@/utils";
+import {
+  formatDate,
+  formatDisplayName,
+  getImageResolution,
+  truncateText,
+} from "@/utils";
 import { useEffect, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
 import ViewSkeleton from "../components/viewSkeleton";
@@ -256,17 +261,33 @@ export default function Generation() {
                   className="flex gap-1"
                 >
                   <div>
-                    <Image
+                    {/* <Image
                       src={authorImage || "/profile.jpg"}
                       alt="profile"
                       width={48}
                       height={48}
                       className="rounded-full"
-                    />
+                    /> */}
+
+                    {authorImage ? (
+                      <OptimizedImage
+                        className="rounded-full drop-shadow-lg"
+                        src={authorImage}
+                        width={48}
+                        height={48}
+                        alt={`${authorUsername}'s profile`}
+                        isProfile={true}
+                        trackPerformance={true}
+                        imageName={`profile-${post?.author}`}
+                        isAvatar={true}
+                      />
+                    ) : (
+                      <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
+                    )}
                   </div>
                   <div>
                     <p className="font-semibold text-lg leading-6 text-primary-2">
-                      {authorUsername}
+                      {authorUsername && formatDisplayName(authorUsername)}
                     </p>
                     <p className="text-primary-7 nasalization">Creator</p>
                   </div>
@@ -300,9 +321,7 @@ export default function Generation() {
                   <Interactions
                     postId={post?.id as number}
                     postDetails={commentPhoto as IPhoto}
-                    selectedImageIndex={
-                      selectedImageIndex
-                    }
+                    selectedImageIndex={selectedImageIndex}
                   />
                 )}
                 {post && userId == post?.author && (
@@ -384,7 +403,9 @@ export default function Generation() {
           <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10 ">
             {a ? "Drafts" : "Other posts"} by{"  "}
             <Link href={`/home/profile/${post?.author}`}>
-              <strong className="text-primary-5 pl-1">{authorUsername}</strong>
+              <strong className="text-primary-5 pl-1">
+                {authorUsername && formatDisplayName(authorUsername)}
+              </strong>
             </Link>
           </p>
 

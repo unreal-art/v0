@@ -366,6 +366,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
                       target.src = "/default-avatar.jpg";
                     }
                   }}
+                  isAvatar={true}
                 />
               ) : (
                 <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
