@@ -1,10 +1,10 @@
 import { type NextRequest } from "next/server";
-import { updateSession } from "$/supabase/middleware";
-//import { highlightMiddleware } from "@highlight-run/next/server";
+import { updateSession } from "../supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   //await highlightMiddleware(request);
   // update user's auth session
+  // console.log("🔥 Middleware running for path:", request.nextUrl.pathname);
   return await updateSession(request);
 }
 

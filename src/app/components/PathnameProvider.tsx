@@ -1,11 +1,8 @@
 "use client";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from "$/supabase/client"; // Keeping your original alias
+import { supabase } from "$/supabase/client";
 import Image from "next/image";
-
-const protectedRoutes = ["/home"];
-const AUTH_TIMEOUT_MS = 10000; // 10 seconds timeout for auth requests
 
 export default function PathnameProvider({
   children,
@@ -13,76 +10,41 @@ export default function PathnameProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(
-          () => reject(new Error("Authentication check timed out")),
-          AUTH_TIMEOUT_MS
-        );
-      });
-
+    // Optional: Initialize any client-side auth state synchronization
+    const initializeAuth = async () => {
       try {
-        setLoading(true);
-
-        // Race the auth check against the timeout
-        const authPromise = supabase.auth.getSession();
-        const result = await Promise.race([authPromise, timeoutPromise]);
-
-        // If we get here, authPromise resolved before the timeout
-        const { data: sessionData } = result as Awaited<typeof authPromise>;
-        const session = sessionData.session;
-
-        // Check if we're on a protected route
-        const isProtectedRoute = protectedRoutes.some((route) =>
-          pathname.startsWith(route)
-        );
-
-        // Log state for debugging
-        console.log("Auth check:", {
-          pathname,
-          isProtectedRoute,
-          session: session ? "exists" : "null",
-        });
-
-        // Only redirect if no session AND we're on a protected route
-        if (!session && isProtectedRoute) {
-          console.log("Redirecting to /auth due to failed authentication");
-          router.replace("/auth");
-        }
+        // This just ensures the client-side auth state is in sync
+        // but doesn't handle redirects (that's done in middleware)
+        await supabase.auth.getSession();
       } catch (error) {
-        console.error("Authentication check failed:", error);
-
-        // We'll treat timeout or network errors as auth failures for protected routes
-        const isProtectedRoute = protectedRoutes.some((route) =>
-          pathname.startsWith(route)
-        );
-        if (isProtectedRoute) {
-          console.log("Network issue detected, redirecting to auth page");
-          router.replace("/auth");
-        }
+        console.error("Client-side auth initialization failed:", error);
       } finally {
-        // Update both states at the end to avoid race conditions
-        setAuthChecked(true);
-        setLoading(false);
+        setIsInitializing(false);
       }
     };
 
-    checkAuth();
+    initializeAuth();
 
-    // Cleanup function to handle component unmounting during auth check
-    return () => {
-      // This will help avoid state updates on unmounted components
-    };
-  }, [pathname, router]);
+    // Listen for auth state changes (optional)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(
+        "Auth state changed:",
+        event,
+        session ? "session exists" : "no session"
+      );
+    });
 
-  // Only show loader while we're loading and haven't completed the auth check
-  if (loading && !authChecked) {
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Show loading screen only briefly during initialization
+  // The middleware will handle redirects, so this is just for UX
+  if (isInitializing) {
     return (
       <div
         style={{
@@ -99,7 +61,6 @@ export default function PathnameProvider({
         }}
       >
         <div className="flex flex-col items-center gap-4">
-          {/* Fallback in case image fails */}
           <div className="relative">
             <Image
               src="/Icon-White.png"
@@ -107,7 +68,6 @@ export default function PathnameProvider({
               height={50}
               width={50}
               priority
-
             />
           </div>
         </div>
