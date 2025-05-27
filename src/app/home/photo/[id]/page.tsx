@@ -300,6 +300,9 @@ export default function Generation() {
                   <Interactions
                     postId={post?.id as number}
                     postDetails={commentPhoto as IPhoto}
+                    selectedImageIndex={
+                      selectedImageIndex
+                    }
                   />
                 )}
                 {post && userId == post?.author && (
