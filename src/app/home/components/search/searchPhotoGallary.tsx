@@ -18,7 +18,7 @@ import useAuthorImage from "@/hooks/useAuthorImage";
 import { useSearchPostsInfinite } from "@/hooks/useSearchPostsInfinite";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
@@ -228,9 +228,7 @@ function PhotoWithAuthor({
               )}
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">
-              {typeof capitalizeFirstAlpha === "function"
-                ? capitalizeFirstAlpha(userName)
-                : userName}
+              {formatDisplayName(userName)}
             </p>
           </>
         )}

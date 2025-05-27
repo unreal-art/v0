@@ -204,3 +204,88 @@ export function truncateEmail(
   // Fallback: just truncate the whole email
   return email.substring(0, charLimit - 3) + "...";
 }
+
+export function formatDisplayName(fullName: string, maxLength = 15) {
+  if (!fullName || typeof fullName !== "string") {
+    return "";
+  }
+
+  // Helper function to capitalize first letter of each name part
+  const capitalizeName = (name: string) => {
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  };
+
+  // Clean and split the name, capitalize each part
+  const nameParts = fullName
+    .trim()
+    .split(/\s+/)
+    .filter((part) => part.length > 0)
+    .map(capitalizeName);
+
+  if (nameParts.length === 0) {
+    return "";
+  }
+
+  // If single name, just truncate if needed
+  if (nameParts.length === 1) {
+    const name = nameParts[0];
+    return name.length > maxLength
+      ? name.substring(0, maxLength - 3) + "..."
+      : name;
+  }
+
+  const firstName = nameParts[0];
+  const lastName = nameParts[nameParts.length - 1];
+
+  // Strategy 1: Try full name first
+  let result = nameParts.join(" ");
+  if (result.length <= maxLength) {
+    return result;
+  }
+
+  // Strategy 2: Try first + last name only
+  result = `${firstName} ${lastName}`;
+  if (result.length <= maxLength) {
+    return result;
+  }
+
+  // Strategy 3: Try first name + last initial
+  result = `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+  if (result.length <= maxLength) {
+    return result;
+  }
+
+  // Strategy 4: Just first name
+  if (firstName.length <= maxLength) {
+    return firstName;
+  }
+
+  // Strategy 5: Truncate first name with ellipsis
+  return firstName.substring(0, maxLength - 3) + "...";
+}
+
+// Helper function to get initials
+export function getInitials(fullName: string, maxInitials = 2) {
+  if (!fullName || typeof fullName !== "string") {
+    return "";
+  }
+
+  const nameParts = fullName
+    .trim()
+    .split(/\s+/)
+    .filter((part) => part.length > 0);
+
+  if (nameParts.length === 0) {
+    return "";
+  }
+
+  // For 1-2 names, use all initials
+  if (nameParts.length <= maxInitials) {
+    return nameParts.map((part) => part.charAt(0).toUpperCase()).join("");
+  }
+
+  // For more names, use first and last
+  const firstName = nameParts[0];
+  const lastName = nameParts[nameParts.length - 1];
+  return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+}

@@ -28,7 +28,7 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { usePost } from "@/hooks/usePost";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 
 // Dynamically import ImageView component to reduce initial bundle size
 const ImageView = dynamic(() => import("./imageView"), {
@@ -373,7 +373,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
             </div>
             <p className="font-semibold text-sm drop-shadow-lg">
               {typeof userName === "string"
-                ? capitalizeFirstAlpha(userName)
+                ? formatDisplayName(userName)
                 : "Unknown"}
             </p>
           </>

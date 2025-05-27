@@ -11,7 +11,7 @@ import ImageOptionMenu from "../imageOptionMenu";
 import { IPhoto } from "@/app/libs/interfaces";
 import { Following } from "../followingBtn";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 
 interface CommentAreaProps {
   image: string;
@@ -68,7 +68,7 @@ export default function CommentArea({
               <p className="font-semibold text-lg leading-6 text-primary-2">
                 {isLoading
                   ? "Loading..."
-                  : capitalizeFirstAlpha(userName) || "Unknown"}
+                  : formatDisplayName(userName) || "Unknown"}
               </p>
               <p className="text-primary-7 nasalization">Creator</p>
             </div>

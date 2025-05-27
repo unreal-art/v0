@@ -29,7 +29,7 @@ import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
-import { capitalizeFirstAlpha } from "@/utils";
+import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 import { Color } from "three/src/Three.Core.js";
 
 function renderNextImage(
@@ -284,9 +284,7 @@ function PhotoWithAuthor({
               )}
             </div>
             <p className="font-light text-sm drop-shadow-lg">
-              {typeof capitalizeFirstAlpha === "function"
-                ? capitalizeFirstAlpha(userName)
-                : userName}
+              {formatDisplayName(userName)}
             </p>
           </Link>
         )}
