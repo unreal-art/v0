@@ -116,7 +116,6 @@ export default function ImageOptionMenu({
 
             <MenuItem
               onClick={() => {
-                console.log(image);
                 if (!image.src) {
                   handleClose();
                   return;

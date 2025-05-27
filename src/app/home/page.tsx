@@ -14,8 +14,8 @@ import { updateUserTorusId } from "@/queries/torus";
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: false, // Changed to false since it uses browser-only APIs
   loading: () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
-      {Array(12)
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
+      {Array(15)
         .fill(null)
         .map((_, index) => (
           <Skeleton

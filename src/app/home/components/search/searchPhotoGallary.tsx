@@ -104,7 +104,7 @@ export default function SearchPhotoGallary({
     if (typeof window === "undefined") return; // Ensure it runs only on the client
 
     const handleResize = () => {
-      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 4);
+      setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 5);
     };
 
     window.addEventListener("resize", handleResize);
@@ -166,7 +166,7 @@ export default function SearchPhotoGallary({
         <MasonryPhotoAlbum
           photos={photos}
           columns={columns}
-          spacing={4}
+          spacing={10}
           render={{
             extras: (_, context) => (
               <PhotoWithAuthor
