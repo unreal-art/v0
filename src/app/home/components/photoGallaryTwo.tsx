@@ -16,7 +16,7 @@ import { supabase } from "$/supabase/client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
-import { formattedPhotos } from "../formattedPhotos";
+import { formattedPhotosForGallery } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useParams, useSearchParams } from "next/navigation";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
@@ -75,6 +75,7 @@ function renderNextImage(
         sizes={responsiveSizes}
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
+        className="rounded-lg"
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
         trackPerformance={process.env.NODE_ENV === "development"}
         imageName={imageName}
@@ -230,7 +231,7 @@ function PhotoGallaryTwo() {
   const photos = useMemo(() => {
     try {
       if (!data?.pages) return [];
-      return formattedPhotos(data.pages);
+      return formattedPhotosForGallery(data.pages);
     } catch (err) {
       console.error("Error formatting photos:", err);
       setError(err instanceof Error ? err.message : "Failed to format photos");

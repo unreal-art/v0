@@ -1,9 +1,11 @@
 "use client";
 import {
+  ColumnsPhotoAlbum,
   MasonryPhotoAlbum,
   RenderImageContext,
   RenderImageProps,
   RenderPhotoContext,
+  RowsPhotoAlbum,
 } from "react-photo-album";
 import "react-photo-album/masonry.css";
 import { useEffect, useState } from "react";
@@ -18,7 +20,7 @@ import {
 } from "@/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "./InfiniteScroll";
-import { formattedPhotosForGallary } from "../formattedPhotos";
+import { formattedPhotosForGallery } from "../formattedPhotos";
 import { Post } from "$/types/data.types";
 import { useSearchParams } from "next/navigation";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
@@ -28,6 +30,7 @@ import Skeleton from "react-loading-skeleton";
 import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
 import { capitalizeFirstAlpha } from "@/utils";
+import { Color } from "three/src/Three.Core.js";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
@@ -61,6 +64,7 @@ function renderNextImage(
         alt={alt || "Gallery image"}
         title={title}
         sizes={responsiveSizes}
+        className="rounded-lg"
         loading={shouldPrioritize ? "eager" : "lazy"}
         priority={shouldPrioritize}
         placeholder={"blurDataURL" in photo ? "blur" : undefined}
@@ -203,8 +207,8 @@ export default function PhotoGallary() {
     );
   }
 
-  // Safety check to ensure we have valid data before formatting
-  const photos = data?.pages ? formattedPhotosForGallary(data.pages) : [];
+  // Format photos directly here using your existing function
+  const photos = formattedPhotosForGallery(data.pages);
 
   return (
     <div className="w-full">
@@ -217,7 +221,7 @@ export default function PhotoGallary() {
         >
           <MasonryPhotoAlbum
             photos={photos}
-            columns={columns || 2} // Provide fallback columns value
+            columns={columns || 2}
             spacing={4}
             render={{
               extras: (_, context) => (
@@ -257,7 +261,7 @@ function PhotoWithAuthor({
       setImageIndex={() => handleImageIndex(context)}
       context={context}
     >
-      <div className="absolute flex items-center gap-1 bottom-2 left-2">
+      <div className="absolute flex items-center gap-1 bottom-2 left-2 ">
         {!isUserLoading && !imageLoading && userName && (
           <Link
             href={`/home/profile/${authorId}`}
