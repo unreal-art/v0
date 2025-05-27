@@ -1,8 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Define your protected routes
+const protectedRoutes = ["/home"];
+const authRoutes = ["/auth", "/login", "/signup"]; // Routes that authenticated users shouldn't access
+
 export async function updateSession(request: NextRequest) {
-  console.log("🔥 updateSession() called for:", request.nextUrl.pathname);
+  const { pathname } = request.nextUrl;
+
+  // Add response headers for debugging (visible in Network tab)
+  const headers = new Headers();
+  headers.set("x-middleware-pathname", pathname);
+  headers.set("x-middleware-timestamp", new Date().toISOString());
+
+  // console.log("🔥 updateSession() called for:", pathname);
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -31,24 +42,56 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // Get the user session
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+  // console.log("🔐 Auth status:", {
+  //   pathname,
+  //   user: user ? "authenticated" : "not authenticated",
+  //   userId: user?.id,
+  //   error: error?.message,
+  // });
 
-  await supabase.auth.getUser();
+  // Check if the current path is a protected route
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  // Check if the current path is an auth route
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+
+  // Redirect unauthenticated users away from protected routes
+  if (isProtectedRoute && (!user || error)) {
+    // console.log("🚫 Redirecting unauthenticated user to /auth");
+    const redirectUrl = new URL("/auth", request.url);
+    // redirectUrl.searchParams.set("redirectTo", pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Redirect authenticated users away from auth routes
+  if (isAuthRoute && user && !error) {
+    // console.log("✅ Redirecting authenticated user to /home");
+    const redirectUrl = new URL("/home", request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Add debug headers to the response
+  supabaseResponse.headers.set("x-middleware-pathname", pathname);
+  supabaseResponse.headers.set(
+    "x-middleware-user",
+    user ? "authenticated" : "not-authenticated",
+  );
+  supabaseResponse.headers.set(
+    "x-middleware-protected",
+    isProtectedRoute.toString(),
+  );
+  supabaseResponse.headers.set(
+    "x-middleware-auth-route",
+    isAuthRoute.toString(),
+  );
 
   return supabaseResponse;
 }

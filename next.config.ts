@@ -63,11 +63,11 @@ const nextConfig: NextConfig = {
   },
   // Enable turbopack for faster dev experience
   experimental: {
-    turbo: {
-      rules: {
-        "*.mdx": ["mdx-loader"],
-      },
-    },
+    // turbo: {
+    //   rules: {
+    //     "*.mdx": ["mdx-loader"],
+    //   },
+    // },
     // Enable optimizations for faster page transitions
     optimizePackageImports: [
       "react-multi-carousel",
