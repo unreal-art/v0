@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "rimraf .next && next build",
+    "prestart": "bun run build",
     "start": "next start",
     "postinstall": "bun run build",
     "lint": "next lint",
