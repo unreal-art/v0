@@ -9,7 +9,7 @@
   "packageManager": "bun@1.1.38",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rimraf .next && next build",
     "start": "next start",
     "postinstall": "bun run build",
     "lint": "next lint",
