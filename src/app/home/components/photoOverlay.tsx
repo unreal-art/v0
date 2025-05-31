@@ -59,7 +59,7 @@ export default function PhotoOverlay({
   const { mutate: toggleLike } = useLikePost(
     Number(context.photo.id),
     userId,
-    context.photo.author,
+    context.photo.author
   );
 
   const userHasLiked = likes?.some((like) => like.author === userId);
@@ -70,7 +70,7 @@ export default function PhotoOverlay({
   };
 
   const { data: comments, isLoading: loadingComments } = useComments(
-    context.photo.id,
+    context.photo.id
   );
   useRealtimeComments(context.photo.id);
 
@@ -116,7 +116,7 @@ export default function PhotoOverlay({
             )}
 
             {/* {!loadingLikes && !loadingComments && ( */}
-            <div className="flex justify-center  w-fit m-auto p-2 rounded-md hover:bg-black/30 gap-4 z-10">
+            <div className="flex justify-center w-fit m-auto p-2 rounded-md hover:bg-black/30 gap-4 z-10">
               <button
                 className="flex gap-1 items-center"
                 onClick={() => toggleLike()}
@@ -126,15 +126,23 @@ export default function PhotoOverlay({
                 ) : (
                   <HeartIcon color="#FFFFFF" />
                 )}
-                <p>{likes ? formatNumber(likes?.length) : ""}</p>
+                <div className="min-w-[24px] text-center">
+                  <p className={`transition-opacity duration-300 ${likes ? 'opacity-100' : 'opacity-0'}`}>
+                    {likes ? formatNumber(likes.length) : '0'}
+                  </p>
+                </div>
               </button>
 
               <button
                 className="flex gap-1 items-center"
                 onClick={() => handleCommentClick()}
               >
-                <ChatIcon color="#FFFFFF" />{" "}
-                <p>{comments ? formatNumber(comments?.length) : ""}</p>
+                <ChatIcon color="#FFFFFF" />
+                <div className="min-w-[24px] text-center">
+                  <p className={`transition-opacity duration-300 ${comments ? 'opacity-100' : 'opacity-0'}`}>
+                    {comments ? formatNumber(comments.length) : '0'}
+                  </p>
+                </div>
               </button>
             </div>
             {/* )} */}
@@ -168,7 +176,9 @@ export default function PhotoOverlay({
           </div>
 
           <div
-            className={`flex flex-col ${section == "photoGridTwo" ? " mb-12" : "mb-2"}`}
+            className={`flex flex-col ${
+              section == "photoGridTwo" ? "mb-12" : ""
+            }`}
           >
             <div className="relative flex flex-col items-center">
               <button
@@ -181,23 +191,33 @@ export default function PhotoOverlay({
                   <HeartIcon color="#FFFFFF" />
                 )}
               </button>
-
-              <p className="mt-6 z-10">
-                {likes ? formatNumber(likes?.length) : ""}
-              </p>
+              <div className="h-6 mt-6 z-10 min-w-[24px] text-center">
+                <p
+                  className={`transition-opacity duration-300 ${
+                    likes ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {likes ? formatNumber(likes.length) : "0"}
+                </p>
+              </div>
             </div>
 
-            <div className="relative flex flex-col items-center">
+            <div className="relative flex flex-col items-center ">
               <button
                 className="absolute flex gap-1 items-center z-10"
                 onClick={handleCommentClick}
               >
                 <ChatIcon color="#FFFFFF" />
               </button>
-
-              <p className="mt-6 z-10">
-                {comments ? formatNumber(comments?.length) : ""}
-              </p>
+              <div className="h-6 mt-6 z-10 min-w-[24px] text-center">
+                <p
+                  className={`transition-opacity duration-300 ${
+                    comments ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {comments ? formatNumber(comments.length) : "0"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
