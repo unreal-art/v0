@@ -2,13 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "$/types/database.types";
+import appConfig from "@/config";
 
 export async function createClient(): Promise<SupabaseClient<Database>> {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    appConfig.services.supabase.url!,
+    appConfig.services.supabase.anonKey!,
     {
       cookies: {
         getAll() {
@@ -17,7 +18,7 @@ export async function createClient(): Promise<SupabaseClient<Database>> {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
+              cookieStore.set(name, value, options)
             );
           } catch {
             // The `setAll` method was called from a Server Component.
@@ -31,6 +32,6 @@ export async function createClient(): Promise<SupabaseClient<Database>> {
         persistSession: true,
         detectSessionInUrl: true,
       },
-    },
+    }
   );
 }

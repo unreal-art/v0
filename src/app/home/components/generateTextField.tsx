@@ -10,6 +10,7 @@ import { getContractInstance } from "@/utils";
 import { torusTestnet } from "$/constants/chains";
 import { formatEther } from "ethers";
 import { toast } from "sonner";
+import appConfig from "@/config";
 
 interface GenerateTextFieldProps {
   open: boolean;
@@ -17,7 +18,7 @@ interface GenerateTextFieldProps {
 }
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  appConfig.blockchain.contracts.dart
 );
 
 export default function GenerateTextField({
@@ -64,7 +65,7 @@ export default function GenerateTextField({
           setShowProgress(false);
           toast.error(`Error generating image: ${error.message}`);
         },
-      },
+      }
     );
   };
 

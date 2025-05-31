@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import appConfig from "@/config";
 
 type Params = Promise<{ author: string }>;
 
@@ -9,7 +10,7 @@ export async function GET(req: Request, segmentData: { params: Params }) {
     const { author } = await segmentData.params;
 
     // Initialize Supabase client once
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+    const supabaseUrl = appConfig.services.supabase.url;
     const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
     const supabase = createClient(supabaseUrl, privateKey);
 
@@ -23,7 +24,7 @@ export async function GET(req: Request, segmentData: { params: Params }) {
     if (profileError) {
       return NextResponse.json(
         { success: false, error: profileError.message },
-        { status: profileError.code === "PGRST116" ? 404 : 500 },
+        { status: profileError.code === "PGRST116" ? 404 : 500 }
       );
     }
 
@@ -36,7 +37,7 @@ export async function GET(req: Request, segmentData: { params: Params }) {
     if (countError) {
       return NextResponse.json(
         { success: false, error: countError.message },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -49,7 +50,7 @@ export async function GET(req: Request, segmentData: { params: Params }) {
     console.error("Error counting posts:", err);
     return NextResponse.json(
       { success: false, error: err.message },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

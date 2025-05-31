@@ -1,9 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { logError } from "@/utils/sentryUtils";
+import appConfig from "@/config";
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  appConfig.services.supabase.url || "",
   process.env.SUPABASE_SERVICE_ROLE_KEY || "" // Service role key (used ONLY in backend)
 );
 
@@ -21,8 +22,8 @@ export async function DELETE(req: Request) {
 
     // Ensure token belongs to user
     const supabaseAuthClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+      appConfig.services.supabase.url,
+      appConfig.services.supabase.anonKey,
       { global: { headers: { Authorization: `Bearer ${token}` } } }
     );
 

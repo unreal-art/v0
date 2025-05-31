@@ -1,5 +1,6 @@
 import axios from "axios";
 import https from "https";
+import appConfig from "@/config";
 
 const agent = new https.Agent({
   rejectUnauthorized: false, // Disable SSL verification
@@ -28,7 +29,7 @@ lQ7Ghuq6/cFOhwmhdh2zUf8x/N8lzzeZqPdy3DYVGPmPyKOAPRsq69s=
 });
 
 export const axiosInstance = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}`, // Base URL
+  baseURL: appConfig.services.api.url, // Base URL
   // headers: {
   //   "Content-Type": "application/json",
   // },

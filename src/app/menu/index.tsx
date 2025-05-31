@@ -19,6 +19,7 @@ import { useReadContract } from "thirdweb/react";
 import { formatEther } from "ethers";
 import { log, logError } from "@/utils/sentryUtils";
 import OptimizedImage from "../components/OptimizedImage";
+import appConfig from "@/config";
 
 interface INotificationProps {
   children: ReactNode;
@@ -26,7 +27,7 @@ interface INotificationProps {
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  appConfig.blockchain.contracts.dart
 );
 
 export default function Menu({ children }: INotificationProps) {

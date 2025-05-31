@@ -1,4 +1,5 @@
 import { Database } from "$/types/database.types";
+import appConfig from "@/config";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
 
   try {
     // Initialize configuration
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseUrl = appConfig.services.supabase.url;
     const privateServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !privateServiceRoleKey) {
@@ -62,53 +63,59 @@ export async function GET(request: Request) {
     console.log(`Querying data from ${startDateStr} to ${endDateStr}`);
 
     // Fetch data with proper error handling and correct column names
-    const [signUpsResult, creditsResult, mediaResult, imagesCount, songsCount, videosCount] =
-      await Promise.allSettled([
-        // Query profiles for sign-ups - using createdAt (camelCase as per schema)
-        supabase
-          .from("profiles")
-          .select("createdAt", { count: 'exact' })
-          .gte("createdAt", startDateStr)
-          .lte("createdAt", endDateStr),
+    const [
+      signUpsResult,
+      creditsResult,
+      mediaResult,
+      imagesCount,
+      songsCount,
+      videosCount,
+    ] = await Promise.allSettled([
+      // Query profiles for sign-ups - using createdAt (camelCase as per schema)
+      supabase
+        .from("profiles")
+        .select("createdAt", { count: "exact" })
+        .gte("createdAt", startDateStr)
+        .lte("createdAt", endDateStr),
 
-        // Query credit purchases - using created_at (snake_case as per schema)
-        supabase
-          .from("credit_purchases")
-          .select("created_at, amount", { count: 'exact' })
-          .gte("created_at", startDateStr)
-          .lte("created_at", endDateStr),
+      // Query credit purchases - using created_at (snake_case as per schema)
+      supabase
+        .from("credit_purchases")
+        .select("created_at, amount", { count: "exact" })
+        .gte("created_at", startDateStr)
+        .lte("created_at", endDateStr),
 
-        // Query all media for processing
-        supabase
-          .from("posts")
-          .select("createdAt, media_type")
-          .not("media_type", "is", null)
-          .gte("createdAt", startDateStr)
-          .lte("createdAt", endDateStr)
-          .limit(1000), // Still fetch some sample data for weekly breakdown
-          
-        // Get accurate counts for each media type
-        supabase
-          .from("posts")
-          .select('*', { count: 'exact', head: true })
-          .eq('media_type', 'IMAGE')
-          .gte("createdAt", startDateStr)
-          .lte("createdAt", endDateStr),
-          
-        supabase
-          .from("posts")
-          .select('*', { count: 'exact', head: true })
-          .eq('media_type', 'SONG')
-          .gte("createdAt", startDateStr)
-          .lte("createdAt", endDateStr),
-          
-        supabase
-          .from("posts")
-          .select('*', { count: 'exact', head: true })
-          .eq('media_type', 'VIDEO')
-          .gte("createdAt", startDateStr)
-          .lte("createdAt", endDateStr)
-      ]);
+      // Query all media for processing
+      supabase
+        .from("posts")
+        .select("createdAt, media_type")
+        .not("media_type", "is", null)
+        .gte("createdAt", startDateStr)
+        .lte("createdAt", endDateStr)
+        .limit(1000), // Still fetch some sample data for weekly breakdown
+
+      // Get accurate counts for each media type
+      supabase
+        .from("posts")
+        .select("*", { count: "exact", head: true })
+        .eq("media_type", "IMAGE")
+        .gte("createdAt", startDateStr)
+        .lte("createdAt", endDateStr),
+
+      supabase
+        .from("posts")
+        .select("*", { count: "exact", head: true })
+        .eq("media_type", "SONG")
+        .gte("createdAt", startDateStr)
+        .lte("createdAt", endDateStr),
+
+      supabase
+        .from("posts")
+        .select("*", { count: "exact", head: true })
+        .eq("media_type", "VIDEO")
+        .gte("createdAt", startDateStr)
+        .lte("createdAt", endDateStr),
+    ]);
 
     // Extract data and log results
     const signUps =
@@ -128,17 +135,19 @@ export async function GET(request: Request) {
 
     // Extract accurate counts for each media type
     const getCount = (result: any) => {
-      return result.status === 'fulfilled' && !result.value.error
+      return result.status === "fulfilled" && !result.value.error
         ? result.value.count || 0
         : 0;
     };
-    
+
     const totalImages = getCount(imagesCount);
     const totalSongs = getCount(songsCount);
     const totalVideos = getCount(videosCount);
-    
+
     // Log the accurate counts for debugging
-    console.log(`Total media counts - Images: ${totalImages}, Songs: ${totalSongs}, Videos: ${totalVideos}`);
+    console.log(
+      `Total media counts - Images: ${totalImages}, Songs: ${totalSongs}, Videos: ${totalVideos}`
+    );
 
     // Log results for debugging
     console.log(
@@ -200,21 +209,23 @@ export async function GET(request: Request) {
       image: 0,
       song: 0,
       video: 0,
-      other: 0
+      other: 0,
     };
 
     // First pass: count the sample data
     media.forEach((item) => {
-      const mediaType = item.media_type?.toUpperCase() || 'OTHER';
+      const mediaType = item.media_type?.toUpperCase() || "OTHER";
       mediaTypeCounts[mediaType] = (mediaTypeCounts[mediaType] || 0) + 1;
     });
 
     // Calculate scaling factors for each media type (case-insensitive)
     const scalingFactors = {
-      IMAGE: mediaTypeCounts.IMAGE > 0 ? totalImages / mediaTypeCounts.IMAGE : 0,
+      IMAGE:
+        mediaTypeCounts.IMAGE > 0 ? totalImages / mediaTypeCounts.IMAGE : 0,
       SONG: mediaTypeCounts.SONG > 0 ? totalSongs / mediaTypeCounts.SONG : 0,
-      VIDEO: mediaTypeCounts.VIDEO > 0 ? totalVideos / mediaTypeCounts.VIDEO : 0,
-      OTHER: 0
+      VIDEO:
+        mediaTypeCounts.VIDEO > 0 ? totalVideos / mediaTypeCounts.VIDEO : 0,
+      OTHER: 0,
     };
 
     // Second pass: apply scaling to the sample data
@@ -222,7 +233,7 @@ export async function GET(request: Request) {
       const date = new Date(item.createdAt);
       const weekKey = getWeekKey(date);
       if (weeksData[weekKey]) {
-        const mediaType = item.media_type?.toUpperCase() || 'OTHER';
+        const mediaType = item.media_type?.toUpperCase() || "OTHER";
         switch (mediaType) {
           case "IMAGE":
             weeksData[weekKey].images += scalingFactors.IMAGE || 0;
@@ -241,9 +252,9 @@ export async function GET(request: Request) {
         }
       }
     });
-    
+
     // Round the values to whole numbers for display
-    Object.values(weeksData).forEach(week => {
+    Object.values(weeksData).forEach((week) => {
       week.images = Math.round(week.images);
       week.songs = Math.round(week.songs);
       week.videos = Math.round(week.videos);

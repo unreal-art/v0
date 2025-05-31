@@ -4,6 +4,7 @@ import "./globals.css";
 import ServiceWorker from "./components/serviceWorker";
 import ProgressBar from "./components/progressBar";
 import { Suspense } from "react";
+import appConfig from "@/config";
 
 import { HighlightInit } from "@highlight-run/next/client";
 import PageTransitionProvider from "./providers/PageTransitionProvider";
@@ -90,16 +91,16 @@ export default function RootLayout({
     <html lang="en" className={`${archivo.variable} ${nasalization.variable}`}>
       <head>
         {/* Storage URLs: Primary R2 storage for production assets */}
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_R2_STORAGE_URL} />
+        <link rel="preconnect" href={appConfig.services.cloudflare.r2StorageUrl} />
 
         {/* Cloudflare URL: Used for both development and public resources */}
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_CF_URL} />
+        <link rel="preconnect" href={appConfig.services.cloudflare.url} />
 
         {/* Gateway URLs: For external content */}
-        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_MESH3_URL} />
+        <link rel="dns-prefetch" href="https://mesh3.network" />
         <link
           rel="dns-prefetch"
-          href={process.env.NEXT_PUBLIC_LIGHTHOUSE_URL}
+          href={appConfig.services.lighthouse.gateway}
         />
 
         {/* Preload critical assets for offline caching */}

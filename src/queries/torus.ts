@@ -3,6 +3,7 @@
 import { createClient } from "$/supabase/client";
 import { Client } from "$/supabase/client";
 import { logError } from "@/utils/sentryUtils";
+import appConfig from "@/config";
 
 /**
  * Updates a user's torus ID in the database
@@ -57,8 +58,7 @@ export const updateUserTorusId = async (torusId: string, client?: Client) => {
       }
 
       // Insert credit purchase record for new user
-      const creditAmount = process.env.NEXT_PUBLIC_NEW_USER_CREDIT ? 
-        Number(process.env.NEXT_PUBLIC_NEW_USER_CREDIT) : 0;
+      const creditAmount = appConfig.app.newUserCredit;
         
       const { error: creditError } = await authClient
         .from('credit_purchases')

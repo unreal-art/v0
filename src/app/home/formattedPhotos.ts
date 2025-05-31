@@ -1,6 +1,7 @@
 import { Page, Post } from "$/types/data.types";
 import { isHighQualityImage } from "@/utils";
 import type { Photo } from "react-photo-album";
+import appConfig from "@/config";
 
 export interface ExtendedPhoto extends Photo {
   prompt?: string;
@@ -32,7 +33,7 @@ export const getImage = (
       return "/fallback.png"; // Handle missing value gracefully
     }
 
-    const isDev = process.env.NODE_ENV === "development";
+    const isDev = appConfig.environment.isDevelopment;
     const isLighthouseCID = !cidOrUrl?.startsWith("http"); // Use optional chaining
 
     let imageOptions = "";
@@ -43,22 +44,22 @@ export const getImage = (
     // In dev mode, use R2.dev for Cloudflare images, but keep Lighthouse CID-based URLs
     if (isDev) {
       return isLighthouseCID
-        ? process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY +
+        ? appConfig.services.lighthouse.gateway +
             cidOrUrl +
             "/" +
             fileName +
             imageOptions
-        : `${process.env.NEXT_PUBLIC_CF_URL}/${author}/${fileName}`;
+        : `${appConfig.services.cloudflare.url}/${author}/${fileName}`;
     }
 
     // In production, return the stored URL as-is
     return isLighthouseCID
-      ? process.env.NEXT_PUBLIC_LIGHTHOUSE_GATE_WAY +
+      ? appConfig.services.lighthouse.gateway +
           cidOrUrl +
           "/" +
           fileName +
           imageOptions
-      : `${process.env.NEXT_PUBLIC_CF_URL}/${author}/${fileName}`; //cidOrUrl; // fetch from Cloudflare TODO: get direct from Cloudflare
+      : `${appConfig.services.cloudflare.url}/${author}/${fileName}`; //cidOrUrl; // fetch from Cloudflare TODO: get direct from Cloudflare
   } catch (error) {
     console.error("Error fetching image:", error);
     return "/fallback.png"; // Fallback if there's an error

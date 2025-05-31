@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 import { getUser } from "@/queries/user";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import appConfig from "@/config";
 
 const transferTopic = ethers.id("Transfer(address,address,uint256)");
 
@@ -10,7 +11,7 @@ const ERC20_ABI = [
 ];
 
 export async function POST(req: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+  const supabaseUrl = appConfig.services.supabase.url as string;
   const private_SRK = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
 
   const secretSupabaseClient: SupabaseClient = createClient(
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
           value.toString() === expectedValue.toString()
         ) {
           const userBalance = user?.creditBalance || 0;
-          const rate = Number(process.env.NEXT_PUBLIC_STABLE_COIN_RATE);
+          const rate = Number(appConfig.blockchain.rates.stableCoin);
           // divide formatted amount by rate to get added balance
           const addedBalance =
             Number(formattedAmount) /
@@ -105,16 +106,16 @@ export async function POST(req: NextRequest) {
 
           // Insert credit purchase record
           const { error: creditError } = await secretSupabaseClient
-            .from('credit_purchases')
+            .from("credit_purchases")
             .insert([
-              { 
+              {
                 amount: addedBalance,
-                user: user?.id
-              }
+                user: user?.id,
+              },
             ]);
 
           if (creditError) {
-            console.error('Error inserting credit purchase:', creditError);
+            console.error("Error inserting credit purchase:", creditError);
             // Don't fail the whole process if credit insertion fails
           }
 
