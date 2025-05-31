@@ -10,8 +10,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prestart": "bun run build",
     "start": "next start",
+    "postinstall": "bun run build",
     "lint": "next lint",
+    "dev:prod": "bun dev -- -H 0.0.0.0",
     "deploy": "bun wrangler deploy",
     "cloudflare:build": "bun run build",
     "cloudflare:deploy": "bun wrangler deploy",

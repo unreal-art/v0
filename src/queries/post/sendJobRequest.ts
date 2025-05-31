@@ -34,12 +34,12 @@ export const sendJobRequest = ({
 
   const dto: Partial<JobSpec> = {
     module: "nearai",
-    version: "v0.3.1",
+    version: "v0.3.2",
     inputs: {
       Prompt: prompt,
       Seed: random.int(1e3, 1e8),
       N: 4,
-      Format: "webp",
+      Format: "jpg",
     },
     author,
     category: "GENERATION",
