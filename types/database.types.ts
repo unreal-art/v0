@@ -91,6 +91,35 @@ export type Database = {
           },
         ]
       }
+      credit_purchases: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          user: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          user?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          user?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_purchases_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
@@ -271,6 +300,7 @@ export type Database = {
           isPinned: boolean | null
           isPrivate: boolean | null
           like_count: number | null
+          media_type: string | null
           n: number | null
           prompt: string | null
           seed: number | null
@@ -288,6 +318,7 @@ export type Database = {
           isPinned?: boolean | null
           isPrivate?: boolean | null
           like_count?: number | null
+          media_type?: string | null
           n?: number | null
           prompt?: string | null
           seed?: number | null
@@ -305,6 +336,7 @@ export type Database = {
           isPinned?: boolean | null
           isPrivate?: boolean | null
           like_count?: number | null
+          media_type?: string | null
           n?: number | null
           prompt?: string | null
           seed?: number | null
@@ -343,7 +375,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           createdAt?: string
-          credit_balance?: number
+          credit_balance: number
           display_name?: string | null
           email?: string | null
           follower_count?: number
@@ -463,6 +495,7 @@ export type Database = {
           isPinned: boolean | null
           isPrivate: boolean | null
           like_count: number | null
+          media_type: string | null
           n: number | null
           prompt: string | null
           seed: number | null

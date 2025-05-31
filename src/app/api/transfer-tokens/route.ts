@@ -163,6 +163,21 @@ export async function POST(
         .update({ credit_balance: newBalance })
         .eq("id", user?.id);
 
+      // Insert credit purchase record
+      const { error: creditError } = await supabase
+        .from('credit_purchases')
+        .insert([
+          { 
+            amount: addedBalance,
+            user: user?.id
+          }
+        ]);
+
+      if (creditError) {
+        console.error('Error inserting credit purchase:', creditError);
+        // Don't fail the whole process if credit insertion fails
+      }
+
       if (error) {
         console.error("Supabase update error:", error);
         return NextResponse.json(

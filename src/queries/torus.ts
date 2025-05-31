@@ -48,11 +48,30 @@ export const updateUserTorusId = async (torusId: string, client?: Client) => {
         .eq("id", profileData.id)
         .single();
 
+     
       if (updateError) {
         console.error("Error updating torus_id:", updateError);
         await supabase.auth.signOut();
         window.location.replace(`/auth?torus_user=${torusId}`);
         return { success: false, error: "Failed to update torus_id" };
+      }
+
+      // Insert credit purchase record for new user
+      const creditAmount = process.env.NEXT_PUBLIC_NEW_USER_CREDIT ? 
+        Number(process.env.NEXT_PUBLIC_NEW_USER_CREDIT) : 0;
+        
+      const { error: creditError } = await authClient
+        .from('credit_purchases')
+        .insert([
+          { 
+            amount: creditAmount,
+            user: profileData.id
+          }
+        ]);
+
+      if (creditError) {
+        console.error('Error inserting credit purchase:', creditError);
+        // Don't fail the whole process if credit insertion fails
       }
 
       // Clear localStorage after successful update

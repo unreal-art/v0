@@ -103,6 +103,21 @@ export async function POST(req: NextRequest) {
             .update({ credit_balance: newBalance })
             .eq("id", user?.id);
 
+          // Insert credit purchase record
+          const { error: creditError } = await secretSupabaseClient
+            .from('credit_purchases')
+            .insert([
+              { 
+                amount: addedBalance,
+                user: user?.id
+              }
+            ]);
+
+          if (creditError) {
+            console.error('Error inserting credit purchase:', creditError);
+            // Don't fail the whole process if credit insertion fails
+          }
+
           if (error) {
             return NextResponse.json(
               { success: false, error: { message: error.message } },
