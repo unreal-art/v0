@@ -160,6 +160,8 @@ export default function UserData() {
               trackPerformance={true}
               imageName={`profile-${profileId}`}
               isProfile={true}
+              username={profileData?.username || ""}
+              isAvatar={true}
             />
           </div>
 
@@ -223,7 +225,7 @@ export default function UserData() {
             />
           </div>
 
-          <p className="text-primary-7 my-4"> Bio </p>
+          {profileData?.bio && <p className="text-primary-7 my-4"> Bio </p>}
           <p className="text-primary-7 my-4"> {profileData?.bio} </p>
         </div>
 

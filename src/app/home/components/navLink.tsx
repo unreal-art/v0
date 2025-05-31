@@ -25,7 +25,7 @@ function NavLink({ href, text, icon }: NavLinkProps) {
   // const active = useMemo(() => pathname === href, [pathname, href]);
   const active = useMemo(
     () => pathname === href.split("?")[0],
-    [pathname, href],
+    [pathname, href]
   );
 
   // Memoized color to avoid recalculation
@@ -104,6 +104,8 @@ function NavLink({ href, text, icon }: NavLinkProps) {
                   className="rounded-full object-cover"
                   trackPerformance={true}
                   imageName="nav-profile-avatar"
+                  username={user?.username || ""}
+                  isAvatar={true}
                 />
               </div>
             ) : (

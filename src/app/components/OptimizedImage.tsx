@@ -54,14 +54,31 @@ function OptimizedImage({
 
   if (error) {
     if (isAvatar) {
-      return (
+      if (!isProfile) return (
         <div
-          className="rounded-full text-xs flex justify-center items-center bg-gray-700 text-gray-200 font-semibold"
+          className={`rounded-full text-xs flex justify-center items-center bg-gray-700 text-gray-200 font-semibold`}
           style={{ width: `${width}px`, height: `${width}px` }}
         >
           {username && getInitials(username)}
         </div>
       );
+       return (
+         <>
+           <div
+             className={`hidden md:flex rounded-full text-4xl justify-center items-center bg-gray-700 text-gray-200 font-semibold`}
+             style={{ width: `${width}px`, height: `${width}px` }}
+           >
+             {username && getInitials(username)}
+           </div>
+
+           <div
+             className={`rounded-full text-xl flex md:hidden justify-center items-center bg-gray-700 text-gray-200 font-semibold`}
+             style={{ width: `${100}px`, height: `${100}px` }}
+           >
+             {username && getInitials(username)}
+           </div>
+         </>
+       );
     }
     return (
       <Image
