@@ -3,7 +3,7 @@ import Image from "next/image";
 //import PhotoOverlay from "../photoOverlay"
 import { OptionMenuIcon } from "@/app/components/icons";
 import { timeAgo } from "@/app/libs/timeAgo";
-import { truncateText } from "@/utils";
+import { formatDisplayName, truncateText } from "@/utils";
 import ProfileInfo from "../../profile/components/profileInfo";
 import { useSearchUsersInfinite } from "@/hooks/useSearchUsersInfinite";
 import { ProfileWithPosts } from "@/queries/post/searchUsersPaginated";
@@ -15,6 +15,7 @@ import { useDoesUserFollow } from "@/hooks/useDoesUserFollow";
 import { useUser } from "@/hooks/useUser";
 import { useToggleFollow } from "@/hooks/useToggleFollow";
 import Link from "next/link";
+import OptimizedImage from "@/app/components/OptimizedImage";
 
 export default function UserSearch({ searchTerm }: { searchTerm: string }) {
   const {
@@ -44,7 +45,7 @@ export default function UserSearch({ searchTerm }: { searchTerm: string }) {
       {data?.pages?.flatMap((page) =>
         (page.data || []).map((details: ProfileWithPosts) => (
           <User key={details.id} data={details} posts={details.posts || []} />
-        )),
+        ))
       ) || (
         <div className="flex flex-col items-center justify-center w-full p-8">
           <p className="text-center text-lg">
@@ -71,7 +72,7 @@ export function User({
   const { userId } = useUser();
   const { data: isFollowing, isLoading: isFollowLoading } = useDoesUserFollow(
     userId || "", // Provide default empty string instead of casting
-    data.id,
+    data.id
   );
   const toggleFollowMutation = useToggleFollow();
 
@@ -88,24 +89,37 @@ export function User({
     <div className="bg-primary-11 rounded-t-3xl my-3">
       <div className="flex justify-between items-center h-16 py-4 px-4">
         <div className="flex items-center gap-4">
-          <Link
-            href={data.id ? `/home/profile/${data.id}` : "#"}
-            className="w-10 h-10 bg-primary-9 rounded-full"
-          >
-            <Image
+          <Link href={data.id ? `/home/profile/${data.id}` : "#"}>
+            {/* <Image
               src={data.avatar_url || "/profile.jpg"}
               width={40}
               height={40}
               alt="profile"
               className="rounded-full"
-            />
+            /> */}
+
+            {data.avatar_url ? (
+              <OptimizedImage
+                className="rounded-full drop-shadow-lg"
+                src={data.avatar_url}
+                width={24}
+                height={24}
+                alt={`${data.username}'s profile picture`}
+                trackPerformance={true}
+                imageName={`profile-${data.id}`}
+                username={data.username || ""}
+                isAvatar={true}
+              />
+            ) : (
+              <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
+            )}
           </Link>
 
           <Link
             href={data.id ? `/home/profile/${data.id}` : "#"}
             className="text-primary-1 text-lg w-36 font-normal"
           >
-            {data.username || "Unknown user"}
+            {formatDisplayName(data.username || "") || "Unknown user"}
           </Link>
 
           {userId && userId !== data.id && (
@@ -119,8 +133,8 @@ export function User({
                 {isFollowLoading
                   ? "Loading..."
                   : isFollowing
-                    ? "Unfollow"
-                    : "Follow"}
+                  ? "Unfollow"
+                  : "Follow"}
               </p>
             </button>
           )}
