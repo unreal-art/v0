@@ -1,6 +1,7 @@
 "use client";
 import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { getContractInstance, logError } from "@/utils";
+import appConfig from "@/config";
 import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
 import { BigNumberish, formatEther, parseEther, parseUnits } from "ethers";
@@ -40,15 +41,15 @@ interface OdpPayProps {
   refetch: () => void;
 }
 const defaultOdpContract = getContractInstance(
-  process.env.NODE_ENV === "development" ? torusTestnet : torusMainnet,
-  process.env.NODE_ENV == "development"
-    ? (process.env.NEXT_PUBLIC_ODP_ADDRESS_TESTNET as string)
-    : (process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string),
+  appConfig.environment.isDevelopment ? torusTestnet : torusMainnet,
+  appConfig.environment.isDevelopment
+    ? appConfig.blockchain.contracts.odpTestnet
+    : appConfig.blockchain.contracts.odpMainnet
 );
 
 // const exchangeContract = getContractInstance(
 //   torusTestnet,
-//   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+//   appConfig.blockchain.contracts.exchange,
 // );
 
 export default function OdpPay({
@@ -119,15 +120,16 @@ export default function OdpPay({
   // };
 
   const getTokenAddress = (token: string) => {
-    const sepoliaUSDC = process.env.NEXT_PUBLIC_SEPOLIA_USDC;
-    const polygonAmoyUSDC = process.env.NEXT_PUBLIC_POLYGON_AMOY_USDC;
-    const bnbTestnetUSDC = process.env.NEXT_PUBLIC_BNB_TESTNET_USDC;
-    const ethereumUSDC = process.env.NEXT_PUBLIC_ETHEREUM_USDC;
-    const polygonUSDC = process.env.NEXT_PUBLIC_POLYGON_USDC;
-    const bnbUSDC = process.env.NEXT_PUBLIC_BNB_USDC;
-    const ethereumUSDT = process.env.NEXT_PUBLIC_ETHEREUM_USDT;
-    const polygonUSDT = process.env.NEXT_PUBLIC_POLYGON_USDT;
-    const bnbUSDT = process.env.NEXT_PUBLIC_BNB_USDT;
+    const { tokens } = appConfig.blockchain;
+    const sepoliaUSDC = tokens.testnet.sepolia.usdc;
+    const polygonAmoyUSDC = tokens.testnet.polygonAmoy.usdc;
+    const bnbTestnetUSDC = tokens.testnet.bnbTestnet.usdc;
+    const ethereumUSDC = tokens.mainnet.ethereum.usdc;
+    const polygonUSDC = tokens.mainnet.polygon.usdc;
+    const bnbUSDC = tokens.mainnet.bnb.usdc;
+    const ethereumUSDT = tokens.mainnet.ethereum.usdt;
+    const polygonUSDT = tokens.mainnet.polygon.usdt;
+    const bnbUSDT = tokens.mainnet.bnb.usdt;
 
     if (!activeChain) return;
 
@@ -190,7 +192,7 @@ export default function OdpPay({
       txHash: transactionHash,
       tokenAddress: getTokenAddress(token),
       expectedFrom: activeAccount?.address,
-      expectedTo: process.env.NEXT_PUBLIC_TREASURY as string,
+      expectedTo: appConfig.blockchain.contracts.treasury,
       expectedAmount: amount.toString(), //amount paid
       decimals: 6,
       chainId: activeChain?.id,
@@ -227,7 +229,7 @@ export default function OdpPay({
       contract: tokenContract,
       method:
         "function transfer(address recipient, uint256 amount) public returns (bool)",
-      params: [process.env.NEXT_PUBLIC_TREASURY as string, parsedAmount],
+      params: [appConfig.blockchain.contracts.treasury, parsedAmount],
     });
     transferTransaction(prepareTransfer as PreparedTransaction, {
       onSuccess: (data) => {
@@ -299,11 +301,11 @@ export default function OdpPay({
       console.log(activeChain.id);
       // Create the signature using our utility function
       const signature = await createTokenSignature(activeAccount, {
-        owner: activeAccount?.address as string,
-        spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS as string,
+        owner: activeAccount?.address,
+        spender: appConfig.blockchain.contracts.spender,
         value: amountInWei,
         deadline: deadline.toString(), // Convert to string for compatibility
-        tokenAddress: process.env.NEXT_PUBLIC_ODP_ADDRESS_MAINNET as string,
+        tokenAddress: appConfig.blockchain.contracts.odpMainnet,
         chainId: activeChain.id,
       });
 
@@ -318,8 +320,8 @@ export default function OdpPay({
           signature: signature,
           value: amountInWei,
           deadline: deadline,
-          spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS as string,
-          partnerwallet: process.env.NEXT_PUBLIC_TREASURY as string,
+          spender: appConfig.blockchain.contracts.spender,
+          partnerwallet: appConfig.blockchain.contracts.treasury,
           vendor: "UNREAL",
         },
         {
@@ -334,9 +336,9 @@ export default function OdpPay({
                 data.data.transactionhash
                   ? `Transfer successful! Transaction: ${data.data.transactionhash.substring(
                       0,
-                      6,
+                      6
                     )}...`
-                  : "Transfer completed successfully",
+                  : "Transfer completed successfully"
               );
             } else {
               // Fallback message if data structure is unexpected
@@ -358,11 +360,11 @@ export default function OdpPay({
             } else {
               // Fallback for network or other errors
               toast.error(
-                `Transfer failed: ${error.message || "Unknown error"}`,
+                `Transfer failed: ${error.message || "Unknown error"}`
               );
             }
           },
-        },
+        }
       );
     } catch (error: any) {
       setMainLoadingState(false);
@@ -370,7 +372,7 @@ export default function OdpPay({
 
       toast.dismiss(); // Clear any loading toasts
       toast.error(
-        `Signature creation failed: ${error.message || "Unknown error"}`,
+        `Signature creation failed: ${error.message || "Unknown error"}`
       );
     }
   };

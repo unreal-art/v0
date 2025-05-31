@@ -26,13 +26,14 @@ import { formatEther } from "ethers";
 import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
 import { log, logError } from "@/utils/sentryUtils";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import appConfig from "@/config";
 // import { getUser } from "$/queries/user/getUser";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
 const dartContract = getContractInstance(
   torusTestnet,
-  process.env.NEXT_PUBLIC_DART_ADDRESS as string,
+  appConfig.blockchain.contracts.dart
 );
 
 // Add this placeholder function at the top of the file, outside the component

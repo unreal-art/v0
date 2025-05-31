@@ -5,6 +5,7 @@ import { formatMoney, getContractInstance } from "@/utils";
 import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { useReadContract } from "thirdweb/react";
 import { BigNumberish, formatEther } from "ethers";
+import appConfig from "@/config";
 
 interface TopupProps {
   open: boolean;
@@ -14,7 +15,7 @@ interface TopupProps {
 
 // const exchangeContract = getContractInstance(
 //   torusTestnet,
-//   process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS as string,
+//   appConfig.blockchain.contracts.exchange,
 // );
 
 export default function Topup({ open, setOpen, refetch }: TopupProps) {
@@ -22,14 +23,14 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
   const [amount, setAmount] = useState<number>(0);
   const [cost, setCost] = useState<number>(0);
   // const [rate, setRate] = useState<number>(
-  //   Number(formatEther(process.env.NEXT_PUBLIC_ODP_RATE || "0"))
+  //   Number(formatEther(appConfig.blockchain.tokenRates.odp || "0"))
   // );
   type Token = "USDT" | "USDC" | "ODP";
   const [selectedToken, setSelectedToken] = useState<Token>("ODP");
   const [tokenRates, setTokenRates] = useState<Record<Token, number>>({
-    USDT: Number(formatEther(process.env.NEXT_PUBLIC_STABLE_COIN_RATE || "0")),
-    USDC: Number(formatEther(process.env.NEXT_PUBLIC_STABLE_COIN_RATE || "0")),
-    ODP: Number(formatEther(process.env.NEXT_PUBLIC_ODP_RATE || "0")),
+    USDT: Number(formatEther(appConfig.blockchain.rates.stableCoin || "0")),
+    USDC: Number(formatEther(appConfig.blockchain.rates.stableCoin || "0")),
+    ODP: Number(formatEther(appConfig.blockchain.rates.odp || "0")),
   });
 
   const [openPayment, setOpenPayment] = useState(false);

@@ -1,5 +1,6 @@
 import { EdgeHighlight } from "@highlight-run/next/server";
+import appConfig from "@/config";
 
 export const withEdgeHighlight = EdgeHighlight({
-  projectID: process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID as string,
+  projectID: appConfig.app.highlightProjectId,
 });

@@ -18,11 +18,6 @@ interface Env {
   NEXT_PUBLIC_R2_STORAGE_URL: string;
   NEXT_PUBLIC_CF_URL: string;
 
-  // Smart contract addresses
-  NEXT_PUBLIC_DART_ADDRESS: string;
-  NEXT_PUBLIC_ODP_ADDRESS: string;
-  NEXT_PUBLIC_EXCHANGE_ADDRESS: string;
-
   // ThirdWeb integration
   NEXT_PUBLIC_TW_CLIENT_ID: string;
 

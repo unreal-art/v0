@@ -4,6 +4,7 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { torusMainnet, torusTestnet } from "$/constants/chains";
 import { createThirdwebClient } from "thirdweb";
 import { ConnectButton } from "thirdweb/react";
+import appConfig from "@/config";
 import {
   bsc,
   bscTestnet,
@@ -14,11 +15,11 @@ import {
 } from "thirdweb/chains";
 
 export const client = createThirdwebClient({
-  clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID as string,
+  clientId: appConfig.services.thirdweb.clientId,
 });
 
 const chains =
-  process.env.NODE_ENV === "development"
+  appConfig.environment.isDevelopment
     ? [
         torusTestnet,
         torusMainnet,

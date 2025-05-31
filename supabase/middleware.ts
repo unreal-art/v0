@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import appConfig from "@/config";
 
 // Define your protected routes
 const protectedRoutes = ["/home"];
@@ -20,8 +21,8 @@ export async function updateSession(request: NextRequest) {
   });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    appConfig.services.supabase.url!,
+    appConfig.services.supabase.anonKey!,
     {
       cookies: {
         getAll() {
@@ -29,17 +30,17 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
+            request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(name, value, options)
           );
         },
       },
-    },
+    }
   );
 
   // Get the user session
@@ -57,7 +58,7 @@ export async function updateSession(request: NextRequest) {
 
   // Check if the current path is a protected route
   const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
+    pathname.startsWith(route)
   );
 
   // Check if the current path is an auth route
@@ -82,15 +83,15 @@ export async function updateSession(request: NextRequest) {
   supabaseResponse.headers.set("x-middleware-pathname", pathname);
   supabaseResponse.headers.set(
     "x-middleware-user",
-    user ? "authenticated" : "not-authenticated",
+    user ? "authenticated" : "not-authenticated"
   );
   supabaseResponse.headers.set(
     "x-middleware-protected",
-    isProtectedRoute.toString(),
+    isProtectedRoute.toString()
   );
   supabaseResponse.headers.set(
     "x-middleware-auth-route",
-    isAuthRoute.toString(),
+    isAuthRoute.toString()
   );
 
   return supabaseResponse;
