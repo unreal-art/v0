@@ -32,6 +32,7 @@ export const appConfig = {
     supabase: {
       url: process.env.NEXT_PUBLIC_SUPABASE_URL,
       anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      SRK: process.env.SUPABASE_SERVICE_ROLE_KEY,
     },
     odp: {
       apiKey: process.env.ODP_API_KEY,

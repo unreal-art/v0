@@ -12,7 +12,7 @@ const ERC20_ABI = [
 
 export async function POST(req: NextRequest) {
   const supabaseUrl = appConfig.services.supabase.url as string;
-  const private_SRK = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+  const private_SRK = appConfig.services.supabase.SRK as string;
 
   const secretSupabaseClient: SupabaseClient = createClient(
     supabaseUrl,

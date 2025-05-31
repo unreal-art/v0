@@ -11,7 +11,7 @@ export async function GET(req: Request, segmentData: { params: Params }) {
 
     // Initialize Supabase client once
     const supabaseUrl = appConfig.services.supabase.url;
-    const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+    const privateKey = appConfig.services.supabase.SRK as string;
     const supabase = createClient(supabaseUrl, privateKey);
 
     // Get author's profile

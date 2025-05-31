@@ -22,24 +22,12 @@ interface TokenTransferResponse {
   warning?: string;
 }
 
-// Environment variables validation on startup
-const REQUIRED_ENV_VARS = ["SUPABASE_SERVICE_ROLE_KEY"];
-
-const missingEnvVars = REQUIRED_ENV_VARS.filter(
-  (varName) => !process.env[varName]
-);
-if (missingEnvVars.length > 0) {
-  console.error(
-    `Missing required environment variables: ${missingEnvVars.join(", ")}`
-  );
-}
-
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<TokenTransferResponse>> {
   // Initialize required configuration
   const supabaseUrl = appConfig.services.supabase.url;
-  const privateServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const privateServiceRoleKey = appConfig.services.supabase.SRK;
   const odpApiKey = appConfig.services.odp.apiKey;
   const odpApiEndpoint = appConfig.services.odp.apiEndpoint;
   const rateStr = appConfig.blockchain.rates.odp;

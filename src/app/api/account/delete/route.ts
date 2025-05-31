@@ -5,7 +5,7 @@ import appConfig from "@/config";
 
 const supabaseAdmin = createClient(
   appConfig.services.supabase.url || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || "" // Service role key (used ONLY in backend)
+  appConfig.services.supabase.SRK || "" // Service role key (used ONLY in backend)
 );
 
 export async function DELETE(req: Request) {

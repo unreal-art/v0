@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   try {
     // Initialize configuration
     const supabaseUrl = appConfig.services.supabase.url;
-    const privateServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const privateServiceRoleKey = appConfig.services.supabase.SRK;
 
     if (!supabaseUrl || !privateServiceRoleKey) {
       console.error("Missing server configuration");
