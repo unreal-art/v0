@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, memo, useState } from "react";
 import dynamic from "next/dynamic";
+import appConfig from "@/config";
 
 // Dynamically import the OfflineAlert component to avoid SSR issues
 const OfflineAlert = dynamic(() => import("./offlineAlert"), {
@@ -19,7 +20,7 @@ function ServiceWorker() {
       try {
         sw.postMessage({
           type: "SET_BUILD_VERSION",
-          version: process.env.NEXT_PUBLIC_BUILD_VERSION,
+          version: appConfig.app.buildVersion,
         });
       } catch (error) {
         if (process.env.NODE_ENV === "development") {

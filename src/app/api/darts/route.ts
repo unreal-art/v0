@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 // import axios from "axios";
 import { getUser } from "@/queries/user";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import appConfig from "@/config";
 
 //remove edge runtime since we are not on vercel
 // import { withEdgeHighlight } from "@/utils/edge-highlight.config";
@@ -11,12 +12,12 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 // export const maxDuration = 300; // 5-minute max execution time
 
 export async function POST(req: Request) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-  const private_SRK = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+  const supabaseUrl = appConfig.services.supabase.url as string;
+  const private_SRK = appConfig.services.supabase.SRK as string;
 
   const secretSupabaseClient: SupabaseClient = createClient(
     supabaseUrl,
-    private_SRK,
+    private_SRK
   );
 
   try {
@@ -78,7 +79,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
