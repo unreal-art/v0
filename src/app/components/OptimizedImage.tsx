@@ -69,7 +69,9 @@ function OptimizedImage({
       return (
         <>
           <div
-            className={`hidden md:flex rounded-full text-4xl justify-center items-center bg-gray-700 text-gray-200 font-semibold`}
+            className={`hidden md:flex ${
+              isProfilePage ? "text-xl" : "text-xs"
+            } rounded-full text-4xl justify-center items-center bg-gray-700 text-gray-200 font-semibold`}
             style={{ width: `${width}px`, height: `${width}px` }}
           >
             {username && getInitials(username)}
@@ -122,29 +124,30 @@ function OptimizedImage({
         className="absolute inset-0 flex items-center justify-center"
         style={{
           opacity: loaded ? 0 : 1,
-          transition: 'opacity 0.2s ease-out',
-          pointerEvents: 'none', // Ensures it doesn't interfere with clicks
+          transition: "opacity 0.2s ease-out",
+          pointerEvents: "none", // Ensures it doesn't interfere with clicks
           zIndex: 10,
         }}
       >
         {!isProfile && (
           <div className="flex items-center justify-center h-full w-full">
             {/* Gradient background shimmer effect */}
-            <div 
-              className="absolute inset-0" 
+            <div
+              className="absolute inset-0"
               style={{
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)',
-                backgroundSize: '200% 100%',
-                animation: 'shimmer 1.5s infinite',
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)",
+                backgroundSize: "200% 100%",
+                animation: "shimmer 1.5s infinite",
               }}
             />
-            
+
             {/* Very subtle loading indicator */}
-            <div 
+            <div
               className="h-full w-full opacity-30"
               style={{
-                background: 'rgba(20,20,20,0.1)',
-                backdropFilter: 'blur(1px)',
+                background: "rgba(20,20,20,0.1)",
+                backdropFilter: "blur(1px)",
               }}
             />
           </div>

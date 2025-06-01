@@ -93,7 +93,7 @@ export default function Menu({ children }: INotificationProps) {
                 {user?.avatar_url ? (
                   <OptimizedImage
                     className="rounded-full drop-shadow-lg"
-                    src={user?.avatar_url + "ppp"}
+                    src={user?.avatar_url}
                     width={48}
                     height={48}
                     alt={`${user?.full_name || user?.username}'s profile`}
