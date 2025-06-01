@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animation for image loading shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 @layer base {
   :root {
     --color-text-base: #ffffff;

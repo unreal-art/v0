@@ -162,6 +162,7 @@ export default function UserData() {
               isProfile={true}
               username={profileData?.username || ""}
               isAvatar={true}
+              isProfilePage={true}
             />
           </div>
 

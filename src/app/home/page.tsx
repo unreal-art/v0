@@ -13,20 +13,20 @@ import { updateUserTorusId } from "@/queries/torus";
 // Dynamically import PhotoGallary with proper loading state
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: false, // Changed to false since it uses browser-only APIs
-  loading: () => (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
-      {Array(15)
-        .fill(null)
-        .map((_, index) => (
-          <Skeleton
-            key={index}
-            height={200}
-            baseColor="#1a1a1a"
-            highlightColor="#333"
-          />
-        ))}
-    </div>
-  ),
+  // loading: () => (
+  //   <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
+  //     {Array(15)
+  //       .fill(null)
+  //       .map((_, index) => (
+  //         <Skeleton
+  //           key={index}
+  //           height={200}
+  //           baseColor="#1a1a1a"
+  //           highlightColor="#333"
+  //         />
+  //       ))}
+  //   </div>
+  // ),
 });
 
 export default function HomePage() {

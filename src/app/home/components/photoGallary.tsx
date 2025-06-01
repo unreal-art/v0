@@ -34,7 +34,7 @@ import { Color } from "three/src/Three.Core.js";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 8 images (eagerly loaded)
   const shouldPrioritize = index < 8;
@@ -77,8 +77,11 @@ function renderNextImage(
 
 export default function PhotoGallary() {
   const [imageIndex, setImageIndex] = useState(-1);
-  const [columns, setColumns] = useState<number | null>(null);
+  // Always initialize with a stable value to prevent layout shifts
+  const [columns, setColumns] = useState<number>(2);
   const [isBrowser, setIsBrowser] = useState(false);
+  // Keep a reference to the previous photos to prevent layout jumping during tab changes
+  const [prevPhotos, setPrevPhotos] = useState<any[]>([]);
 
   // Use Zustand store for tab state
   const { activeTab, initFromUrl } = useGalleryStore();
@@ -92,6 +95,12 @@ export default function PhotoGallary() {
     const urlParam = searchParams?.get("s");
     if (initFromUrl && urlParam) {
       initFromUrl(urlParam);
+    }
+
+    // Set initial columns based on window width
+    if (typeof window !== 'undefined') {
+      const columnCount = window.innerWidth < MD_BREAKPOINT ? 2 : 5;
+      setColumns(columnCount);
     }
   }, [searchParams, initFromUrl]);
 
@@ -134,30 +143,48 @@ export default function PhotoGallary() {
     refetchOnMount: false,
   });
 
+  // Column calculation effect with debouncing for stability
   useEffect(() => {
     if (typeof window === "undefined") return;
-
+    
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    
     const handleResize = () => {
-      requestAnimationFrame(() => {
-        setColumns(window.innerWidth < MD_BREAKPOINT ? 2 : 5);
-      });
+      // Calculate columns based on current window width
+      const newColumnCount = window.innerWidth < MD_BREAKPOINT ? 2 : 5;
+      
+      // Clear any existing timer to debounce the resize
+      clearTimeout(resizeTimer);
+      
+      // Debounce column updates to prevent rapid changes
+      resizeTimer = setTimeout(() => {
+        setColumns(prevColumns => {
+          // Only update if changed to prevent unnecessary renders
+          return prevColumns !== newColumnCount ? newColumnCount : prevColumns;
+        });
+      }, 50); // 50ms debounce
     };
 
     try {
-      const resizeObserver = new ResizeObserver(handleResize);
+      // Use ResizeObserver for better performance
+      const resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(handleResize);
+      });
+      
       resizeObserver.observe(document.body);
-
-      handleResize();
+      handleResize(); // Initial calculation
 
       return () => {
+        clearTimeout(resizeTimer);
         resizeObserver.disconnect();
       };
     } catch (err) {
-      // Fallback if ResizeObserver is not supported
+      // Fallback for browsers without ResizeObserver
       window.addEventListener("resize", handleResize);
-      handleResize();
+      handleResize(); // Initial calculation
 
       return () => {
+        clearTimeout(resizeTimer);
         window.removeEventListener("resize", handleResize);
       };
     }
@@ -175,26 +202,8 @@ export default function PhotoGallary() {
     );
   }
 
-  // Show loading state during initial data fetch
-  if (isLoading || !columns) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
-        {Array(15)
-          .fill(null)
-          .map((_, index) => (
-            <Skeleton
-              key={index}
-              height={200}
-              baseColor="#1a1a1a"
-              highlightColor="#333"
-            />
-          ))}
-      </div>
-    );
-  }
-
   // Only show no data message when we have data object but it's empty
-  if (!data || data.pages.length === 0 || data.pages[0].data.length === 0) {
+  if (!isLoading && (!data || data.pages.length === 0 || data.pages[0].data.length === 0)) {
     return (
       <div className="flex flex-col items-center justify-center w-full min-h-[200px]">
         <p className="text-center text-lg text-primary-6">No posts found</p>
@@ -208,7 +217,22 @@ export default function PhotoGallary() {
   }
 
   // Format photos directly here using your existing function
-  const photos = formattedPhotosForGallery(data.pages);
+  const currentPhotos = data ? formattedPhotosForGallery(data.pages) : [];
+  
+  // Store current photos when they become available and are not empty
+  // But only when loading completes to prevent infinite loops
+  useEffect(() => {
+    // Only update when not loading and we have photos to prevent infinite loops
+    if (!isLoading && currentPhotos.length > 0) {
+      // Compare to avoid unnecessary state updates
+      if (JSON.stringify(prevPhotos) !== JSON.stringify(currentPhotos)) {
+        setPrevPhotos(currentPhotos);
+      }
+    }
+  }, [isLoading, currentPhotos, prevPhotos]);
+  
+  // Use previous photos during loading to maintain layout, or current photos when available
+  const photos = isLoading && prevPhotos.length > 0 ? prevPhotos : currentPhotos;
 
   return (
     <div className="w-full">
@@ -219,20 +243,38 @@ export default function PhotoGallary() {
           loadMore={() => hasNextPage && fetchNextPage()}
           hasNextPage={!!hasNextPage}
         >
-          <MasonryPhotoAlbum
-            photos={photos}
-            columns={columns || 2}
-            spacing={10}
-            render={{
-              extras: (_, context) => (
-                <PhotoWithAuthor
-                  context={context as ExtendedRenderPhotoContext}
-                  handleImageIndex={handleImageIndex}
-                />
-              ),
-              image: renderNextImage,
-            }}
-          />
+          {isLoading && prevPhotos.length === 0 ? (
+            // Only show skeletons when we don't have previous photos to display
+            <div className="masonry-container" style={{ width: '100%' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: '10px' }}>
+                {Array(15)
+                  .fill(null)
+                  .map((_, index) => (
+                    <Skeleton
+                      key={index}
+                      height={200}
+                      baseColor="#1a1a1a"
+                      highlightColor="#333"
+                    />
+                  ))}
+              </div>
+            </div>
+          ) : (
+            <MasonryPhotoAlbum
+              photos={photos}
+              columns={columns}
+              spacing={10}
+              render={{
+                extras: (_, context) => (
+                  <PhotoWithAuthor
+                    context={context as ExtendedRenderPhotoContext}
+                    handleImageIndex={handleImageIndex}
+                  />
+                ),
+                image: renderNextImage,
+              }}
+            />
+          )}
         </InfiniteScroll>
       )}
       {isBrowser && imageIndex > -1 && photos[imageIndex] && (

@@ -4,8 +4,8 @@ export default function Loading() {
   return (
     <div className="h-[100dvh] w-screen top-0 left-0 fixed z-50 flex items-center justify-center bg-black">
       <div className="flex flex-col items-center gap-4">
-        {/* Fallback in case image fails */}
-        <div className="relative">
+        {/* Loading indicator with pulse animation */}
+        <div className="relative animate-pulse">
           <Image
             src="/Icon-White.png"
             alt="unreal"
@@ -14,8 +14,9 @@ export default function Loading() {
             priority
           />
         </div>
-       
 
+        {/* Optional subtle text indicator */}
+        {/* <div className="h-2 w-24 bg-gray-800 rounded animate-pulse"></div> */}
       </div>
     </div>
   );
