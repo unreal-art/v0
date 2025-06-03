@@ -160,7 +160,7 @@ export default function UserData() {
               trackPerformance={true}
               imageName={`profile-${profileId}`}
               isProfile={true}
-              username={profileData?.username || ""}
+              username={profileData?.full_name || profileData?.username || ""}
               isAvatar={true}
               isProfilePage={true}
             />
