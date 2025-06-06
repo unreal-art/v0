@@ -18,7 +18,7 @@ interface GenerateTextFieldProps {
 }
 const dartContract = getContractInstance(
   torusTestnet,
-  appConfig.blockchain.contracts.dart
+  appConfig.blockchain.contracts.dart,
 );
 
 export default function GenerateTextField({
@@ -43,14 +43,14 @@ export default function GenerateTextField({
       return;
     }
 
-    if (
-      (user?.creditBalance ?? 0) +
-        Number(formatEther(dartBalance ?? BigInt(0))) <
-      1
-    ) {
-      toast.error("Credit balance too low.");
-      return;
-    }
+    // if (
+    //   (user?.creditBalance ?? 0) +
+    //     Number(formatEther(dartBalance ?? BigInt(0))) <
+    //   1
+    // ) {
+    //   toast.error("Credit balance too low.");
+    //   return;
+    // }
 
     setShowProgress(true);
 
@@ -65,7 +65,7 @@ export default function GenerateTextField({
           setShowProgress(false);
           toast.error(`Error generating image: ${error.message}`);
         },
-      }
+      },
     );
   };
 
@@ -112,23 +112,23 @@ export default function GenerateTextField({
 
               <Topup open={topup} setOpen={setTopup} refetch={refetchUser} />
 
-              {(user?.creditBalance ?? 0) < 1 && (
+              {/* {(user?.creditBalance ?? 0) < 1 && (
                 <button
                   onClick={() => setTopup(true)}
                   className="basis-1/6 text-primary-11 bg-primary-5 font-semibold whitespace-nowrap rounded-full px-6"
                 >
                   Top Up
                 </button>
-              )}
+              )} */}
 
-              {(user?.creditBalance ?? 0) >= 1 && (
-                <button
-                  onClick={generate}
-                  className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
-                >
-                  Generate
-                </button>
-              )}
+              {/* {(user?.creditBalance ?? 0) >= 1 && ( */}
+              <button
+                onClick={generate}
+                className="basis-1/6 text-primary-11 bg-primary-5 font-semibold rounded-full px-6"
+              >
+                Generate
+              </button>
+              {/* )} */}
             </div>
           </div>
         </div>

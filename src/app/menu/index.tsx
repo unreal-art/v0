@@ -124,7 +124,7 @@ export default function Menu({ children }: INotificationProps) {
               </div>
             </Link>
 
-            <MenuItem
+            {/* <MenuItem
               onClick={handleClose}
               icon={<FlashIcon width={16} height={16} color="#C1C1C1" />}
               text={(() => {
@@ -142,7 +142,7 @@ export default function Menu({ children }: INotificationProps) {
                   Top Up
                 </button>
               }
-            />
+            /> */}
 
             <Link
               href={"https://www.linkedin.com/company/decenter-ai/"}
