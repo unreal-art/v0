@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
   const secretSupabaseClient: SupabaseClient = createClient(
     supabaseUrl,
-    private_SRK
+    private_SRK,
   );
 
   try {
@@ -28,18 +28,18 @@ export async function POST(req: Request) {
     const user = await getUser();
 
     // if (!user || !user.creditBalance || !user.wallet?.privateKey) return;
-    if (!user || !user.creditBalance) return;
+    if (!user) return;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
     // Add Authorization only when `creditBalance <= 0`
-    if (user.creditBalance <= 0) {
-      // headers.Authorization = `Bearer ${user.wallet.privateKey}`;
-      // changed to throw error
-      throw new Error("Insufficient credit balance");
-    }
+    // if (user.creditBalance <= 0) {
+    //   // headers.Authorization = `Bearer ${user.wallet.privateKey}`;
+    //   // changed to throw error
+    //   throw new Error("Insufficient credit balance");
+    // }
 
     //send to queue.
     const { error } = await secretSupabaseClient.rpc("send_to_queue", {
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,9 +1,9 @@
-import { ExtendedUser, JobSpec } from "$/types/data.types"
-import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance"
-import axios from "axios"
-import random from "random"
-import { toast } from "sonner"
-import { logError } from "@/utils/sentryUtils"
+import { ExtendedUser, JobSpec } from "$/types/data.types";
+import { axiosInstance, axiosInstanceLocal } from "@/lib/axiosInstance";
+import axios from "axios";
+import random from "random";
+import { toast } from "sonner";
+import { logError } from "@/utils/sentryUtils";
 
 // Function to send job request (Fire-and-Forget)
 export const sendJobRequest = ({
@@ -11,20 +11,26 @@ export const sendJobRequest = ({
   user,
   stopGeneration,
 }: {
-  prompt: string
-  user: ExtendedUser | null
-  stopGeneration: () => void
+  prompt: string;
+  user: ExtendedUser | null;
+  stopGeneration: () => void;
 }) => {
   if (!user) {
-    logError("User is undefined, cannot send job request", new Error("No user"))
-    return
+    logError(
+      "User is undefined, cannot send job request",
+      new Error("No user"),
+    );
+    return;
   }
   if (!user.wallet?.privateKey) {
-    logError("Missing private key, cannot proceed", new Error("No private key"))
-    return
+    logError(
+      "Missing private key, cannot proceed",
+      new Error("No private key"),
+    );
+    return;
   }
 
-  const author = user.id
+  const author = user.id;
 
   const dto: Partial<JobSpec> = {
     module: "nearai",
@@ -37,25 +43,25 @@ export const sendJobRequest = ({
     },
     author,
     category: "GENERATION",
-  }
+  };
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-  }
+  };
 
-  if (user.creditBalance <= 0) {
-    headers.Authorization = `Bearer ${user.wallet.privateKey}`
-  }
+  // if (user.creditBalance <= 0) {
+  //   headers.Authorization = `Bearer ${user.wallet.privateKey}`
+  // }
 
   // 🚀 Fire-and-Forget: No need to `await`, just send the request
   axiosInstanceLocal.post("/api/darts", dto, { headers }).catch((error) => {
-    stopGeneration()
+    stopGeneration();
     toast.error(
-      "Error sending job request:" + error.response?.data || error.message
-    )
-    logError("Error sending job request", error)
-  })
-}
+      "Error sending job request:" + error.response?.data || error.message,
+    );
+    logError("Error sending job request", error);
+  });
+};
 
 // import { Client } from "$/supabase/client";
 // import { ExtendedUser, JobSpec } from "$/types/data.types";
