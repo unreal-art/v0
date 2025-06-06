@@ -1,32 +1,17 @@
-import { redirect } from "next/navigation";
-import { createClient as createServerClient } from "$/supabase/server";
 import ClientHome from "./components/clientHome";
 
 export const dynamic = "force-dynamic";
 
-// Server-side auth check
-async function getSession() {
-  try {
-    const supabase = await createServerClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    return session;
-  } catch (error) {
-    console.error("Error checking session:", error);
-    return null;
-  }
-}
-
-// Server component for initial auth check
-export default async function Home() {
-  const session = await getSession();
-
-  // Server-side redirect if authenticated
-  if (session) {
-    redirect("/home");
-  }
-
-  // If not authenticated, render client component for further checks
+/**
+ * Root page component
+ * 
+ * Note: Authentication redirects are now handled by the middleware:
+ * - Authenticated users visiting / are redirected to /home
+ * - Unauthenticated users visiting protected routes are redirected to /auth
+ * 
+ * This page simply renders ClientHome which handles any remaining client-side
+ * authentication logic for unauthenticated users.
+ */
+export default function Home() {
   return <ClientHome />;
 }

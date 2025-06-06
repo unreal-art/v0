@@ -79,6 +79,14 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+
+  // Redirect authenticated users from the root path to /home
+  if (user && !error && pathname === "/") {
+    // console.log("✅ Redirecting authenticated user from / to /home");
+    const redirectUrl = new URL("/home", request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // Add debug headers to the response
   supabaseResponse.headers.set("x-middleware-pathname", pathname);
   supabaseResponse.headers.set(
