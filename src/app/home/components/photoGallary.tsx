@@ -98,7 +98,7 @@ export default function PhotoGallary() {
     }
 
     // Set initial columns based on window width
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const columnCount = window.innerWidth < MD_BREAKPOINT ? 2 : 5;
       setColumns(columnCount);
     }
@@ -146,19 +146,19 @@ export default function PhotoGallary() {
   // Column calculation effect with debouncing for stability
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
+
     let resizeTimer: ReturnType<typeof setTimeout>;
-    
+
     const handleResize = () => {
       // Calculate columns based on current window width
       const newColumnCount = window.innerWidth < MD_BREAKPOINT ? 2 : 5;
-      
+
       // Clear any existing timer to debounce the resize
       clearTimeout(resizeTimer);
-      
+
       // Debounce column updates to prevent rapid changes
       resizeTimer = setTimeout(() => {
-        setColumns(prevColumns => {
+        setColumns((prevColumns) => {
           // Only update if changed to prevent unnecessary renders
           return prevColumns !== newColumnCount ? newColumnCount : prevColumns;
         });
@@ -170,7 +170,7 @@ export default function PhotoGallary() {
       const resizeObserver = new ResizeObserver(() => {
         requestAnimationFrame(handleResize);
       });
-      
+
       resizeObserver.observe(document.body);
       handleResize(); // Initial calculation
 
@@ -203,7 +203,10 @@ export default function PhotoGallary() {
   }
 
   // Only show no data message when we have data object but it's empty
-  if (!isLoading && (!data || data.pages.length === 0 || data.pages[0].data.length === 0)) {
+  if (
+    !isLoading &&
+    (!data || data.pages.length === 0 || data.pages[0].data.length === 0)
+  ) {
     return (
       <div className="flex flex-col items-center justify-center w-full min-h-[200px]">
         <p className="text-center text-lg text-primary-6">No posts found</p>
@@ -218,7 +221,7 @@ export default function PhotoGallary() {
 
   // Format photos directly here using your existing function
   const currentPhotos = data ? formattedPhotosForGallery(data.pages) : [];
-  
+
   // Store current photos when they become available and are not empty
   // But only when loading completes to prevent infinite loops
   useEffect(() => {
@@ -230,9 +233,10 @@ export default function PhotoGallary() {
       }
     }
   }, [isLoading, currentPhotos, prevPhotos]);
-  
+
   // Use previous photos during loading to maintain layout, or current photos when available
-  const photos = isLoading && prevPhotos.length > 0 ? prevPhotos : currentPhotos;
+  const photos =
+    isLoading && prevPhotos.length > 0 ? prevPhotos : currentPhotos;
 
   return (
     <div className="w-full">
@@ -245,8 +249,14 @@ export default function PhotoGallary() {
         >
           {isLoading && prevPhotos.length === 0 ? (
             // Only show skeletons when we don't have previous photos to display
-            <div className="masonry-container" style={{ width: '100%' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: '10px' }}>
+            <div className="masonry-container" style={{ width: "100%" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: `repeat(${columns}, 1fr)`,
+                  gap: "10px",
+                }}
+              >
                 {Array(15)
                   .fill(null)
                   .map((_, index) => (
@@ -303,7 +313,7 @@ function PhotoWithAuthor({
       setImageIndex={() => handleImageIndex(context)}
       context={context}
     >
-      <div className="absolute flex items-center gap-1 bottom-2 left-2 ">
+      <div className="hidden md:flex absolute items-center gap-1 bottom-2 left-2 ">
         {!isUserLoading && !imageLoading && userName && (
           <Link
             href={authorId ? `/home/profile/${authorId}` : "#"}

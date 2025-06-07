@@ -127,8 +127,12 @@ export default function PhotoOverlay({
                   <HeartIcon color="#FFFFFF" />
                 )}
                 <div className="min-w-[24px] text-center">
-                  <p className={`transition-opacity duration-300 ${likes ? 'opacity-100' : 'opacity-0'}`}>
-                    {likes ? formatNumber(likes.length) : '0'}
+                  <p
+                    className={`transition-opacity duration-300 ${
+                      likes ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {likes ? formatNumber(likes.length) : "0"}
                   </p>
                 </div>
               </button>
@@ -139,8 +143,12 @@ export default function PhotoOverlay({
               >
                 <ChatIcon color="#FFFFFF" />
                 <div className="min-w-[24px] text-center">
-                  <p className={`transition-opacity duration-300 ${comments ? 'opacity-100' : 'opacity-0'}`}>
-                    {comments ? formatNumber(comments.length) : '0'}
+                  <p
+                    className={`transition-opacity duration-300 ${
+                      comments ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {comments ? formatNumber(comments.length) : "0"}
                   </p>
                 </div>
               </button>
@@ -177,7 +185,7 @@ export default function PhotoOverlay({
 
           <div
             className={`flex flex-col ${
-              section == "photoGridTwo" ? "mb-12" : ""
+              section == "photoGridTwo" ? "mb-12" : " -mb-3"
             }`}
           >
             <div className="relative flex flex-col items-center">

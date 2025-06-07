@@ -23,7 +23,7 @@ import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 // Add renderNextImage function for lazy/eager loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Use priority loading for the first 8 images (eagerly loaded)
   // This provides fast initial rendering for visible content
@@ -208,7 +208,7 @@ function PhotoWithAuthor({
       setImageIndex={() => handleImageIndex(context)}
       context={context}
     >
-      <div className="absolute flex items-center gap-1 bottom-2 left-2">
+      <div className="hidden md:flex absolute  items-center gap-1 bottom-2 left-2">
         {!isUserLoading && !imageLoading && userName && (
           <>
             <div className="rounded-full">

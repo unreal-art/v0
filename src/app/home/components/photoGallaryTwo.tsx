@@ -39,7 +39,7 @@ const ImageView = dynamic(() => import("./imageView"), {
 // Define renderNextImage as a regular function since it's used as a render prop
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext,
+  { photo, width, height, index = 0 }: RenderImageContext
 ) {
   // Validate photo object
   if (!photo || typeof photo !== "object") {
@@ -136,14 +136,14 @@ function PhotoGallaryTwo() {
             supabase,
             pageParam,
             postId ?? 0,
-            post.author,
+            post.author
           );
         } else {
           result = await getOtherPostsByUser(
             supabase,
             pageParam,
             postId ?? 0,
-            post.author,
+            post.author
           );
         }
 
@@ -158,7 +158,7 @@ function PhotoGallaryTwo() {
         return { data: [], nextCursor: undefined };
       }
     },
-    [a, postId, post?.author],
+    [a, postId, post?.author]
   );
 
   // Use a stable query key that won't change structure between renders
@@ -169,7 +169,7 @@ function PhotoGallaryTwo() {
       a ? "drafts" : "public",
       postId,
     ],
-    [post?.author, a, postId],
+    [post?.author, a, postId]
   );
 
   const {
@@ -346,7 +346,7 @@ const PhotoWithAuthor = memo(function PhotoWithAuthor({
       setImageIndex={() => handleImageIndex(context)}
       context={context}
     >
-      <div className="absolute flex items-center gap-1 bottom-2 left-2">
+      <div className="hidden md:flex absolute  items-center gap-1 bottom-2 left-2">
         {!isUserNameLoading && !isImageLoading && userName ? (
           <>
             <div className="rounded-full">
