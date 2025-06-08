@@ -134,21 +134,9 @@ export default function RootLayout({
         </Suspense> */}
 
         {/* Main content with streaming SSR */}
-        <Suspense
-          fallback={
-            <div className="min-h-screen bg-primary-1 flex items-center justify-center">
-              <div className="w-16 h-16 border-t-4 border-primary-5 border-solid rounded-full animate-spin"></div>
-            </div>
-          }
-        >
+        <Suspense fallback={<div className="min-h-screen bg-black"></div>}>
           <PageTransitionProvider>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-primary-1 flex items-center justify-center">
-                  <div className="w-16 h-16 border-t-4 border-primary-5 border-solid rounded-full animate-spin"></div>
-                </div>
-              }
-            >
+            <Suspense fallback={<div className="min-h-screen bg-black"></div>}>
               {children}
             </Suspense>
           </PageTransitionProvider>
