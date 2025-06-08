@@ -5,19 +5,20 @@ import { useRef } from "react";
 import Image from "next/image";
 
 // Import landing images directly
-import landing1 from "@/assets/images/landing-1.png";
-import landing2 from "@/assets/images/landing-2.png";
-import landing3 from "@/assets/images/landing-3.png";
-import landing4 from "@/assets/images/landing-4.png";
+import landing1 from "@/assets/images/landing-1.webp";
+import landing2 from "@/assets/images/landing-2.webp";
+import landing3 from "@/assets/images/landing-3.webp";
+import landing4 from "@/assets/images/landing-4.webp";
 
 gsap.registerPlugin(useGSAP);
 
 export default function LandingCarouselTwo() {
+  // Predefine image dimensions for better CLS optimization
   const images = [
-    landing1,
-    landing2,
-    landing3,
-    landing4,
+    { src: landing1, width: 1200, height: 800 },
+    { src: landing2, width: 1200, height: 800 },
+    { src: landing3, width: 1200, height: 800 },
+    { src: landing4, width: 1200, height: 800 },
   ];
 
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -52,7 +53,7 @@ export default function LandingCarouselTwo() {
           width={200}
           height={12}
           priority
-          quality={90}
+          quality={80}
           className="w-auto h-auto"
         />
       </div>
@@ -70,24 +71,28 @@ export default function LandingCarouselTwo() {
           style={{ display: "flex", width: "max-content" }} // Ensures smooth scrolling
         >
           {/* Duplicate images to make the scrolling seamless */}
-          {[...images, ...images].map((src, index) => (
-            <div
-              key={index}
-              className="w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] relative shrink-0"
-            >
-              <Image
-                src={src}
-                alt={`Carousel image ${index + 1}`}
-                fill
-                sizes="(max-width: 640px) 250px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 450px"
-                quality={85}
-                loading={index < 4 ? "eager" : "lazy"}
-                className="rounded-md object-cover"
-                placeholder="blur"
-                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSAyVC08MTY3LjIyOUVFRTlBNj9BNj9BNj9BNj9BNj9BNj9BNj9BNj9BNj//2wBDARUXFx4aHjshITtBNkE2QTZBNkE2QTZBNkE2QTZBNkE2QTZBNkE2QTZBNkE2QTZBNkE2QTZBNkE2QTZBNkE2QTZBNkE//wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-              />
-            </div>
-          ))}
+          {[...images, ...images].map((img, index) => {
+            // Only load the first 4 images eagerly, the rest lazily
+            const isInitialImage = index < 4;
+            return (
+              <div
+                key={index}
+                className="w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] relative shrink-0"
+              >
+                <Image
+                  src={img.src}
+                  alt={`Carousel image ${(index % 4) + 1}`}
+                  fill
+                  sizes="(max-width: 640px) 250px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 450px"
+                  quality={75}
+                  loading={isInitialImage ? "eager" : "lazy"}
+                  className="rounded-md object-cover"
+                  placeholder="blur"
+                  priority={isInitialImage}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
