@@ -14,6 +14,7 @@ import Reply from "./Reply";
 import { useState } from "react";
 import { formatNumber } from "@/utils";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import profileImage from "@/assets/images/profile.jpg";
 
 import { useEffect, useRef } from "react";
 
@@ -68,7 +69,7 @@ export default function Comment({
       <div className="flex w-full  gap-2">
         <div className="h-12 w-12">
           <OptimizedImage
-            src={data.avatar_url || "/profile.jpg"}
+            src={data.avatar_url || profileImage}
             isProfile={true}
             width={48}
             height={48}

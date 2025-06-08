@@ -4,14 +4,20 @@ import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
 import Image from "next/image";
 
+// Import landing images directly
+import landing1 from "@/assets/images/landing-1.png";
+import landing2 from "@/assets/images/landing-2.png";
+import landing3 from "@/assets/images/landing-3.png";
+import landing4 from "@/assets/images/landing-4.png";
+
 gsap.registerPlugin(useGSAP);
 
 export default function LandingCarouselTwo() {
   const images = [
-    "/images/landing-1.png",
-    "/images/landing-2.png",
-    "/images/landing-3.png",
-    "/images/landing-4.png",
+    landing1,
+    landing2,
+    landing3,
+    landing4,
   ];
 
   const carouselRef = useRef<HTMLDivElement>(null);

@@ -2,6 +2,7 @@ import { Page, Post } from "$/types/data.types";
 import { isHighQualityImage } from "@/utils";
 import type { Photo } from "react-photo-album";
 import appConfig from "@/config";
+import fallbackImage from "@/assets/images/fallback.png";
 
 export interface ExtendedPhoto extends Photo {
   prompt?: string;
@@ -26,11 +27,11 @@ export const getImage = (
   cidOrUrl: string | undefined,
   fileName: string,
   author: string,
-) => {
+): string => {
   try {
     if (!cidOrUrl) {
       //console.warn("getImage called with an undefined or empty cidOrUrl");
-      return "/fallback.png"; // Handle missing value gracefully
+      return typeof fallbackImage === 'string' ? fallbackImage : fallbackImage.src; // Handle missing value gracefully
     }
 
     const isDev = appConfig.environment.isDevelopment;
@@ -62,7 +63,7 @@ export const getImage = (
       : `${appConfig.services.cloudflare.url}/${author}/${fileName}`; //cidOrUrl; // fetch from Cloudflare TODO: get direct from Cloudflare
   } catch (error) {
     console.error("Error fetching image:", error);
-    return "/fallback.png"; // Fallback if there's an error
+    return typeof fallbackImage === 'string' ? fallbackImage : fallbackImage.src; // Fallback if there's an error
   }
 };
 export const formattedPhotosForGallery = (pages: Page[]): ExtendedPhoto[] => {
