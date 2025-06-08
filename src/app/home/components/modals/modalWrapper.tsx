@@ -1,3 +1,4 @@
+"use client";
 import { ReactNode } from "react";
 import { CloseIcon } from "../../../components/icons";
 

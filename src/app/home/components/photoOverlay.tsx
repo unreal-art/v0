@@ -173,7 +173,7 @@ export default function PhotoOverlay({
           {!hideContent && hover && !menuActive ? (
             <Link href={`/home/photo/${context.photo.id}`}>
               {/*Link is added to enable prefetch */}
-              <p className="text-left text-primary-1 text-sm z-10">
+              <p className="hidden md:block text-left text-primary-1 text-sm z-10">
                 {truncateText(context.photo.caption || context.photo.prompt)}
               </p>
             </Link>

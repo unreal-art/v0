@@ -120,71 +120,82 @@ export default function ShareModal({
 
         <div className="flex justify-evenly items-center  bg-primary-10 h-[104px] rounded-[20] mt-6">
           <div className="border-r-[1px]">
-            <ShareItem
-              image="copy.png"
-              text="Copy link"
-              onClick={copyToClipboard}
-            />
+            <button onClick={copyToClipboard}>
+              <ShareItem
+                image="copy.png"
+                text="Copy link"
+              />
+            </button>
           </div>
 
-          <ShareItem
-            image="discord.png"
-            text="Discord"
-            onClick={shareOnDiscord}
-          />
+          <button onClick={shareOnDiscord}>
+            <ShareItem
+              image="discord.png"
+              text="Discord"
+            />
+          </button>
 
-          <TwitterShareButton url={link} title="ok">
+          <TwitterShareButton 
+            url={link} 
+            title="ok"
+            onClick={() => {
+              if (!isProfile && post?.id) {
+                addNotification({
+                  userId: post?.author as string,
+                  senderId: userId as string,
+                  postId: post?.id as number,
+                  type: "share",
+                });
+                // Immediately increment the share count
+                incrementShareCount();
+              }
+            }}
+          >
             <ShareItem
               image="x.png"
               text="Xapp"
-              onClick={() => {
-                if (!isProfile && post?.id) {
-                  addNotification({
-                    userId: post?.author as string,
-                    senderId: userId as string,
-                    postId: post?.id as number,
-                    type: "share",
-                  });
-                  // Immediately increment the share count
-                  incrementShareCount();
-                }
-              }}
             />
           </TwitterShareButton>
-          <FacebookShareButton url={link} title="ok">
+          <FacebookShareButton 
+            url={link} 
+            title="ok"
+            onClick={() => {
+              if (!isProfile && post?.id) {
+                addNotification({
+                  userId: post?.author as string,
+                  senderId: userId as string,
+                  postId: post?.id as number,
+                  type: "share",
+                });
+                // Immediately increment the share count
+                incrementShareCount();
+              }
+            }}
+          >
             <ShareItem
               image="facebook.png"
               text="Facebook"
-              onClick={() => {
-                if (!isProfile && post?.id) {
-                  addNotification({
-                    userId: post?.author as string,
-                    senderId: userId as string,
-                    postId: post?.id as number,
-                    type: "share",
-                  });
-                  // Immediately increment the share count
-                  incrementShareCount();
-                }
-              }}
             />
           </FacebookShareButton>
-          <LinkedinShareButton url={link} title="ok">
+          <LinkedinShareButton 
+            url={link} 
+            title="ok"
+            onClick={() => {
+              if (!isProfile && post?.id) {
+                addNotification({
+                  userId: post?.author as string,
+                  senderId: userId as string,
+                  postId: post?.id as number,
+                  type: "share",
+                });
+                // Immediately increment the share count
+                incrementShareCount();
+              }
+            }}
+          >
             <ShareItem
               image="linkedin.png"
               text="LinkedIn"
-              onClick={() => {
-                if (!isProfile && post?.id) {
-                  addNotification({
-                    userId: post?.author as string,
-                    senderId: userId as string,
-                    postId: post?.id as number,
-                    type: "share",
-                  });
-                  // Immediately increment the share count
-                  incrementShareCount();
-                }
-              }}
             />
           </LinkedinShareButton>
         </div>
@@ -195,16 +206,13 @@ export default function ShareModal({
 
 function ShareItem({
   image,
-  text,
-  onClick,
+  text
 }: {
   image: string;
   text: string;
-  onClick?: () => void;
 }) {
   return (
     <span
-      onClick={onClick}
       className={`flex items-center cursor-pointer justify-between flex-col px-2  h-14 ${
         image === "x.png" ? "pt-2" : ""
       } `}

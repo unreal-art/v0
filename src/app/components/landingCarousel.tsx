@@ -1,7 +1,7 @@
 "use client";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { useRef, Suspense } from "react";
 import Image from "next/image";
 import AuthBtn from "./authBtn";
 import { AppleIcon, GoogleIcon } from "./icons";
@@ -137,13 +137,17 @@ export default function LandingCarousel() {
 
           <div className={`absolute flex justify-center w-full bottom-20 scale-50 z-10`}>
             <div style={{zIndex: 1000}} className="absolute flex z-50 flex-col justify-center items-center border-primary-10 border-x-[1px] border-b-[1px] w-[350px] rounded-xl gap-4 py-12">
-              <AuthBtn icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />} provider="google">
-                Continue with Google
-              </AuthBtn>
+              <Suspense fallback={<div className="px-6 py-3 bg-primary-13 text-primary-11 rounded-md flex justify-center items-center h-10 w-[276px] border-[1px] border-primary-9">Loading...</div>}>
+                <AuthBtn icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />} provider="google">
+                  Continue with Google
+                </AuthBtn>
+              </Suspense>
 
-              <AuthBtn icon={<AppleIcon color="#C1C1C1" width={21} height={20} />} provider="apple">
-                Continue with Apple
-              </AuthBtn>
+              <Suspense fallback={<div className="px-6 py-3 bg-primary-13 text-primary-11 rounded-md flex justify-center items-center h-10 w-[276px] border-[1px] border-primary-9">Loading...</div>}>
+                <AuthBtn icon={<AppleIcon color="#C1C1C1" width={21} height={20} />} provider="apple">
+                  Continue with Apple
+                </AuthBtn>
+              </Suspense>
             </div> 
           </div>
         </div>

@@ -67,9 +67,15 @@ export default function HomePage() {
         </div>
         <div className="flex gap-x-2 items-center w-full h-10 mt-3 md:mt-0 mb-2 relative">
           <Search />
-          <TabBtn text="Explore" />
-          <TabBtn text="Following" />
-          <TabBtn text="Top" />
+          <Suspense fallback={<div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">Explore</div>}>
+            <TabBtn text="Explore" />
+          </Suspense>
+          <Suspense fallback={<div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">Following</div>}>
+            <TabBtn text="Following" />
+          </Suspense>
+          <Suspense fallback={<div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">Top</div>}>
+            <TabBtn text="Top" />
+          </Suspense>
         </div>
         <div className="overflow-y-auto w-full">
           {isClient && (

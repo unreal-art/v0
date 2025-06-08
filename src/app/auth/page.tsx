@@ -2,6 +2,7 @@ import SocialLink from "../components/social-link";
 import LandingCarouselTwo from "../components/landingCarouselTwo";
 import { GoogleIcon } from "../components/icons";
 import AuthBtn from "../components/authBtn";
+import { Suspense } from "react";
 
 export default async function Auth() {
   return (
@@ -14,12 +15,14 @@ export default async function Auth() {
         style={{ zIndex: 1000 }}
         className="h-[20%]  inset-x-0 mx-auto flex flex-col justify-center items-center w-[350px] max-w-[90%] sm:max-w-[80%] rounded-b-xl gap-4 shadow-lg"
       >
-        <AuthBtn
-          icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />}
-          provider="google"
-        >
-          Continue with Google
-        </AuthBtn>
+        <Suspense fallback={<div className="px-6 py-3 bg-primary-13 text-primary-11 rounded-md flex justify-center items-center h-10 w-[276px] border-[1px] border-primary-9">Loading...</div>}>
+          <AuthBtn
+            icon={<GoogleIcon color="#C1C1C1" width={21} height={20} />}
+            provider="google"
+          >
+            Continue with Google
+          </AuthBtn>
+        </Suspense>
       </div>
 
       <div className="flex-1 flex flex-col items-center  justify-center w-full borderColor-primary-10/50 ">

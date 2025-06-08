@@ -91,17 +91,17 @@ export default function RootLayout({
     <html lang="en" className={`${archivo.variable} ${nasalization.variable}`}>
       <head>
         {/* Storage URLs: Primary R2 storage for production assets */}
-        <link rel="preconnect" href={appConfig.services.cloudflare.r2StorageUrl} />
+        <link
+          rel="preconnect"
+          href={appConfig.services.cloudflare.r2StorageUrl}
+        />
 
         {/* Cloudflare URL: Used for both development and public resources */}
         <link rel="preconnect" href={appConfig.services.cloudflare.url} />
 
         {/* Gateway URLs: For external content */}
         <link rel="dns-prefetch" href="https://mesh3.network" />
-        <link
-          rel="dns-prefetch"
-          href={appConfig.services.lighthouse.gateway}
-        />
+        <link rel="dns-prefetch" href={appConfig.services.lighthouse.gateway} />
 
         {/* Preload critical assets for offline caching */}
         <link rel="preload" href="/offline.html" as="document" />
@@ -125,24 +125,34 @@ export default function RootLayout({
         className={`bg-primary-13 text-primary-11 ${archivo.className} ${nasalization.className}`}
       >
         {/* Progress indicator with immediate feedback */}
-        <Suspense
+        {/* <Suspense
           fallback={
             <div className="h-1 bg-white/30 absolute top-0 left-0 w-full animate-pulse"></div>
           }
         >
           <ProgressBar />
-        </Suspense>
-        
+        </Suspense> */}
+
         {/* Main content with streaming SSR */}
-        <PageTransitionProvider>
-          <Suspense fallback={
+        <Suspense
+          fallback={
             <div className="min-h-screen bg-primary-1 flex items-center justify-center">
               <div className="w-16 h-16 border-t-4 border-primary-5 border-solid rounded-full animate-spin"></div>
             </div>
-          }>
-            {children}
-          </Suspense>
-        </PageTransitionProvider>
+          }
+        >
+          <PageTransitionProvider>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-primary-1 flex items-center justify-center">
+                  <div className="w-16 h-16 border-t-4 border-primary-5 border-solid rounded-full animate-spin"></div>
+                </div>
+              }
+            >
+              {children}
+            </Suspense>
+          </PageTransitionProvider>
+        </Suspense>
         <ServiceWorker />
       </body>
     </html>
