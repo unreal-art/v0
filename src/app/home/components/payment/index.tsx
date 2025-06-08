@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { BackIcon, CloseIcon, FlashIcon } from "../../../components/icons";
 import OdpPay from "./odpPay";

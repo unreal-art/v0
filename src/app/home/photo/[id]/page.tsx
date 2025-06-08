@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import GenerateInput from "../../components/generateInput";
 import dynamic from "next/dynamic";
@@ -43,7 +43,8 @@ const PhotoGallaryTwo = dynamic(
   }
 );
 
-export default function Generation() {
+// Component that uses useSearchParams wrapped in Suspense
+function GenerationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const a = searchParams.get("a");
@@ -222,7 +223,7 @@ export default function Generation() {
   );
 
   return (
-    <>
+    <div className="w-full">
       <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
         <GenerateInput />
       </div>
@@ -238,7 +239,8 @@ export default function Generation() {
       </div>
 
       <div className="overflow-y-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-12 w-full ">
+        <div className="grid grid-cols-1 md:grid-cols-12 w-full">
+          {/* Main Content Column */}
           <div className="flex flex-col justify-between items-center col-span-9">
             <div className="flex justify-between h-24 p-6 gap-5 w-full">
               <Link
@@ -260,7 +262,7 @@ export default function Generation() {
                       isAvatar={true}
                     />
                   ) : (
-                    <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
+                    <div className="w-6 h-6 bg-gray-300 rounded-full" />
                   )}
                 </div>
                 <div>
@@ -292,6 +294,7 @@ export default function Generation() {
                       (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
                     }`}
                     priority={true}
+                    loading="eager"
                     trackPerformance={true}
                     imageName={`view-${
                       (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
@@ -326,11 +329,12 @@ export default function Generation() {
             </div>
           </div>
 
+          {/* Sidebar Column */}
           <div className="col-span-3 border-[1px] border-primary-11 bg-primary-12 rounded-r-[20px] p-6 overflow-y-auto">
             <div className="h-36">
               <p className="text-primary-5 text-lg">Output quantity</p>
 
-              <div className=" py-2 relative flex gap-2 overflow-x-auto ">
+              <div className="py-2 relative flex gap-2 overflow-x-auto">
                 {(post?.ipfsImages as UploadResponse[])?.map((image, index) => (
                   <Image
                     key={index}
@@ -342,7 +346,7 @@ export default function Generation() {
                     width={98}
                     height={128}
                     alt="generated"
-                    className={` hover:opacity-100 transition-opacity duration-200 cursor-pointer ${
+                    className={`hover:opacity-100 transition-opacity duration-200 cursor-pointer ${
                       selectedImageIndex == index ? "opacity-100" : "opacity-20"
                     }`}
                     onClick={() => setSelectedImageIndex(index)}
@@ -352,7 +356,8 @@ export default function Generation() {
             </div>
 
             <hr className="border-[1px] border-primary-10 my-2" />
-            {/* only creator sees the prompt */}
+
+            {/* Only creator sees the prompt */}
             {post?.author == userId && (
               <Prompt title="Prompt" fullText={post?.prompt || ""}>
                 {truncateText(post?.prompt || "", 100)}
@@ -367,9 +372,7 @@ export default function Generation() {
 
             <div className="grid grid-cols-2 gap-6">
               <Feature title="Model" content="Dart 2.0" />
-
               <Feature title="Style" content="Default" />
-
               <ImageResolutionFeature
                 imageUrl={getImage(
                   (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
@@ -377,11 +380,8 @@ export default function Generation() {
                   post?.author as string
                 )}
               />
-
               <Feature title="Rendering" content="Default" />
-
               <Feature title="Seed" content={post?.seed?.toString() || ""} />
-
               <Feature
                 title="Date"
                 content={formatDate(post?.createdAt as string)}
@@ -390,8 +390,9 @@ export default function Generation() {
           </div>
         </div>
 
-        <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10 ">
-          {a ? "Drafts" : "Other posts"} by{"  "}
+        {/* Related Posts Section */}
+        <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10">
+          {a ? "Drafts" : "Other posts"} by{" "}
           <Link href={post?.author ? `/home/profile/${post?.author}` : "#"}>
             <strong className="text-primary-5 pl-1">
               {authorUsername && formatDisplayName(authorUsername)}
@@ -419,7 +420,16 @@ export default function Generation() {
           </ErrorBoundary>
         </div>
       </div>
-    </>
+    </div>
+  );
+}
+
+// Export the component wrapped in Suspense
+export default function Generation() {
+  return (
+    <Suspense fallback={<ViewSkeleton />}>
+      <GenerationContent />
+    </Suspense>
   );
 }
 

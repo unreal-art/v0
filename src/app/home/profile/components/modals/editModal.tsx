@@ -1,3 +1,4 @@
+"use client";
 import { DeleteIcon, UserProfileIcon } from "@/app/components/icons";
 
 interface EditModalProps {

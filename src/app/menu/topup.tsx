@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { CloseIcon, FlashIcon } from "../components/icons";
 import Payment from "../home/components/payment";
@@ -113,7 +114,7 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
                       const newToken = e.target.value as Token;
                       setSelectedToken(newToken);
                       setCost(
-                        Math.round(Number(credit) * tokenRates[newToken]),
+                        Math.round(Number(credit) * tokenRates[newToken])
                       );
                     }}
                     className="absolute text-primary-3 bg-inherit cursor-pointer left-0 top-0 w-full h-14 px-2  rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0"
@@ -138,8 +139,8 @@ export default function Topup({ open, setOpen, refetch }: TopupProps) {
                       handleCreditChange(e);
                       setCost(
                         Math.round(
-                          Number(e.target.value) * tokenRates[selectedToken],
-                        ),
+                          Number(e.target.value) * tokenRates[selectedToken]
+                        )
                       );
                     }}
                     className="absolute text-primary-3 placeholder:text-primary-6 bg-inherit left-0 top-0 w-full h-14 px-2 rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0 hide-arrow"

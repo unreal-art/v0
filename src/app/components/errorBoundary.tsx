@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
-import { ErrorBoundary as HighlightErrorBoundary } from "@highlight-run/next/client";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   children: ReactNode;
@@ -89,16 +89,45 @@ export function ErrorBoundary({
     );
   }
   
-  // In production, wrap with Highlight's error boundary for reporting
+  // In production, wrap with Sentry's error boundary for reporting
+  const defaultFallback = (
+    <div className="p-4 rounded-md bg-red-900/20 border border-red-800">
+      <h2 className="text-lg font-medium text-red-200 mb-2">Something went wrong</h2>
+      <p className="text-sm text-red-300 mb-3">
+        {componentName 
+          ? `The ${componentName} component couldn't be loaded.` 
+          : 'This component couldn\'t be loaded.'}
+      </p>
+    </div>
+  );
+  
   return (
-    <HighlightErrorBoundary showDialog={false}>
-      <EnhancedErrorBoundary 
-        fallback={fallback}
-        componentName={componentName}
-        onError={onError}
-      >
-        {children}
-      </EnhancedErrorBoundary>
-    </HighlightErrorBoundary>
+    <Sentry.ErrorBoundary 
+      fallback={({ resetError }) => (
+        <div>
+          {fallback || defaultFallback}
+          <button 
+            onClick={resetError} 
+            className="mt-3 px-3 py-1 text-sm bg-red-800 hover:bg-red-700 text-white rounded-md transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+      onError={(error, info) => {
+        // Cast the unknown error to Error type for Sentry
+        const errorObj = error instanceof Error ? error : new Error(String(error));
+        
+        // Create a proper ErrorInfo object
+        const errorInfo: ErrorInfo = {
+          componentStack: typeof info === 'string' ? info : String(info)
+        };
+        
+        Sentry.captureException(errorObj, { extra: { componentName, errorInfo } });
+        if (onError) onError(errorObj, errorInfo);
+      }}
+    >
+      {children}
+    </Sentry.ErrorBoundary>
   );
 }
