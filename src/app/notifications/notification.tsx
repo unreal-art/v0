@@ -11,6 +11,7 @@ import { useMarkNotificationAsRead } from "@/hooks/useMarkNotificationAsRead";
 import { useEffect } from "react";
 import NotificationSkeleton from "./components/notificationSkeleton";
 import Link from "next/link";
+import profileImage from "@/assets/images/profile.jpg";
 
 interface NotificationProps {
   notification: NotificationType;
@@ -58,7 +59,7 @@ const Notification: React.FC<NotificationProps> = ({
           <div className="flex gap-2 mt-1 w-ful">
             <div className="basis-10 ">
               <Image
-                src={image || "/profile.jpg"}
+                src={image || profileImage}
                 width={36}
                 height={36}
                 alt="profile"
@@ -91,7 +92,7 @@ const Notification: React.FC<NotificationProps> = ({
                     post.ipfsImages[0].fileNames[0] as string,
                     post.author,
                   )
-                : "/profile.jpg"
+                : profileImage
             }
             width={70}
             height={70}

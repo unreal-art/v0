@@ -4,6 +4,7 @@ import { CloseIcon, EmojiIcon } from "@/app/components/icons";
 import { usePostComment } from "@/hooks/useComments";
 import { useUser } from "@/hooks/useUser";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import profileImage from "@/assets/images/profile.jpg";
 import { useState } from "react";
 
 interface CommentTextboxProps {
@@ -53,7 +54,7 @@ export default function CommentTextbox({
           <div className="flex gap-2 items-center">
             <div>
               <OptimizedImage
-                src={replyTo.avatar_url || "/profile.jpg"}
+                src={replyTo.avatar_url || profileImage}
                 isProfile={true}
                 width={32}
                 height={32}

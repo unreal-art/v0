@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
 import useUserData, { UserData } from "@/hooks/useUserData";
 import { log } from "@/utils/sentryUtils";
+import profileImage from "@/assets/images/profile.jpg";
 
 // Update the types to be more specific
 interface EditProfileModalProps {
@@ -116,7 +117,7 @@ export default function EditProfileModal({
           <div>
             <Image
               className="rounded-full"
-              src={profileData?.avatar_url || "/profile.jpg"}
+              src={profileData?.avatar_url || profileImage}
               width={80}
               height={80}
               alt=""

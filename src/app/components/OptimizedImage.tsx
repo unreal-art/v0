@@ -2,6 +2,7 @@ import { getInitials, log } from "@/utils";
 import Image, { ImageProps } from "next/image";
 import { useState, useCallback, memo } from "react";
 import style from "styled-jsx/style";
+import fallbackImage from "@/assets/images/fallback.png";
 
 interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
   trackPerformance?: boolean;
@@ -92,7 +93,7 @@ function OptimizedImage({
     }
     return (
       <Image
-        src={"/fallback.png"}
+        src={fallbackImage}
         alt={alt}
         width={width}
         height={height}

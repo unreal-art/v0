@@ -26,6 +26,7 @@ import { formatEther } from "ethers";
 import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
 import { log, logError } from "@/utils/sentryUtils";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import profileImage from "@/assets/images/profile.jpg";
 import appConfig from "@/config";
 // import { getUser } from "$/queries/user/getUser";
 
@@ -153,7 +154,7 @@ export default function UserData() {
           <div className="w-28 h-28 md:w-52 md:h-52">
             <OptimizedImage
               className="rounded-full"
-              src={profileData?.avatar_url || "/profile.jpg"}
+              src={profileData?.avatar_url || profileImage}
               width={200}
               height={200}
               alt={`${profileData?.full_name}'s profile picture`}

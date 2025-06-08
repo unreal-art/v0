@@ -4,6 +4,7 @@ import { CommentWithUser } from "$/types/data.types";
 import { timeAgo } from "@/app/libs/timeAgo";
 import useAuthorUsername from "@/hooks/useAuthorUserName";
 import OptimizedImage from "@/app/components/OptimizedImage";
+import profileImage from "@/assets/images/profile.jpg";
 import {
   useLikeComment,
   useLikeReply,
@@ -38,7 +39,7 @@ export default function Reply({
         <div className="flex w-full  gap-2">
           <div className="h-12 w-12">
             <OptimizedImage
-              src={data.avatar_url || "/profile.jpg"}
+              src={data.avatar_url || profileImage}
               width={48}
               height={48}
               alt={`${user || "User"}'s profile picture`}
