@@ -5,6 +5,7 @@ import {
   useState,
   useEffect,
   useTransition,
+  Suspense,
 } from "react";
 import Tabs from "./Tabs";
 import PhotoGridTwo from "./PhotoGridTwo";
@@ -25,6 +26,7 @@ import { Post } from "$/types/data.types";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
+import { ErrorBoundary } from "@/app/components/errorBoundary";
 
 // Memoize tab configurations to prevent recreating on each render
 const TAB_CONFIGS = {
@@ -185,83 +187,79 @@ export default function CreationView() {
   // Combine isPending with queryIsLoading for a comprehensive loading state
   const isLoading = isPending || queryIsLoading;
 
-  // Get current tab config
-  const currentConfig = useMemo(() => {
-    const currentTab = s || creationTab || "Public";
-    const configKey = (currentTab.charAt(0).toUpperCase() +
-      currentTab.slice(1).toLowerCase()) as TabConfigKey;
-    return TAB_CONFIGS[configKey] || TAB_CONFIGS.Public;
-  }, [s, creationTab]);
+  // Render the current tab content with proper error handling and loading states
+  const renderTabContent = useCallback(() => {
+    const currentTabConfig = Object.values(TAB_CONFIGS)[currentIndex];
 
-  // Render content based on loading, error, and data states
-  const renderContent = useCallback(() => {
-    // Handle error cases
-    if (isError && !isPending) {
-      return (
-        <div className="w-full flex justify-center items-center min-h-[200px] text-red-500">
-          {error instanceof Error
-            ? error.message
-            : "An error occurred while loading posts"}
-        </div>
-      );
-    }
-
-    // During transitions or loading, show loading state in PhotoGridTwo
-    // Or when we have data, let PhotoGridTwo handle the display
     return (
-      <PhotoGridTwo
-        {...currentConfig}
-        data={data}
-        isLoading={isLoading}
-        hasNextPage={hasNextPage}
-        fetchNextPage={fetchNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-      />
+      <ErrorBoundary
+        fallback={
+          <div className="flex flex-col items-center justify-center w-full py-8">
+            <p className="text-center text-lg text-primary-6 mb-4">
+              Unable to load {currentTabConfig.title.toLowerCase()} content
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        }
+      >
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4">
+              {Array(8)
+                .fill(null)
+                .map((_, index) => (
+                  <div key={index} className="aspect-square relative">
+                    <Skeleton
+                      height="100%"
+                      width="100%"
+                      className="rounded-lg absolute inset-0"
+                      baseColor="#1a1a1a"
+                      highlightColor="#333"
+                    />
+                  </div>
+                ))}
+            </div>
+          }
+        >
+          <PhotoGridTwo
+            title={currentTabConfig.title}
+            content={currentTabConfig.content}
+            subContent={currentTabConfig.subContent}
+            data={data}
+            isLoading={isLoading || isPending}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }, [
+    currentIndex,
+    data,
     isLoading,
     isPending,
-    isError,
-    error,
-    data,
-    currentConfig,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
   ]);
 
-  // Handle error state
-  if (isError && !isPending)
-    return (
-      <div className="w-full">
-        <div className="w-full mb-4">
-          <Tabs
-            currentIndex={currentIndex}
-            setCurrentIndex={handleTabChange}
-            hideDraft={false}
-            section="creation"
-          />
-        </div>
-        <div className="w-full flex justify-center items-center min-h-[200px] text-red-500">
-          {error instanceof Error
-            ? error.message
-            : "An error occurred while loading posts"}
-        </div>
-      </div>
-    );
-
   return (
-    <div className="w-full">
-      <div className="w-full mb-4">
-        <Tabs
-          currentIndex={currentIndex}
-          setCurrentIndex={handleTabChange}
-          hideDraft={false}
-          section="creation"
-        />
+    <div className="w-full ">
+        <div className="w-full mb-4">
+      <Tabs
+        currentIndex={currentIndex}
+        setCurrentIndex={handleTabChange}
+        section="creation"
+        hideDraft={false}
+      />
       </div>
-
-      <div className="w-full">{renderContent()}</div>
+      {renderTabContent()}
     </div>
   );
 }

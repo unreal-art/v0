@@ -124,16 +124,25 @@ export default function RootLayout({
       <body
         className={`bg-primary-13 text-primary-11 ${archivo.className} ${nasalization.className}`}
       >
+        {/* Progress indicator with immediate feedback */}
         <Suspense
           fallback={
-            <div className="h-1 bg-white/30 absolute top-0 left-0 w-full"></div>
+            <div className="h-1 bg-white/30 absolute top-0 left-0 w-full animate-pulse"></div>
           }
         >
-          {/* <ProgressBar /> */}
+          <ProgressBar />
         </Suspense>
-        <Suspense fallback={<div className="min-h-screen bg-primary-1"></div>}>
-          <PageTransitionProvider>{children}</PageTransitionProvider>
-        </Suspense>
+        
+        {/* Main content with streaming SSR */}
+        <PageTransitionProvider>
+          <Suspense fallback={
+            <div className="min-h-screen bg-primary-1 flex items-center justify-center">
+              <div className="w-16 h-16 border-t-4 border-primary-5 border-solid rounded-full animate-spin"></div>
+            </div>
+          }>
+            {children}
+          </Suspense>
+        </PageTransitionProvider>
         <ServiceWorker />
       </body>
     </html>

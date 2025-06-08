@@ -5,6 +5,7 @@ import {
   useState,
   useEffect,
   useTransition,
+  Suspense,
 } from "react";
 import Tabs from "../../creations/components/Tabs";
 import PhotoGridTwo from "../../creations/components/PhotoGridTwo";
@@ -17,6 +18,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import Skeleton from "react-loading-skeleton";
 import { supabase } from "$/supabase/client";
 import { Post } from "$/types/data.types";
+import { ErrorBoundary } from "@/app/components/errorBoundary";
 import {
   getIsDraftPostsByUser,
   getPinnedPostsByUser,
@@ -167,31 +169,47 @@ export default function ProfileView() {
   );
 
   const renderContent = useCallback(() => {
-    // Handle error cases but don't show errors during transitions
-    if (isError && !isPending) {
-      return (
-        <div className="text-center text-red-500">
-          {"message" in error ? error.message : "An error occurred"}
-        </div>
-      );
-    }
-
     const configs = ["Public", "Private", "Liked", "Pinned", "Draft"];
     const config =
       contentConfig[configs[currentIndex] as keyof typeof contentConfig];
     if (!config) return null;
 
-    // During transitions or loading, show loading state in PhotoGridTwo
-    // Or when we have data, let PhotoGridTwo handle the display
     return (
-      <PhotoGridTwo
-        {...config}
-        data={data}
-        isLoading={isLoading}
-        hasNextPage={hasNextPage}
-        fetchNextPage={fetchNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-      />
+      <ErrorBoundary
+        componentName={`ProfileTab-${configs[currentIndex]}`}
+        fallback={
+          <div className="flex flex-col items-center justify-center w-full py-8">
+            <p className="text-center text-lg text-primary-6 mb-4">
+              Unable to load {configs[currentIndex]} content
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        }
+      >
+        <Suspense fallback={
+          <div className="w-full">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array(8).fill(null).map((_, i) => (
+                <Skeleton key={i} height={300} baseColor="#1a1a1a" highlightColor="#333" className="rounded-lg" />
+              ))}
+            </div>
+          </div>
+        }>
+          <PhotoGridTwo
+            {...config}
+            data={data}
+            isLoading={isLoading}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }, [
     isLoading,

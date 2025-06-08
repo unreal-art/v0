@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import GenerateInput from "../../components/generateInput";
 import dynamic from "next/dynamic";
@@ -21,11 +22,11 @@ import {
   getImageResolution,
   truncateText,
 } from "@/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
 import ViewSkeleton from "../components/viewSkeleton";
 import Link from "next/link";
-import Head from "next/head";
+// Head is not needed in App Router
 import { toast } from "sonner";
 import ImageOptionMenu from "../../components/imageOptionMenu";
 import { useQueryClient } from "@tanstack/react-query";
@@ -33,12 +34,13 @@ import { supabase } from "$/supabase/client";
 import { IPhoto } from "@/app/libs/interfaces";
 import OptimizedImage from "@/app/components/OptimizedImage";
 import { Following } from "../../components/followingBtn";
+import { ErrorBoundary } from "@/app/components/errorBoundary";
 
 const PhotoGallaryTwo = dynamic(
   () => import("../../components/photoGallaryTwo"),
   {
     ssr: false,
-  },
+  }
 );
 
 export default function Generation() {
@@ -73,7 +75,7 @@ export default function Generation() {
   const [isFetching, setIsFetching] = useState(true);
   const [dynamicTitle, setDynamicTitle] = useState("Default Title");
   const [dynamicDescription, setDynamicDescription] = useState(
-    "Default Description",
+    "Default Description"
   );
   const [commentPhoto, setCommentPhoto] = useState<IPhoto | boolean>(false);
   const [dynamicImage, setDynamicImage] = useState("/default-image.jpg");
@@ -94,7 +96,7 @@ export default function Generation() {
         image: getImage(
           (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
           (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-          post?.author as string,
+          post?.author as string
         ),
       };
 
@@ -212,208 +214,209 @@ export default function Generation() {
     return <ViewSkeleton />;
   }
 
-  const image = getImage(
+  // Get the selected image or default to the first one
+  const mainImage = getImage(
     (post?.ipfsImages as UploadResponse[])?.[selectedImageIndex]?.hash,
     (post?.ipfsImages as UploadResponse[])?.[selectedImageIndex]?.fileNames[0],
-    post?.author as string,
+    post?.author as string
   );
 
   return (
     <>
-      <Head>
-        <title>{dynamicTitle}</title>
-        <meta name="description" content={dynamicDescription} />
+      <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
+        <GenerateInput />
+      </div>
 
-        {/* Open Graph / Facebook / LinkedIn */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={dynamicTitle} />
-        <meta property="og:description" content={dynamicDescription} />
-        <meta property="og:image" content={dynamicImage} />
-        <meta property="og:url" content="https:unreal.art" />
+      <div className="flex gap-x-2 items-center w-full h-10 mt-8 md:mt-0 mb-2">
+        <button
+          className="flex gap-x-1 items-center text-sm"
+          onClick={() => router.back()}
+        >
+          <BackIcon width={16} height={16} color="#5D5D5D" />
+          <p>Back</p>
+        </button>
+      </div>
 
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={dynamicTitle} />
-        <meta name="twitter:description" content={dynamicDescription} />
-        <meta name="twitter:image" content={dynamicImage} />
-      </Head>
-      <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full ">
-        <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
-          <GenerateInput />
-        </div>
-
-        <div className="flex gap-x-2 items-center w-full h-10 mt-8 md:mt-0 mb-2">
-          <button
-            className="flex gap-x-1 items-center text-sm"
-            onClick={() => router.back()}
-          >
-            <BackIcon width={16} height={16} color="#5D5D5D" />
-            <p>Back</p>
-          </button>
-        </div>
-
-        <div className="overflow-y-auto w-full">
-          <div className="grid grid-cols-1 md:grid-cols-12 w-full ">
-            <div className="flex flex-col justify-between items-center col-span-9">
-              <div className="flex justify-between h-24 p-6 gap-5 w-full">
-                <Link
-                  href={post?.author ? `/home/profile/${post?.author}` : "#"}
-                  className="flex gap-1"
-                >
-                  <div>
-                    {/* <Image
-                      src={authorImage || "/profile.jpg"}
-                      alt="profile"
+      <div className="overflow-y-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-12 w-full ">
+          <div className="flex flex-col justify-between items-center col-span-9">
+            <div className="flex justify-between h-24 p-6 gap-5 w-full">
+              <Link
+                href={post?.author ? `/home/profile/${post?.author}` : "#"}
+                className="flex gap-1"
+              >
+                <div>
+                  {authorImage ? (
+                    <OptimizedImage
+                      className="rounded-full drop-shadow-lg"
+                      src={authorImage}
                       width={48}
                       height={48}
-                      className="rounded-full"
-                    /> */}
-
-                    {authorImage ? (
-                      <OptimizedImage
-                        className="rounded-full drop-shadow-lg"
-                        src={authorImage}
-                        width={48}
-                        height={48}
-                        alt={`${authorUsername}'s profile`}
-                        isProfile={true}
-                        trackPerformance={true}
-                        imageName={`profile-${post?.author}`}
-                        username={authorUsername || ""}
-                        isAvatar={true}
-                      />
-                    ) : (
-                      <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg leading-6 text-primary-2">
-                      {authorUsername && formatDisplayName(authorUsername)}
-                    </p>
-                    <p className="text-primary-7 nasalization">Creator</p>
-                  </div>
-                </Link>
-                {/* <ImageOptionMenu postId={String(postId)} image={post as any}>
-                  <OptionMenuIcon color="#C1C1C1" />
-                </ImageOptionMenu> */}
-
-                {post && post.author && <Following authorId={post?.author} />}
-              </div>
-
-              <div className="flex justify-center w-full relative">
-                <OptimizedImage
-                  className="w-[306px] h-[408px] sm:w-[350px] sm:h-[450px] md:w-[400px] md:h-[500px] lg:w-[450px] lg:h-[550px] xl:w-[500px] xl:h-[600px] object-contain"
-                  src={image}
-                  width={0} // Allow automatic width handling
-                  height={0} // Allow automatic height handling
-                  alt={`unreal-image-${(post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]}`}
-                  trackPerformance={true}
-                  imageName={`view-${(post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]}`}
-                />
-              </div>
-
-              <div className="flex flex-col w-full px-1 mt-8 md:mt-0 md:px-6 gap-y-4">
-                <CaptionInput
-                  caption={caption as string}
-                  setCaption={setCaption}
-                  readOnly={userId !== post?.author}
-                />
-                {post && (
-                  <Interactions
-                    postId={post?.id as number}
-                    postDetails={commentPhoto as IPhoto}
-                    selectedImageIndex={selectedImageIndex}
-                  />
-                )}
-                {post && userId == post?.author && (
-                  <PostingActions
-                    privatePost={privatePost as boolean}
-                    setPrivatePost={setPrivatePost}
-                    saveAsDraft={saveAsDraft}
-                    postImage={postImage}
-                    isDraft={post.isDraft as boolean}
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="col-span-3 border-[1px] border-primary-11 bg-primary-12 rounded-r-[20px] p-6 overflow-y-auto">
-              <div className="h-36">
-                <p className="text-primary-5 text-lg">Output quantity</p>
-
-                <div className=" py-2 relative flex gap-2 overflow-x-auto ">
-                  {(post?.ipfsImages as UploadResponse[])?.map(
-                    (image, index) => (
-                      <Image
-                        key={index}
-                        src={getImage(
-                          image.hash,
-                          image.fileNames[0],
-                          post?.author as string,
-                        )}
-                        width={98}
-                        height={128}
-                        alt="generated"
-                        className={` hover:opacity-100 transition-opacity duration-200 cursor-pointer ${selectedImageIndex == index ? "opacity-100" : "opacity-20"}`}
-                        onClick={() => setSelectedImageIndex(index)}
-                      />
-                    ),
+                      alt={`${authorUsername}'s profile`}
+                      isProfile={true}
+                      trackPerformance={true}
+                      imageName={`profile-${post?.author}`}
+                      username={authorUsername || ""}
+                      isAvatar={true}
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-gray-300 rounded-full" /> // Fallback avatar
                   )}
                 </div>
-              </div>
+                <div>
+                  <p className="font-semibold text-lg leading-6 text-primary-2">
+                    {authorUsername && formatDisplayName(authorUsername)}
+                  </p>
+                  <p className="text-primary-7 nasalization">Creator</p>
+                </div>
+              </Link>
 
-              <hr className="border-[1px] border-primary-10 my-2" />
-              {/* only creator sees the prompt */}
-              {post?.author == userId && (
-                <Prompt title="Prompt" fullText={post?.prompt || ""}>
-                  {truncateText(post?.prompt || "", 100)}
-                </Prompt>
-              )}
+              {post && post.author && <Following authorId={post?.author} />}
+            </div>
 
-              {post?.author == userId && (
-                <Prompt title="Magic Prompt" fullText={post?.prompt || ""}>
-                  {truncateText(post?.prompt || "", 100)}
-                </Prompt>
-              )}
+            <div className="flex justify-center w-full relative">
+              <ErrorBoundary
+                fallback={
+                  <div className="w-[306px] h-[408px] sm:w-[350px] sm:h-[450px] md:w-[400px] md:h-[500px] lg:w-[450px] lg:h-[550px] xl:w-[500px] xl:h-[600px] flex items-center justify-center bg-primary-13 rounded-lg">
+                    <p className="text-primary-3">Unable to load image</p>
+                  </div>
+                }
+              >
+                <div className="relative w-[306px] h-[408px] sm:w-[350px] sm:h-[450px] md:w-[400px] md:h-[500px] lg:w-[450px] lg:h-[550px] xl:w-[500px] xl:h-[600px]">
+                  <OptimizedImage
+                    className="object-contain w-full h-full"
+                    src={mainImage}
+                    width={0}
+                    height={0}
+                    alt={`unreal-image-${
+                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                    }`}
+                    priority={true}
+                    trackPerformance={true}
+                    imageName={`view-${
+                      (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
+                    }`}
+                  />
+                </div>
+              </ErrorBoundary>
+            </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <Feature title="Model" content="Dart 2.0" />
-
-                <Feature title="Style" content="Default" />
-
-                <ImageResolutionFeature
-                  imageUrl={getImage(
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
-                    (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-                    post?.author as string,
-                  )}
+            <div className="flex flex-col w-full px-1 mt-8 md:mt-0 md:px-6 gap-y-4">
+              <CaptionInput
+                caption={caption as string}
+                setCaption={setCaption}
+                readOnly={userId !== post?.author}
+              />
+              {post && (
+                <Interactions
+                  postId={post?.id as number}
+                  postDetails={commentPhoto as IPhoto}
+                  selectedImageIndex={selectedImageIndex}
                 />
-
-                <Feature title="Rendering" content="Default" />
-
-                <Feature title="Seed" content={post?.seed?.toString() || ""} />
-
-                <Feature
-                  title="Date"
-                  content={formatDate(post?.createdAt as string)}
+              )}
+              {post && userId == post?.author && (
+                <PostingActions
+                  privatePost={privatePost as boolean}
+                  setPrivatePost={setPrivatePost}
+                  saveAsDraft={saveAsDraft}
+                  postImage={postImage}
+                  isDraft={post.isDraft as boolean}
                 />
-              </div>
+              )}
             </div>
           </div>
 
-          <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10 ">
-            {a ? "Drafts" : "Other posts"} by{"  "}
-            <Link href={post?.author ? `/home/profile/${post?.author}` : "#"}>
-              <strong className="text-primary-5 pl-1">
-                {authorUsername && formatDisplayName(authorUsername)}
-              </strong>
-            </Link>
-          </p>
+          <div className="col-span-3 border-[1px] border-primary-11 bg-primary-12 rounded-r-[20px] p-6 overflow-y-auto">
+            <div className="h-36">
+              <p className="text-primary-5 text-lg">Output quantity</p>
 
-          <div>
-            {" "}
-            <PhotoGallaryTwo />{" "}
+              <div className=" py-2 relative flex gap-2 overflow-x-auto ">
+                {(post?.ipfsImages as UploadResponse[])?.map((image, index) => (
+                  <Image
+                    key={index}
+                    src={getImage(
+                      image.hash,
+                      image.fileNames[0],
+                      post?.author as string
+                    )}
+                    width={98}
+                    height={128}
+                    alt="generated"
+                    className={` hover:opacity-100 transition-opacity duration-200 cursor-pointer ${
+                      selectedImageIndex == index ? "opacity-100" : "opacity-20"
+                    }`}
+                    onClick={() => setSelectedImageIndex(index)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <hr className="border-[1px] border-primary-10 my-2" />
+            {/* only creator sees the prompt */}
+            {post?.author == userId && (
+              <Prompt title="Prompt" fullText={post?.prompt || ""}>
+                {truncateText(post?.prompt || "", 100)}
+              </Prompt>
+            )}
+
+            {post?.author == userId && (
+              <Prompt title="Magic Prompt" fullText={post?.prompt || ""}>
+                {truncateText(post?.prompt || "", 100)}
+              </Prompt>
+            )}
+
+            <div className="grid grid-cols-2 gap-6">
+              <Feature title="Model" content="Dart 2.0" />
+
+              <Feature title="Style" content="Default" />
+
+              <ImageResolutionFeature
+                imageUrl={getImage(
+                  (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
+                  (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+                  post?.author as string
+                )}
+              />
+
+              <Feature title="Rendering" content="Default" />
+
+              <Feature title="Seed" content={post?.seed?.toString() || ""} />
+
+              <Feature
+                title="Date"
+                content={formatDate(post?.createdAt as string)}
+              />
+            </div>
           </div>
+        </div>
+
+        <p className="h-14 py-2 border-y-[1px] border-primary-10 text-center leading-10 my-10 ">
+          {a ? "Drafts" : "Other posts"} by{"  "}
+          <Link href={post?.author ? `/home/profile/${post?.author}` : "#"}>
+            <strong className="text-primary-5 pl-1">
+              {authorUsername && formatDisplayName(authorUsername)}
+            </strong>
+          </Link>
+        </p>
+
+        <div>
+          <ErrorBoundary
+            fallback={
+              <div className="p-8 text-center bg-primary-13 rounded-lg">
+                <p className="text-primary-3 mb-4">
+                  Unable to load related images
+                </p>
+                <button
+                  className="px-4 py-2 bg-primary-5 text-white rounded-lg hover:bg-primary-6 transition-colors"
+                  onClick={() => window.location.reload()}
+                >
+                  Try Again
+                </button>
+              </div>
+            }
+          >
+            <PhotoGallaryTwo />
+          </ErrorBoundary>
         </div>
       </div>
     </>

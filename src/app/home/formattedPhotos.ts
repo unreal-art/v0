@@ -112,20 +112,20 @@ export const formattedPhotosForGallery = (pages: Page[]): ExtendedPhoto[] => {
 
         if (aspectRatio < 0.6) {
           // Extra tall portraits - ensure good spacing from UI elements
-          minHeight = 420;
-          maxHeight = 500;
+          minHeight = 450; // Increased from 420
+          maxHeight = 520; // Increased from 500
         } else if (aspectRatio < 0.8) {
           // Portrait images - increased minimum for mobile UI clearance
-          minHeight = 360;
-          maxHeight = 450;
+          minHeight = 400; // Increased from 360
+          maxHeight = 480; // Increased from 450
         } else if (aspectRatio > 1.2) {
           // Landscape images - maintain reasonable minimum
-          minHeight = 240;
-          maxHeight = 320;
+          minHeight = 300; // Increased from 240
+          maxHeight = 380; // Increased from 320
         } else {
           // Square-ish images - increased minimum for better mobile experience
-          minHeight = 320;
-          maxHeight = 400;
+          minHeight = 380; // Increased from 320
+          maxHeight = 450; // Increased from 400
         }
 
         // Apply constraints

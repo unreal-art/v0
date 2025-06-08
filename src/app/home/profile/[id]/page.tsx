@@ -3,6 +3,10 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+import { Suspense } from "react";
+import { ErrorBoundary } from "@/app/components/errorBoundary";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 // import { getPosts } from "$/queries/post/getPosts";
 import { createClient } from "$/supabase/server";
 import { Post } from "$/types/data.types";
@@ -120,8 +124,66 @@ export default async function Profile({
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="relative flex flex-col items-center background-color-primary-1 px-1 md:px-10 w-full">
-        <UserData />
-        <ProfileView />
+        <ErrorBoundary
+          componentName="UserProfile"
+          fallback={
+            <div className="flex flex-col items-center justify-center w-full py-8">
+              <p className="text-center text-lg text-primary-6 mb-4">Unable to load user profile</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          }
+        >
+          <Suspense fallback={
+            <div className="w-full max-w-7xl py-4">
+              <div className="flex items-center gap-4 mb-6">
+                <Skeleton circle width={80} height={80} baseColor="#1a1a1a" highlightColor="#333" />
+                <div className="flex-1">
+                  <Skeleton width={200} height={24} baseColor="#1a1a1a" highlightColor="#333" className="mb-2" />
+                  <Skeleton width={150} height={18} baseColor="#1a1a1a" highlightColor="#333" />
+                </div>
+              </div>
+            </div>
+          }>
+            <UserData />
+          </Suspense>
+          
+          <ErrorBoundary
+            componentName="ProfileContent"
+            fallback={
+              <div className="flex flex-col items-center justify-center w-full py-8">
+                <p className="text-center text-lg text-primary-6 mb-4">Unable to load profile content</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            }
+          >
+            <Suspense fallback={
+              <div className="w-full max-w-7xl">
+                <div className="flex justify-center gap-4 mb-6">
+                  {Array(5).fill(null).map((_, i) => (
+                    <Skeleton key={i} width={80} height={36} baseColor="#1a1a1a" highlightColor="#333" />
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {Array(12).fill(null).map((_, i) => (
+                    <Skeleton key={i} height={300} baseColor="#1a1a1a" highlightColor="#333" className="rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            }>
+              <ProfileView />
+            </Suspense>
+          </ErrorBoundary>
+        </ErrorBoundary>
       </div>
     </HydrationBoundary>
   );

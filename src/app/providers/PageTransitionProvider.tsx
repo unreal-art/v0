@@ -97,19 +97,43 @@ export default function PageTransitionProvider({
       // Update the stable key to force a new animation
       setStableKey(pathname);
 
-      // Reset transition state after animation completes
-      setTimeout(() => {
-        setIsPageTransitioning(false);
-      }, 300); // Match this to your animation duration
+      // Reset transition state after animation completes using requestAnimationFrame
+      // for better performance and smoother animations
+      const animationDuration = 300; // Match this to your animation duration
+      const startTime = performance.now();
+      
+      const resetTransition = (timestamp: number) => {
+        const elapsed = timestamp - startTime;
+        
+        if (elapsed >= animationDuration) {
+          setIsPageTransitioning(false);
+        } else {
+          requestAnimationFrame(resetTransition);
+        }
+      };
+      
+      requestAnimationFrame(resetTransition);
     } else if (tabChange) {
       // Tab change - lighter transition
       setNavigationType("tab");
       setIsTransitioning(true);
 
-      // Reset the transition after a short delay
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 150);
+      // Reset the transition after a short delay using requestAnimationFrame
+      // for better performance and smoother animations
+      const tabAnimationDuration = 150; // Shorter duration for tab changes
+      const tabStartTime = performance.now();
+      
+      const resetTabTransition = (timestamp: number) => {
+        const elapsed = timestamp - tabStartTime;
+        
+        if (elapsed >= tabAnimationDuration) {
+          setIsTransitioning(false);
+        } else {
+          requestAnimationFrame(resetTabTransition);
+        }
+      };
+      
+      requestAnimationFrame(resetTabTransition);
     }
 
     // Update previous values for next comparison

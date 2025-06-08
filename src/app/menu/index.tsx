@@ -21,6 +21,29 @@ import { log, logError } from "@/utils/sentryUtils";
 import OptimizedImage from "../components/OptimizedImage";
 import appConfig from "@/config";
 
+// Full-screen loading overlay component
+function LogoutOverlay() {
+  return (
+    <div className="h-[100dvh] w-screen top-0 left-0 fixed z-[100] flex items-center justify-center bg-black">
+      <div className="flex flex-col items-center gap-4">
+        {/* Loading indicator with pulse animation */}
+        <div className="relative animate-pulse">
+          <Image
+            src="/Icon-White.png"
+            alt="unreal"
+            height={50}
+            width={50}
+            priority
+          />
+        </div>
+        
+        {/* Logout text */}
+        <p className="text-white text-sm mt-2">Logging out...</p>
+      </div>
+    </div>
+  );
+};
+
 interface INotificationProps {
   children: ReactNode;
 }
@@ -30,11 +53,17 @@ const dartContract = getContractInstance(
   appConfig.blockchain.contracts.dart
 );
 
+// Separate client component for the button
+function MenuButton({ onClick, children }: { onClick: () => void; children: ReactNode }) {
+  return <button onClick={onClick}>{children}</button>;
+}
+
 export default function Menu({ children }: INotificationProps) {
   const { userId, user, refetchUser } = useUser();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [topup, setTopup] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { data: dartBalance, refetch } = useReadContract({
     contract: dartContract,
@@ -53,20 +82,32 @@ export default function Menu({ children }: INotificationProps) {
 
   const logoutUser = async () => {
     try {
+      // First close the menu
+      handleClose();
+      // Then show the loading overlay
+      setIsLoggingOut(true);
+      
+      // Small delay to ensure the overlay is visible
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         logError("Error logging out", error);
+        setIsLoggingOut(false);
       } else {
         log("User logged out successfully");
-        router.replace("/");
+        // Use router.push for smoother navigation
+        router.push("/auth");
+        // No need to reset isLoggingOut as we're navigating away
       }
     } catch (err) {
       logError("Unexpected error during logout", err);
+      setIsLoggingOut(false);
     }
   };
   return (
     <>
-      <button onClick={() => setOpen(true)}>{children}</button>
+      <MenuButton onClick={() => setOpen(true)}>{children}</MenuButton>
 
       {open && (
         <>
@@ -75,7 +116,7 @@ export default function Menu({ children }: INotificationProps) {
             className="fixed z-50  top-0 left-0 h-screen w-full"
           ></div>
 
-          <div className="absolute w-full max-w-[240px] h-[270px] z-50 bottom-20 md:bottom-[5vh] right-4 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
+          <div className="absolute w-full max-w-[240px] h-[240px] z-50 bottom-20 md:bottom-[5vh] right-4 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
             <Link
               onClick={handleClose}
               href={userId ? `/home/profile/${userId}` : "/home"}
@@ -202,14 +243,18 @@ export default function Menu({ children }: INotificationProps) {
             <MenuItem
               onClick={logoutUser}
               icon={<LogoutIcon width={16} height={16} color="#C1C1C1" />}
-              text="Logout"
+              text={isLoggingOut ? "Logging out..." : "Logout"}
               underlineOff={true}
+              disabled={isLoggingOut}
             />
           </div>
         </>
       )}
 
       <Topup open={topup} setOpen={setTopup} refetch={refetchUser} />
+      
+      {/* Show full-screen loading overlay when logging out */}
+      {isLoggingOut && <LogoutOverlay />}
     </>
   );
 }
@@ -220,17 +265,19 @@ export function MenuItem({
   underlineOff,
   action,
   onClick,
+  disabled,
 }: {
   icon: ReactNode;
   text: string;
   onClick?: () => void;
   underlineOff?: boolean;
   action?: ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <div
-      onClick={onClick}
-      className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 cursor-pointer ${
+      onClick={disabled ? undefined : onClick}
+      className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 ${disabled ? 'opacity-60' : 'cursor-pointer'} ${
         !underlineOff ? "border-b-[1px]" : ""
       }`}
     >

@@ -20,7 +20,7 @@ export async function getPostsByUser(
     }
 
     id = userData?.user?.id;
-    console.log("Retrieved ID:", id, "Type:", typeof id);
+
 
     // Check for both undefined and string "null"
     if (!id || id === "null" || id === "") {

@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import type { ReactElement } from "react";
+import { ErrorBoundary } from "@/app/components/errorBoundary";
+import OptimizedImage from "@/app/components/OptimizedImage";
 import Image from "next/image";
 import { truncateText } from "@/utils";
 import { timeAgo } from "@/app/libs/timeAgo";
@@ -12,8 +14,6 @@ import dynamic from "next/dynamic";
 import PhotoOverlay, {
   ExtendedRenderPhotoContext,
 } from "../../components/photoOverlay";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import { TabText } from "@/stores/creationAndProfileStore";
 import { Post } from "$/types/data.types";
 import { getImage } from "../../formattedPhotos";
@@ -78,7 +78,11 @@ interface TransformedPhoto {
 // Dynamically import ImageView with no SSR since it's only needed on client
 const ImageView = dynamic(() => import("../../components/imageView"), {
   ssr: false,
-  loading: () => null,
+  loading: () => (
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="animate-pulse bg-primary-13 rounded-lg w-full h-full"></div>
+    </div>
+  ),
 });
 
 export default function PhotoGridTwo({
@@ -94,7 +98,7 @@ export default function PhotoGridTwo({
   const containerRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<TransformedPhoto[]>([]);
   const [transformedPosts, setTransformedPosts] = useState<TransformedPhoto[]>(
-    [],
+    []
   );
   const [stableLoading, setStableLoading] = useState(true); // Stable loading state to prevent flashing
   const [imageIndex, setImageIndex] = useState(-1);
@@ -128,7 +132,7 @@ export default function PhotoGridTwo({
           const imageUrl = getImage(
             image!.hash,
             image!.fileNames?.[0],
-            post.author,
+            post.author
           );
           return {
             id: post.id.toString(),
@@ -162,7 +166,7 @@ export default function PhotoGridTwo({
     (context: ExtendedRenderPhotoContext) => {
       setImageIndex(context.index);
     },
-    [],
+    []
   );
 
   const loadMore = useCallback(() => {
@@ -176,34 +180,76 @@ export default function PhotoGridTwo({
 
     let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        const width = Number(window.innerWidth);
-        if (width >= BREAKPOINTS.FOUR_XL) {
-          setSize(width * 0.22);
-        } else if (width >= BREAKPOINTS.TWO_XL) {
-          setSize(width * 0.21);
-        } else if (width >= BREAKPOINTS.XL) {
-          setSize(width * 0.276);
-        } else if (width >= BREAKPOINTS.LG) {
-          setSize(width * 0.266);
-        } else if (width >= BREAKPOINTS.MD) {
-          setSize(width * 0.41);
-        } else if (width >= BREAKPOINTS.SM) {
-          setSize(width * 0.49);
-        } else {
-          setSize(width * 0.98);
-        }
-      }, 100);
+      const width = window.innerWidth;
+      if (width >= BREAKPOINTS.TWO_XL) {
+        setSize(GRID_SIZES.TWO_XL);
+      } else if (width >= BREAKPOINTS.LG) {
+        setSize(GRID_SIZES.LG);
+      } else if (width >= BREAKPOINTS.MD) {
+        setSize(GRID_SIZES.MD);
+      } else {
+        setSize(GRID_SIZES.SM);
+      }
     };
 
     handleResize();
+
     window.addEventListener("resize", handleResize);
+
     return () => {
       window.removeEventListener("resize", handleResize);
-      clearTimeout(timeoutId);
     };
   }, []);
+
+  const renderPhoto = useCallback(
+    (context: ExtendedRenderPhotoContext) => {
+      const { photo } = context;
+      const width = size;
+      const height = size;
+
+      return (
+        <ErrorBoundary
+          fallback={
+            <div
+              className="relative bg-primary-13 rounded-lg overflow-hidden"
+              style={{ width, height }}
+            >
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-primary-3 text-sm">Failed to load image</p>
+              </div>
+            </div>
+          }
+        >
+          <div
+            className="relative bg-primary-13 rounded-lg overflow-hidden"
+            style={{ width, height }}
+          >
+            <OptimizedImage
+              src={photo.src}
+              alt={photo.alt || ""}
+              width={width}
+              height={height}
+              className="object-cover w-full h-full transition-opacity duration-300"
+              style={{ opacity: 1, position: "relative" }} // Removed z-index to prevent conflicts
+              imageName={`creation-${photo.id}`}
+              trackPerformance={true}
+              priority={parseInt(photo.id) < 4} // Prioritize first few images
+            />
+            {/* Caption overlay with lower z-index to not interfere with PhotoOverlay elements */}
+            <div
+              className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent"
+              style={{ opacity: 1 }}
+            >
+              <p className="text-white text-xs truncate">
+                {photo.caption || photo.prompt}
+              </p>
+            </div>
+          </div>
+        </ErrorBoundary>
+      );
+    },
+    [size]
+  );
 
   // Only show empty state when we're not loading and have no photos
   // We've already confirmed we have data object but it's empty
@@ -242,43 +288,10 @@ export default function PhotoGridTwo({
                     handleImageIndex(context as ExtendedRenderPhotoContext)
                   }
                   context={context as ExtendedRenderPhotoContext}
-                  photo={
-                    <Image
-                      src={photo.src}
-                      fill={true}
-                      alt={String(photo.alt)}
-                      priority={index < 8}
-                      className="object-cover"
-                      loading={index < 8 ? "eager" : "lazy"}
-                      sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
-                    />
-                  }
+                  photo={renderPhoto(context as ExtendedRenderPhotoContext)}
                   section="photoGridTwo"
                 >
-                  <>
-                    <div className="absolute top-0 flex justify-between text-primary-1 text-sm picture-gradient w-full h-12 items-center px-3">
-                      <p>{timeAgo(context.photo.createdAt)}</p>
-                      <button>
-                        <OptionMenuIcon color="#FFFFFF" />
-                      </button>
-                    </div>
-
-                    <Image
-                      src={photo.src}
-                      fill={true}
-                      alt={String(photo.alt)}
-                      priority={index < 8}
-                      className="object-cover"
-                      loading={index < 8 ? "eager" : "lazy"}
-                      sizes="(min-width: 1536px) 380px, (min-width: 1024px) 320px, (min-width: 768px) 320px, 300px"
-                    />
-
-                    <p className="absolute bottom-0 left-0 w-full text-left text-primary-1 text-sm picture-gradient h-14 p-3">
-                      {truncateText(
-                        context.photo.caption || context.photo.prompt,
-                      )}
-                    </p>
-                  </>
+                  {null}
                 </PhotoOverlay>
               </div>
             );
