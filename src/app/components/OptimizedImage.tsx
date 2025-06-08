@@ -115,19 +115,18 @@ function OptimizedImage({
         sizes={sizes}
         loading={loading}
         quality={quality}
+        style={{ opacity: 1 }} // Ensure image is always visible
         {...props}
-        //placeholder="blur"
-        // blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFeAJcIiLKlAAAAABJRU5ErkJggg=="
-        onLoadingComplete={handleLoadingComplete}
+      onLoadingComplete={handleLoadingComplete}
         onError={handleError}
       />
       <div
         className="absolute inset-0 flex items-center justify-center"
         style={{
-          opacity: loaded ? 0 : 1,
+          opacity: loaded ? 0 : 0.5, // Make overlay semi-transparent so images are visible during loading
           transition: "opacity 0.2s ease-out",
           pointerEvents: "none", // Ensures it doesn't interfere with clicks
-          zIndex: 10,
+          zIndex: 1, // Lower z-index so it doesn't cover the image
         }}
       >
         {!isProfile && (

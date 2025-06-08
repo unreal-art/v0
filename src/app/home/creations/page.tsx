@@ -3,6 +3,10 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+import { Suspense } from "react";
+import { ErrorBoundary } from "@/app/components/errorBoundary";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import { createClient } from "$/supabase/server";
 import {
   getIsDraftPostsByUser,
@@ -58,7 +62,39 @@ export default async function Creation({
         <div className="hidden md:flex flex-col justify-center items-center py-5 w-full">
           <GenerateInput />
         </div>
-        <CreationView />
+        <ErrorBoundary
+          componentName="Creations"
+          fallback={
+            <div className="flex flex-col items-center justify-center w-full py-8">
+              <p className="text-center text-lg text-primary-6 mb-4">Unable to load your creations</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          }
+        >
+          <Suspense fallback={
+            <div className="w-full max-w-7xl">
+              <div className="flex justify-center gap-4 mb-6">
+                {Array(5).fill(null).map((_, i) => (
+                  <Skeleton key={i} width={100} height={40} baseColor="#1a1a1a" highlightColor="#333" className="rounded-md" />
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {Array(12).fill(null).map((_, i) => (
+                  <div className="aspect-square relative">
+                    <Skeleton key={i} height="100%" width="100%" baseColor="#1a1a1a" highlightColor="#333" className="rounded-lg absolute inset-0" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          }>
+            <CreationView />
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </HydrationBoundary>
   );

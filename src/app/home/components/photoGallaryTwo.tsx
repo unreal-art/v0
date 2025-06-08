@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import {
   MasonryPhotoAlbum,
   RenderImageContext,
@@ -36,7 +37,7 @@ const ImageView = dynamic(() => import("./imageView"), {
   loading: () => <div className="w-full h-64 bg-gray-200 animate-pulse"></div>,
 });
 
-// Define renderNextImage as a regular function since it's used as a render prop
+// Enhanced renderNextImage with Intersection Observer for more efficient loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
   { photo, width, height, index = 0 }: RenderImageContext
@@ -46,49 +47,116 @@ function renderNextImage(
     return <div className="w-full h-64 bg-gray-200">Image data missing</div>;
   }
 
-  // Use priority loading for the first images (eagerly loaded)
-  const shouldPrioritize = index < 8;
+  // Use priority loading for the first 4 images only (reduced from 8 for faster initial load)
+  const shouldPrioritize = index < 4;
+  
+  // Create a client-side only component for intersection observer
+  const LazyImage = () => {
+    const imageRef = React.useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(shouldPrioritize);
+    const [hasError, setHasError] = useState(false);
+    
+    useEffect(() => {
+      // Skip for prioritized images - they load immediately
+      if (shouldPrioritize) return;
+      
+      let observer: IntersectionObserver;
+      
+      // Use requestIdleCallback for non-critical initialization
+      const initObserver = () => {
+        observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              observer.disconnect();
+            }
+          },
+          { 
+            rootMargin: '200px', // Load images 200px before they enter viewport
+            threshold: 0.01 // Trigger when just 1% is visible
+          }
+        );
+        
+        if (imageRef.current) {
+          observer.observe(imageRef.current);
+        }
+      };
+      
+      // Use requestIdleCallback or setTimeout as fallback
+      if ('requestIdleCallback' in window) {
+        // @ts-ignore - TypeScript doesn't have types for this by default
+        window.requestIdleCallback(initObserver);
+      } else {
+        setTimeout(initObserver, 1);
+      }
+      
+      return () => observer?.disconnect();
+    }, []);
+    
+    // Extract image name for tracking with safe fallback
+    const imageName =
+      typeof photo === "object" && "src" in photo && typeof photo.src === "string"
+        ? photo.src.split("/").pop()?.split("?")[0] || `gallery-img-${index}`
+        : `gallery-img-${index}`;
 
-  // Extract image name for tracking with safe fallback
-  const imageName =
-    typeof photo === "object" && "src" in photo && typeof photo.src === "string"
-      ? photo.src.split("/").pop()?.split("?")[0] || `gallery-img-${index}`
-      : `gallery-img-${index}`;
-
-  // Responsive size hints for optimal loading
-  const responsiveSizes =
-    sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
-
-  return (
+    // Responsive size hints for optimal loading
+    const responsiveSizes =
+      sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
+      
+    return (
+      <div
+        ref={imageRef}
+        style={{
+          width: "100%",
+          position: "relative",
+          aspectRatio: `${width} / ${height}`,
+          backgroundColor: "#1a1a1a", // Placeholder color matching skeleton
+        }}
+      >
+        {isVisible ? (
+          <OptimizedImage
+            fill
+            src={hasError ? "/placeholder-image.jpg" : photo}
+            alt={alt || "Gallery image"}
+            title={title}
+            sizes={responsiveSizes}
+            loading={shouldPrioritize ? "eager" : "lazy"}
+            priority={shouldPrioritize}
+            className="rounded-lg"
+            placeholder={"blurDataURL" in photo ? "blur" : undefined}
+            trackPerformance={process.env.NODE_ENV === "development"}
+            imageName={imageName}
+            onError={(e) => {
+              // Handle image loading failures
+              setHasError(true);
+              const target = e.target as HTMLImageElement;
+              if (target) {
+                target.onerror = null; // Prevent infinite error loop
+                target.src = "/placeholder-image.jpg";
+              }
+            }}
+          />
+        ) : (
+          // Empty placeholder with correct dimensions
+          <div className="w-full h-full rounded-lg bg-primary-13" />
+        )}
+      </div>
+    );
+  };
+  
+  // Only render the LazyImage component on the client side
+  return typeof window === 'undefined' ? (
+    // Server-side placeholder
     <div
       style={{
         width: "100%",
         position: "relative",
         aspectRatio: `${width} / ${height}`,
+        backgroundColor: "#1a1a1a",
       }}
-    >
-      <OptimizedImage
-        fill
-        src={photo}
-        alt={alt || "Gallery image"}
-        title={title}
-        sizes={responsiveSizes}
-        loading={shouldPrioritize ? "eager" : "lazy"}
-        priority={shouldPrioritize}
-        className="rounded-lg"
-        placeholder={"blurDataURL" in photo ? "blur" : undefined}
-        trackPerformance={process.env.NODE_ENV === "development"}
-        imageName={imageName}
-        onError={(e) => {
-          // Handle image loading failures
-          const target = e.target as HTMLImageElement;
-          if (target) {
-            target.onerror = null; // Prevent infinite error loop
-            target.src = "/placeholder-image.jpg";
-          }
-        }}
-      />
-    </div>
+    />
+  ) : (
+    <LazyImage />
   );
 }
 

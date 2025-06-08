@@ -7,6 +7,14 @@ const isMobileBuild = process.env.BUILD_TARGET === "mobile";
 const nextConfig: NextConfig = {
   output: isMobileBuild ? "export" : undefined,
   trailingSlash: isMobileBuild,
+  
+  // Performance optimizations
+  reactStrictMode: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
 
   // Image optimization settings
   images: {
@@ -76,9 +84,23 @@ const nextConfig: NextConfig = {
       "lodash",
       "swiper",
       "react-loading-skeleton",
+      "react-icons",
+      "recharts",
+      "@tremor/react"
     ],
-    // Optimize CSS for faster processing
-    optimizeCss: true,
+    // Enhanced CSS optimization with critical CSS extraction
+    optimizeCss: {
+      // Extract critical CSS
+      extractCritical: true,
+      // Inline critical CSS in the head
+      inlineCritical: true,
+    },
+    // Enable React 19 streaming features
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+    // Improve client-side navigation
+    // ppr: true, // Disabled until we upgrade to Next.js canary
   },
   // Compress responses for faster delivery
   compress: true,
@@ -97,7 +119,6 @@ const nextConfig: NextConfig = {
   // Removing swcMinify as it's causing errors
 
   // Improve runtime performance
-  reactStrictMode: true,
   // Add page caching
   pageExtensions: ["tsx", "ts", "jsx", "js", "mdx"],
 };

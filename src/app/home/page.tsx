@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import TabBtn from "./components/tabBtn";
 import GenerateInput from "./components/generateInput";
@@ -9,24 +9,26 @@ import Skeleton from "react-loading-skeleton";
 import PostsProvider from "./components/PostsProvider";
 import { createClient } from "$/supabase/client";
 import { updateUserTorusId } from "@/queries/torus";
+import { ErrorBoundary } from "../components/errorBoundary";
 
 // Dynamically import PhotoGallary with proper loading state
 const PhotoGallary = dynamic(() => import("./components/photoGallary"), {
   ssr: false, // Changed to false since it uses browser-only APIs
-  // loading: () => (
-  //   <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
-  //     {Array(15)
-  //       .fill(null)
-  //       .map((_, index) => (
-  //         <Skeleton
-  //           key={index}
-  //           height={200}
-  //           baseColor="#1a1a1a"
-  //           highlightColor="#333"
-  //         />
-  //       ))}
-  //   </div>
-  // ),
+  loading: () => (
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
+      {Array(15)
+        .fill(null)
+        .map((_, index) => (
+          <Skeleton
+            key={index}
+            height={200}
+            baseColor="#1a1a1a"
+            highlightColor="#333"
+            className="rounded-lg"
+          />
+        ))}
+    </div>
+  ),
 });
 
 export default function HomePage() {
@@ -70,7 +72,38 @@ export default function HomePage() {
           <TabBtn text="Top" />
         </div>
         <div className="overflow-y-auto w-full">
-          {isClient && <PhotoGallary />}
+          {isClient && (
+            <ErrorBoundary 
+              componentName="Photo Gallery"
+              fallback={
+                <div className="flex flex-col items-center justify-center w-full py-8">
+                  <p className="text-center text-lg text-primary-6 mb-4">Unable to load gallery</p>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
+                  >
+                    Reload Gallery
+                  </button>
+                </div>
+              }
+            >
+              <Suspense fallback={
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
+                  {Array(15).fill(null).map((_, index) => (
+                    <Skeleton
+                      key={index}
+                      height={200}
+                      baseColor="#1a1a1a"
+                      highlightColor="#333"
+                      className="rounded-lg animate-pulse"
+                    />
+                  ))}
+                </div>
+              }>
+                <PhotoGallary />
+              </Suspense>
+            </ErrorBoundary>
+          )}
         </div>
       </div>
     </PostsProvider>
