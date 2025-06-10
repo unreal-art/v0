@@ -117,12 +117,15 @@ export default function PhotoOverlay({
               <p className="hidden md:block">
                 {timeAgo(context.photo.createdAt)}
               </p>
-              <div 
+              <div
                 onClick={() => setMenuActive(true)}
                 onMouseEnter={() => setMenuActive(true)}
                 onMouseLeave={() => setMenuActive(false)}
               >
-                <ImageOptionMenu image={context.photo} postId={context.photo.id}>
+                <ImageOptionMenu
+                  image={context.photo}
+                  postId={context.photo.id}
+                >
                   <OptionMenuIcon color="#FFFFFF" />
                 </ImageOptionMenu>
               </div>

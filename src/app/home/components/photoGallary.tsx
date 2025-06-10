@@ -41,18 +41,18 @@ function renderNextImage(
   // Use priority loading for the first 4 images (eagerly loaded)
   // Reduced from 8 to 4 to improve initial load time
   const shouldPrioritize = index < 4;
-  
+
   // Create a client-side only component for intersection observer
   const LazyImage = () => {
     const imageRef = React.useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = React.useState(shouldPrioritize);
-    
+
     React.useEffect(() => {
       // Skip for prioritized images - they load immediately
       if (shouldPrioritize) return;
-      
+
       let observer: IntersectionObserver;
-      
+
       // Use requestIdleCallback for non-critical initialization
       const initObserver = () => {
         observer = new IntersectionObserver(
@@ -62,28 +62,28 @@ function renderNextImage(
               observer.disconnect();
             }
           },
-          { 
-            rootMargin: '200px', // Load images 200px before they enter viewport
-            threshold: 0.01 // Trigger when just 1% is visible
+          {
+            rootMargin: "200px", // Load images 200px before they enter viewport
+            threshold: 0.01, // Trigger when just 1% is visible
           }
         );
-        
+
         if (imageRef.current) {
           observer.observe(imageRef.current);
         }
       };
-      
+
       // Use requestIdleCallback or setTimeout as fallback
-      if ('requestIdleCallback' in window) {
+      if ("requestIdleCallback" in window) {
         // @ts-ignore - TypeScript doesn't have types for this by default
         window.requestIdleCallback(initObserver);
       } else {
         setTimeout(initObserver, 1);
       }
-      
+
       return () => observer?.disconnect();
     }, []);
-    
+
     // Extract image name for tracking
     const imageName =
       typeof photo === "object" && photo !== null && "src" in photo
@@ -94,7 +94,7 @@ function renderNextImage(
     // Responsive size hints for optimal loading
     const responsiveSizes =
       sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
-      
+
     return (
       <div
         ref={imageRef}
@@ -103,6 +103,7 @@ function renderNextImage(
           position: "relative",
           aspectRatio: `${width} / ${height}`,
           backgroundColor: "#1a1a1a", // Placeholder color matching skeleton
+          borderRadius: "8px",
         }}
       >
         {isVisible ? (
@@ -126,9 +127,9 @@ function renderNextImage(
       </div>
     );
   };
-  
+
   // Only render the LazyImage component on the client side
-  return typeof window === 'undefined' ? (
+  return typeof window === "undefined" ? (
     // Server-side placeholder
     <div
       style={{
@@ -136,6 +137,7 @@ function renderNextImage(
         position: "relative",
         aspectRatio: `${width} / ${height}`,
         backgroundColor: "#1a1a1a",
+        borderRadius: "8px",
       }}
     />
   ) : (

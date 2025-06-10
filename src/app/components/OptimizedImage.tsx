@@ -121,7 +121,7 @@ function OptimizedImage({
         onError={handleError}
       />
       <div
-        className="absolute inset-0 flex items-center justify-center"
+        className={`absolute inset-0 flex items-center justify-center ${props.className || ''}`}
         style={{
           opacity: loaded ? 0 : 0.5, // Make overlay semi-transparent so images are visible during loading
           transition: "opacity 0.2s ease-out",

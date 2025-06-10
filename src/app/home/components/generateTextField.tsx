@@ -18,7 +18,7 @@ interface GenerateTextFieldProps {
 }
 const dartContract = getContractInstance(
   torusTestnet,
-  appConfig.blockchain.contracts.dart,
+  appConfig.blockchain.contracts.dart
 );
 
 export default function GenerateTextField({
@@ -65,7 +65,7 @@ export default function GenerateTextField({
           setShowProgress(false);
           toast.error(`Error generating image: ${error.message}`);
         },
-      },
+      }
     );
   };
 
@@ -84,17 +84,17 @@ export default function GenerateTextField({
     <>
       <div
         onClick={handleClose}
-        className="fixed z-30 top-0 left-0 h-screen w-full"
+        className="fixed z-[9000] top-0 left-0 h-screen w-full"
       ></div>
 
-      <div className="absolute flex justify-center z-30 top-0 left-0 h-screen w-full">
+      <div className="absolute flex justify-center z-[9000] top-0 left-0 h-screen w-full">
         <div
           onClick={handleClose}
-          className="absolute z-30 top-0 left-0 h-screen w-full"
+          className="absolute z-[9000] top-0 left-0 h-screen w-full"
         ></div>
 
-        <div className="absolute z-50 md:mt-20 w-full md:w-8/12 max-w-[924px] h-5/6 md:h-[432px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
-          <div className="flex flex-col bg-primary-13 h-full w-full rounded-md">
+        <div className="absolute z-[9001] md:mt-20 w-full md:w-8/12 max-w-[924px] h-5/6 md:h-[432px] rounded-md border-primary-8 border-[1px] p-3 bg-primary-12">
+          <div className="flex z-[9002] flex-col bg-primary-13 h-full w-full rounded-md">
             <div className="flex-grow">
               <textarea
                 onChange={(e) => setPrompt(e.target.value)}
