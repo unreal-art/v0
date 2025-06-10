@@ -88,7 +88,11 @@ export default function PhotoOverlay({
       <div
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        className="absolute cursor-pointer top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm md:hover:bg-gray-900/50"
+        className="absolute cursor-pointer top-0 left-0 w-full h-full flex flex-col text-primary-1 text-sm"
+        style={{
+          backgroundColor: hover ? 'rgba(17, 17, 17, 0.3)' : 'transparent',
+          transition: 'background-color 0.2s ease-in-out',
+        }}
       >
         {/* Only show overlay content on hover */}
         <div className="relative md:flex flex-col text-primary-1 justify-between px-3 py-1 h-full ">

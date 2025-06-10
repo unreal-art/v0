@@ -221,7 +221,6 @@ function GenerationContent() {
     (post?.ipfsImages as UploadResponse[])?.[selectedImageIndex]?.fileNames[0],
     post?.author as string
   );
-
   return (
     <div className="w-full">
       <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
