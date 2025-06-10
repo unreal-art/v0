@@ -28,7 +28,8 @@
     "mobile:build:all": "bun run mobile:build:ios && bun run mobile:build:android",
     "mobile:dev:ios": "bunx cap run ios",
     "mobile:dev:android": "bunx cap run android",
-    "mobile:dev:all": "bun run mobile:dev:ios & bun run mobile:dev:android"
+    "mobile:dev:all": "bun run mobile:dev:ios & bun run mobile:dev:android",
+    "update-wallets": "bun run update-missing-wallets.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",
