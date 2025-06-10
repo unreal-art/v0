@@ -1,5 +1,5 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { CloseIcon, SearchIcon } from "@/app/components/icons";
 import Tabs from "./searchTab";
 import SearchPhotoGallary from "./searchPhotoGallary";
@@ -10,11 +10,13 @@ import Skeleton from "react-loading-skeleton";
 
 export default function Search() {
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch] = useDebounce(searchTerm, 500);
+  
+  // Reference for autofocusing input when modal opens
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   function getIconColor() {
     if (hover) {
@@ -23,6 +25,36 @@ export default function Search() {
       return "#5D5D5D";
     }
   }
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Open search with Cmd+K or Ctrl+K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setOpen(true);
+      }
+      
+      // Close search with Escape
+      if (e.key === 'Escape' && open) {
+        e.preventDefault();
+        setOpen(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
+  
+  // Focus input when modal opens
+  useEffect(() => {
+    if (open && searchInputRef.current) {
+      // Small delay to ensure the modal is rendered
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [open]);
 
   return (
     <>
@@ -33,6 +65,8 @@ export default function Search() {
         onClick={() => setOpen(true)}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
+        aria-label="Search"
+        title="Search (Cmd+K)"
       >
         <SearchIcon width={16} height={16} color={getIconColor()} />
       </button>
@@ -44,9 +78,14 @@ export default function Search() {
             className="m-auto z-50  top-0 left-0 h-screen w-screen bg-gray-950/50"
           ></div>
 
-          <div className="absolute w-full max-w-[1034px] h-[90vh] z-50 top-2 md:top-[5vh] left-0 md:left-60 border-primary-8 border-[1px] bg-primary-12 rounded-xl p-4">
+          <div 
+            className="absolute w-full max-w-[1034px] h-[90vh] z-50 top-2 md:top-[5vh] left-0 md:left-60 border-primary-8 border-[1px] bg-primary-12 rounded-xl p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="search-dialog-title"
+          >
             <div className="flex justify-between text-primary-3">
-              <p className="nasalization text-2xl">
+              <p className="nasalization text-2xl" id="search-dialog-title">
                 Search for Anything Imaginable
               </p>
               <div className="cursor-pointer" onClick={() => setOpen(false)}>
@@ -61,11 +100,21 @@ export default function Search() {
                 </button>
 
                 <input
+                  ref={searchInputRef}
                   type="text"
                   placeholder="Search for anything imaginable"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="absolute text-primary-2 placeholder:text-primary-2 bg-inherit left-0 top-0 w-full h-14 px-10 rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-0"
+                  className="absolute text-primary-2 placeholder:text-primary-2 bg-inherit left-0 top-0 w-full h-14 px-10 rounded-lg border-[1px] border-primary-11 border-none focus:outline-none focus:ring-1 focus:ring-primary-5"
+                  aria-label="Search input"
+                  autoComplete="off"
+                  // Close on Escape key
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      e.preventDefault();
+                      setOpen(false);
+                    }
+                  }}
                 />
               </div>
             </div>

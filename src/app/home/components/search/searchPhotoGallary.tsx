@@ -7,7 +7,7 @@ import {
   RenderPhotoContext,
 } from "react-photo-album";
 import "react-photo-album/masonry.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { MD_BREAKPOINT } from "@/app/libs/constants";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "../photoOverlay";
 import ImageView from "../imageView";
@@ -21,16 +21,27 @@ import { useGalleryStore } from "@/stores/galleryStore";
 import OptimizedImage from "@/app/components/OptimizedImage";
 import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 
-// Enhanced renderNextImage with Intersection Observer for more efficient loading
-function renderNextImage(
-  { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
-) {
-  // Use priority loading for the first 4 images only (reduced from 8 for faster initial load)
-  const shouldPrioritize = index < 4;
-
-  // Create a client-side only component for intersection observer
-  const LazyImage = () => {
+// Memoized LazyImage component to prevent unnecessary recreations
+const LazyImage = React.memo(
+  ({
+    photo,
+    width,
+    height,
+    index,
+    alt,
+    title,
+    sizes,
+    shouldPrioritize,
+  }: {
+    photo: any;
+    width: number;
+    height: number;
+    index: number;
+    alt: string;
+    title?: string;
+    sizes?: string;
+    shouldPrioritize: boolean;
+  }) => {
     const imageRef = React.useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(shouldPrioritize);
     const [hasError, setHasError] = useState(false);
@@ -70,14 +81,15 @@ function renderNextImage(
       }
 
       return () => observer?.disconnect();
-    }, []);
+    }, [shouldPrioritize]);
 
     // Extract image name for tracking
-    const imageName =
-      typeof photo === "object" && photo !== null && "src" in photo
+    const imageName = useMemo(() => {
+      return typeof photo === "object" && photo !== null && "src" in photo
         ? String(photo.src).split("/").pop()?.split("?")[0] ||
           `search-img-${index}`
         : `search-img-${index}`;
+    }, [photo, index]);
 
     // Responsive size hints for optimal loading
     const responsiveSizes =
@@ -123,7 +135,32 @@ function renderNextImage(
         )}
       </div>
     );
-  };
+  },
+  // Custom comparison function that only triggers re-renders when necessary
+  (prevProps, nextProps) => {
+    // If the photo ID is the same, don't re-render
+    if (
+      prevProps.photo && 
+      nextProps.photo && 
+      'id' in prevProps.photo && 
+      'id' in nextProps.photo && 
+      prevProps.photo.id === nextProps.photo.id
+    ) {
+      return true; // props are equal, don't re-render
+    }
+    
+    // Default comparison for other cases
+    return false;
+  }
+);
+
+// Enhanced renderNextImage with Intersection Observer for more efficient loading
+function renderNextImage(
+  { alt = "", title, sizes }: RenderImageProps,
+  { photo, width, height, index = 0 }: RenderImageContext
+) {
+  // Use priority loading for the first 4 images only (reduced from 8 for faster initial load)
+  const shouldPrioritize = index < 4;
 
   // Only render the LazyImage component on the client side
   return typeof window === "undefined" ? (
@@ -138,7 +175,16 @@ function renderNextImage(
       }}
     />
   ) : (
-    <LazyImage />
+    <LazyImage 
+      photo={photo}
+      width={width}
+      height={height}
+      index={index}
+      alt={alt}
+      title={title}
+      sizes={sizes}
+      shouldPrioritize={shouldPrioritize}
+    />
   );
 }
 
@@ -147,16 +193,42 @@ export default function SearchPhotoGallary({
 }: {
   searchTerm: string;
 }) {
+  // All useState hooks first to maintain consistent order
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
+  // Create a dictionary to track already processed photos by their ID
+  const [processedPhotoDict, setProcessedPhotoDict] = useState<Record<string, any>>({});
 
+  // All external hooks next
   // Use Zustand store for tab state
   const { initFromUrl } = useGalleryStore();
 
   // Sync with URL on initial load
   const searchParams = useSearchParams();
-
+  
+  // Data fetching hook - always called regardless of conditions
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useSearchPostsInfinite(searchTerm, 10);
+  
+  // Format photos safely with preserved references - placed BEFORE any conditional returns
+  const photos = useMemo(() => {
+    // Safely handle data even before it's loaded
+    if (!data || !data.pages) return [];
+    
+    const formattedPhotos = formattedPhotosForGallery(data.pages);
+    // Reuse existing photo references where possible
+    return formattedPhotos.map(photo => processedPhotoDict[photo.id] || photo);
+  }, [data, processedPhotoDict]);
+  
+  // Client-side initialization effect
   useEffect(() => {
     setIsClient(true);
 
@@ -167,16 +239,28 @@ export default function SearchPhotoGallary({
     }
   }, [searchParams, initFromUrl]);
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useSearchPostsInfinite(searchTerm, 10);
+  // Update processed photo dictionary when new photos are loaded
+  useEffect(() => {
+    if (photos.length > 0 && !isLoading) {
+      const newDict = { ...processedPhotoDict };
+      let dictChanged = false;
+      
+      // Add any new photos to the dictionary
+      photos.forEach(photo => {
+        if (!newDict[photo.id]) {
+          newDict[photo.id] = photo;
+          dictChanged = true;
+        }
+      });
+      
+      // Only update state if the dictionary actually changed
+      if (dictChanged) {
+        setProcessedPhotoDict(newDict);
+      }
+    }
+  }, [photos, isLoading, processedPhotoDict]);
 
+  // Window resize handler
   useEffect(() => {
     if (typeof window === "undefined") return; // Ensure it runs only on the client
 
@@ -192,6 +276,7 @@ export default function SearchPhotoGallary({
     };
   }, []);
 
+  // Handler function definitions AFTER all hooks
   const handleImageIndex = (context: RenderPhotoContext) => {
     setImageIndex(context.index);
   };
@@ -229,8 +314,6 @@ export default function SearchPhotoGallary({
     );
   }
 
-  // Format photos safely
-  const photos = formattedPhotosForGallery(data?.pages ?? []);
 
   return (
     <div className="w-full">

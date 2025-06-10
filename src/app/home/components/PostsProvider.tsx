@@ -138,13 +138,13 @@ export default function PostsProvider({
   return (
     <div className="relative w-full h-full">
       {/* Loading indicator that fades out when data is hydrated */}
-      <div 
+      <div
         className="absolute inset-0 z-10 flex items-center justify-center bg-black"
         style={{
           opacity: isHydrated ? 0 : 1,
-          visibility: isHydrated ? 'hidden' : 'visible',
-          transition: 'opacity 0.3s ease-in-out',
-          transitionDelay: isHydrated ? '0s' : '0.2s',
+          visibility: isHydrated ? "hidden" : "visible",
+          transition: "opacity 0.3s ease-in-out",
+          transitionDelay: isHydrated ? "0s" : "0.2s",
         }}
       >
         <div className="flex flex-col items-center gap-4">
@@ -165,8 +165,8 @@ export default function PostsProvider({
       <div
         style={{
           opacity: isHydrated ? 1 : 0,
-          transition: 'opacity 0.3s ease-in-out',
-          transitionDelay: isHydrated ? '0.2s' : '0s',
+          transition: "opacity 0.3s ease-in-out",
+          transitionDelay: isHydrated ? "0.2s" : "0s",
         }}
       >
         <HydrationBoundary state={dehydrate(queryClient)}>

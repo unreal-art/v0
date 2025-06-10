@@ -1,4 +1,4 @@
 export const MD_BREAKPOINT = 768;
 export const POST_GROUPS = ["PUBLIC", "PRIVATE", "LIKED", "PINNED", "DRAFT"];
 export const TOKEN_ADDRESS = "";
-export const LIST_LIMIT = 20;
+export const LIST_LIMIT = 10;

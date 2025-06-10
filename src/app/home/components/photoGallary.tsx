@@ -9,7 +9,7 @@ import {
   RowsPhotoAlbum,
 } from "react-photo-album";
 import "react-photo-album/masonry.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { LIST_LIMIT, MD_BREAKPOINT } from "@/app/libs/constants";
 import PhotoOverlay, { ExtendedRenderPhotoContext } from "./photoOverlay";
 import ImageView from "./imageView";
@@ -33,17 +33,27 @@ import OptimizedImage from "@/app/components/OptimizedImage";
 import { capitalizeFirstAlpha, formatDisplayName } from "@/utils";
 import { Color } from "three/src/Three.Core.js";
 
-// Enhanced image renderer with Intersection Observer for more efficient loading
-function renderNextImage(
-  { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
-) {
-  // Use priority loading for the first 4 images (eagerly loaded)
-  // Reduced from 8 to 4 to improve initial load time
-  const shouldPrioritize = index < 4;
-
-  // Create a client-side only component for intersection observer
-  const LazyImage = () => {
+// Memoized LazyImage component to prevent unnecessary recreations
+const LazyImage = React.memo(
+  ({
+    photo,
+    width,
+    height,
+    index,
+    alt,
+    title,
+    sizes,
+    shouldPrioritize,
+  }: {
+    photo: any;
+    width: number;
+    height: number;
+    index: number;
+    alt: string;
+    title?: string;
+    sizes?: string;
+    shouldPrioritize: boolean;
+  }) => {
     const imageRef = React.useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = React.useState(shouldPrioritize);
 
@@ -82,14 +92,15 @@ function renderNextImage(
       }
 
       return () => observer?.disconnect();
-    }, []);
+    }, [shouldPrioritize]);
 
     // Extract image name for tracking
-    const imageName =
-      typeof photo === "object" && photo !== null && "src" in photo
+    const imageName = useMemo(() => {
+      return typeof photo === "object" && photo !== null && "src" in photo
         ? String(photo.src).split("/").pop()?.split("?")[0] ||
           `gallery-img-${index}`
         : `gallery-img-${index}`;
+    }, [photo, index]);
 
     // Responsive size hints for optimal loading
     const responsiveSizes =
@@ -126,7 +137,33 @@ function renderNextImage(
         )}
       </div>
     );
-  };
+  },
+  // Custom comparison function that only triggers re-renders when necessary
+  (prevProps, nextProps) => {
+    // If the photo ID is the same, don't re-render
+    if (
+      prevProps.photo && 
+      nextProps.photo && 
+      'id' in prevProps.photo && 
+      'id' in nextProps.photo && 
+      prevProps.photo.id === nextProps.photo.id
+    ) {
+      return true; // props are equal, don't re-render
+    }
+    
+    // Default comparison for other cases
+    return false;
+  }
+);
+
+// Enhanced image renderer with Intersection Observer for more efficient loading
+function renderNextImage(
+  { alt = "", title, sizes }: RenderImageProps,
+  { photo, width, height, index = 0 }: RenderImageContext
+) {
+  // Use priority loading for the first 4 images (eagerly loaded)
+  // Reduced from 8 to 4 to improve initial load time
+  const shouldPrioritize = index < 4;
 
   // Only render the LazyImage component on the client side
   return typeof window === "undefined" ? (
@@ -141,7 +178,16 @@ function renderNextImage(
       }}
     />
   ) : (
-    <LazyImage />
+    <LazyImage 
+      photo={photo}
+      width={width}
+      height={height}
+      index={index}
+      alt={alt}
+      title={title}
+      sizes={sizes}
+      shouldPrioritize={shouldPrioritize}
+    />
   );
 }
 
@@ -152,6 +198,8 @@ export default function PhotoGallary() {
   const [isBrowser, setIsBrowser] = useState(false);
   // Keep a reference to the previous photos to prevent layout jumping during tab changes
   const [prevPhotos, setPrevPhotos] = useState<any[]>([]);
+  // Create a dictionary to track already processed photos by their ID
+  const [processedPhotoDict, setProcessedPhotoDict] = useState<Record<string, any>>({});
 
   // Use Zustand store for tab state
   const { activeTab, initFromUrl } = useGalleryStore();
@@ -289,24 +337,52 @@ export default function PhotoGallary() {
     );
   }
 
-  // Format photos directly here using your existing function
-  const currentPhotos = data ? formattedPhotosForGallery(data.pages) : [];
+  // Use memo to format photos only when necessary
+  const currentPhotos = useMemo(() => {
+    if (!data) return [];
+    
+    // Format only new photos and reuse already processed ones
+    const newPhotos = formattedPhotosForGallery(data.pages).map(photo => {
+      // If we already processed this photo before, reuse the existing reference
+      return processedPhotoDict[photo.id] || photo;
+    });
+    
+    return newPhotos;
+  }, [data, processedPhotoDict]);
 
-  // Store current photos when they become available and are not empty
-  // But only when loading completes to prevent infinite loops
+  // Update our processed photos dictionary and previous photos reference
   useEffect(() => {
-    // Only update when not loading and we have photos to prevent infinite loops
+    // Only update when not loading and we have photos
     if (!isLoading && currentPhotos.length > 0) {
-      // Compare to avoid unnecessary state updates
-      if (JSON.stringify(prevPhotos) !== JSON.stringify(currentPhotos)) {
+      // Build new dictionary of processed photos
+      const newDict = { ...processedPhotoDict };
+      let dictChanged = false;
+      
+      // Add any new photos to our dictionary
+      currentPhotos.forEach(photo => {
+        if (!newDict[photo.id]) {
+          newDict[photo.id] = photo;
+          dictChanged = true;
+        }
+      });
+      
+      // Update the dictionary if changed
+      if (dictChanged) {
+        setProcessedPhotoDict(newDict);
+      }
+      
+      // Compare to avoid unnecessary state updates for previous photos
+      if (prevPhotos.length !== currentPhotos.length) {
         setPrevPhotos(currentPhotos);
       }
     }
-  }, [isLoading, currentPhotos, prevPhotos]);
+  }, [isLoading, currentPhotos, prevPhotos, processedPhotoDict]);
 
-  // Use previous photos during loading to maintain layout, or current photos when available
-  const photos =
-    isLoading && prevPhotos.length > 0 ? prevPhotos : currentPhotos;
+  // Memoize the final photos array to prevent unnecessary rerenders
+  const photos = useMemo(() => {
+    // Use previous photos during loading to maintain layout, or current photos when available
+    return isLoading && prevPhotos.length > 0 ? prevPhotos : currentPhotos;
+  }, [isLoading, prevPhotos.length, currentPhotos.length, currentPhotos]);
 
   return (
     <div className="w-full">

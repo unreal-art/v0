@@ -37,21 +37,27 @@ const ImageView = dynamic(() => import("./imageView"), {
   loading: () => <div className="w-full h-64 bg-gray-200 animate-pulse"></div>,
 });
 
-// Enhanced renderNextImage with Intersection Observer for more efficient loading
-function renderNextImage(
-  { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
-) {
-  // Validate photo object
-  if (!photo || typeof photo !== "object") {
-    return <div className="w-full h-64 bg-gray-200">Image data missing</div>;
-  }
-
-  // Use priority loading for the first 4 images only (reduced from 8 for faster initial load)
-  const shouldPrioritize = index < 4;
-
-  // Create a client-side only component for intersection observer
-  const LazyImage = () => {
+// Memoized LazyImage component to prevent unnecessary recreations
+const LazyImage = React.memo(
+  ({
+    photo,
+    width,
+    height,
+    index,
+    alt,
+    title,
+    sizes,
+    shouldPrioritize,
+  }: {
+    photo: any;
+    width: number;
+    height: number;
+    index: number;
+    alt: string;
+    title?: string;
+    sizes?: string;
+    shouldPrioritize: boolean;
+  }) => {
     const imageRef = React.useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(shouldPrioritize);
     const [hasError, setHasError] = useState(false);
@@ -91,15 +97,16 @@ function renderNextImage(
       }
 
       return () => observer?.disconnect();
-    }, []);
+    }, [shouldPrioritize]);
 
     // Extract image name for tracking with safe fallback
-    const imageName =
-      typeof photo === "object" &&
-      "src" in photo &&
-      typeof photo.src === "string"
-        ? photo.src.split("/").pop()?.split("?")[0] || `gallery-img-${index}`
-        : `gallery-img-${index}`;
+    const imageName = useMemo(() => {
+      return typeof photo === "object" &&
+        "src" in photo &&
+        typeof photo.src === "string"
+          ? photo.src.split("/").pop()?.split("?")[0] || `gallery-img-${index}`
+          : `gallery-img-${index}`;
+    }, [photo, index]);
 
     // Responsive size hints for optimal loading
     const responsiveSizes =
@@ -145,7 +152,37 @@ function renderNextImage(
         )}
       </div>
     );
-  };
+  },
+  // Custom comparison function that only triggers re-renders when necessary
+  (prevProps, nextProps) => {
+    // If the photo ID is the same, don't re-render
+    if (
+      prevProps.photo &&
+      nextProps.photo &&
+      'id' in prevProps.photo &&
+      'id' in nextProps.photo &&
+      prevProps.photo.id === nextProps.photo.id
+    ) {
+      return true; // props are equal, don't re-render
+    }
+
+    // Default comparison for other cases
+    return false;
+  }
+);
+
+// Enhanced renderNextImage with Intersection Observer for more efficient loading
+function renderNextImage(
+  { alt = "", title, sizes }: RenderImageProps,
+  { photo, width, height, index = 0 }: RenderImageContext
+) {
+  // Validate photo object
+  if (!photo || typeof photo !== "object") {
+    return <div className="w-full h-64 bg-gray-200">Image data missing</div>;
+  }
+
+  // Use priority loading for the first 4 images only (reduced from 8 for faster initial load)
+  const shouldPrioritize = index < 4;
 
   // Only render the LazyImage component on the client side
   return typeof window === "undefined" ? (
@@ -160,7 +197,16 @@ function renderNextImage(
       }}
     />
   ) : (
-    <LazyImage />
+    <LazyImage 
+      photo={photo}
+      width={width}
+      height={height}
+      index={index}
+      alt={alt}
+      title={title}
+      sizes={sizes}
+      shouldPrioritize={shouldPrioritize}
+    />
   );
 }
 
@@ -168,6 +214,8 @@ function PhotoGallaryTwo() {
   const [imageIndex, setImageIndex] = useState(-1);
   const [columns, setColumns] = useState<number | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  // Create a dictionary to track already processed photos by their ID
+  const [processedPhotoDict, setProcessedPhotoDict] = useState<Record<string, any>>({});
 
   const { userId } = useUser();
   const searchParams = useSearchParams();
@@ -303,16 +351,46 @@ function PhotoGallaryTwo() {
   const photos = useMemo(() => {
     try {
       if (!data?.pages) return [];
-      return formattedPhotosForGallery(data.pages);
+      
+      // Format photos but preserve references to already processed ones
+      const newPhotos = formattedPhotosForGallery(data.pages).map(photo => {
+        // If we already processed this photo before, reuse the reference
+        return processedPhotoDict[photo.id] || photo;
+      });
+      
+      return newPhotos;
     } catch (err) {
       console.error("Error formatting photos:", err);
       setError(err instanceof Error ? err.message : "Failed to format photos");
       return [];
     }
-  }, [data?.pages]);
+  }, [data?.pages, processedPhotoDict]);
 
   // Handle loading state
   const isLoading = isPostLoading || isQueryLoading;
+  
+  // Update our processed photos dictionary to preserve references
+  useEffect(() => {
+    // Only update when we have photos and not loading
+    if (photos.length > 0 && !isLoading) {
+      // Build new dictionary of processed photos
+      const newDict = { ...processedPhotoDict };
+      let dictChanged = false;
+      
+      // Add any new photos to our dictionary
+      photos.forEach(photo => {
+        if (!newDict[photo.id]) {
+          newDict[photo.id] = photo;
+          dictChanged = true;
+        }
+      });
+      
+      // Update the dictionary if changed
+      if (dictChanged) {
+        setProcessedPhotoDict(newDict);
+      }
+    }
+  }, [photos, isLoading, processedPhotoDict]);
 
   // Handle all possible error states
   const errorMessage =
