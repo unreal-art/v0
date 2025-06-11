@@ -34,7 +34,7 @@ export const sendJobRequest = ({
 
   const dto: Partial<JobSpec> = {
     module: "nearai",
-    version: "v0.3.3",
+    version: "v0.4.1",
     inputs: {
       Prompt: prompt,
       Seed: random.int(1e3, 1e8),
