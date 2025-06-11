@@ -6,7 +6,7 @@ frontend:
                 - 'npm install -g bun && bun i'
         build:
             commands:
-                - 'bun run build'
+                - 'npm run build'
     artifacts:
         baseDirectory: .next
         files:
