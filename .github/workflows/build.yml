@@ -37,17 +37,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 23
           check-latest: false
           # cache-dependency-path: "bun.lockb"
-          cache: "yarn"
+          # cache: "bun"
 
       - name: Install Dependencies
         run: |
           cp .env.example .env
           # source .env.example
           # bun i
-          yarn install
+          bun i
 
       - name: Write environment
         run: |
