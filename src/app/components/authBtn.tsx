@@ -57,7 +57,9 @@ export default function AuthBtn({ icon, children, provider }: AuthBtnProps) {
     const encodedState = btoa(JSON.stringify(state));
 
     //${torusUser ? `?torus_user=${encodeURIComponent(torusUser)}` : ""}`;
-    const redirectTo = `${config.domainName}/api/auth/callback`;
+    // const redirectTo = `${config.domainName}/api/auth/callback`;
+
+    const redirectTo = `${window.location.origin}/api/auth/callback`;
 
     setLoading(true);
     try {

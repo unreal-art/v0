@@ -114,6 +114,7 @@ export const appConfig = {
       },
     },
     rates: {
+      // TODO: try to use ethers library here makes things readable and usable
       standard: process.env.NEXT_PUBLIC_RATE || "300000000000000000000", // 300 tokens
       stableCoin:
         process.env.NEXT_PUBLIC_STABLE_COIN_RATE || "100000000000000000", // 0.1 tokens
