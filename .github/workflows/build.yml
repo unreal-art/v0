@@ -51,8 +51,8 @@ jobs:
 
       - name: Write environment
         run: |
-          echo "\n$envfile" >> .env
-          sed -i 's/ /\n/g' .env
+          echo "\n$envfile" > .env
+          sed -i "s/ /\n/g" .env
           source .env
 
       - name: Build
