@@ -3,6 +3,7 @@ frontend:
     phases:
         preBuild:
             commands:
+                - 'nvm install 23 && nvm use 23 || echo "Node 23 not found, falling back"'
                 - 'npm install -g bun && bun i'
         build:
             commands:
