@@ -53,7 +53,7 @@
         "react-three": "^0.9.7",
         "recharts": "^2.15.3",
         "sonner": "^2.0.1",
-        "supabase": "^2.9.6",
+        "supabase": "^2.24.3",
         "swiper": "9.0.2",
         "tailwind-merge": "^3.3.0",
         "thirdweb": "5.96.6",
@@ -2624,7 +2624,7 @@
 
     "sucrase": ["sucrase@3.35.0", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.2", "commander": "^4.0.0", "glob": "^10.3.10", "lines-and-columns": "^1.1.6", "mz": "^2.7.0", "pirates": "^4.0.1", "ts-interface-checker": "^0.1.9" }, "bin": { "sucrase": "bin/sucrase", "sucrase-node": "bin/sucrase-node" } }, "sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA=="],
 
-    "supabase": ["supabase@2.23.4", "", { "dependencies": { "bin-links": "^5.0.0", "https-proxy-agent": "^7.0.2", "node-fetch": "^3.3.2", "tar": "7.4.3" }, "bin": { "supabase": "bin/supabase" } }, "sha512-zuGxvy9qQqZtbc3ehZ2pP6j0r/dcNOW0hU93XPBJ7zSWfLlmQ/erlQHa/o36R4f2zpfR0REVF6023yuNCUdpMA=="],
+    "supabase": ["supabase@2.24.3", "", { "dependencies": { "bin-links": "^5.0.0", "https-proxy-agent": "^7.0.2", "node-fetch": "^3.3.2", "tar": "7.4.3" }, "bin": { "supabase": "bin/supabase" } }, "sha512-mh9pi4C5pM159GyYE+Rv9qL8kg1kqzimQ4FBr6UH/WhzB/VcDaA+vpn/VeRC3CGVKr+d89Ra5MjDWg+/UoPpXg=="],
 
     "supports-color": ["supports-color@7.2.0", "", { "dependencies": { "has-flag": "^4.0.0" } }, "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="],
 

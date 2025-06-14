@@ -80,7 +80,7 @@
     "react-three": "^0.9.7",
     "recharts": "^2.15.3",
     "sonner": "^2.0.1",
-    "supabase": "^2.9.6",
+    "supabase": "^2.24.3",
     "swiper": "9.0.2",
     "tailwind-merge": "^3.3.0",
     "thirdweb": "5.96.6",
