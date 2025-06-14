@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22 AS builder
+FROM node:20 AS builder
 WORKDIR /app
 
 #COPY package*.json pnpm-lock.yaml ./
@@ -14,7 +14,7 @@ RUN bun install
 
 
 # Deploy stage
-FROM node:22-alpine
+FROM node:20-alpine
 
 ENV PORT=3000
 ENV NODE_ENV="production"
