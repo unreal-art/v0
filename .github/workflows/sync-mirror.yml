@@ -1,5 +1,8 @@
 name: sync-mirror
 
+
+
+
 on:
   push:
     branches:
@@ -32,7 +35,7 @@ jobs:
       max-parallel: 4
       fail-fast: false
       matrix:
-        org: [{{ env.MIRROR_ORG }}]
+        org: ["{{ env.MIRROR_ORG }}"]
         repo: ["${{ github.repository_owner }}-${{ github.event.repository.name }}"]
 
     runs-on: ubuntu-latest
