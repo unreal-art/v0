@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22 AS builder
+FROM node:23 AS builder
 WORKDIR /app
 
 #COPY package*.json pnpm-lock.yaml ./
@@ -14,7 +14,7 @@ RUN bun install
 
 
 # Deploy stage
-FROM node:22-alpine
+FROM node:23-alpine
 
 ENV PORT=3000
 ENV NODE_ENV="production"
@@ -31,6 +31,6 @@ COPY --from=builder /app ./
 RUN bun run build
 # CMD ["sh", "-c", "npm run test && npm run test:e2e"]
 
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["bun", "next", "start"]
 
 LABEL maintainer="Hiro <laciferin@gmail.com>"
