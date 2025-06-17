@@ -1,8 +1,5 @@
 name: sync-mirror
 
-
-
-
 on:
   push:
     branches:
@@ -22,8 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
-  GH_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
+  GITHUB_TOKEN: ${{ secrets.MIRROR_TOKEN || github.token }}
+  GH_TOKEN: ${{ secrets.MIRROR_TOKEN || github.token }}
   GITHUB_REPO: ${{ github.repository }}
   MIRROR_ORG: laciferin2024
 
@@ -33,25 +30,26 @@ jobs:
     permissions:
       contents: write
       actions: write
-    
+
     strategy:
       max-parallel: 4
       fail-fast: false
       matrix:
         org: ["laciferin2024"]
-        repo: ["mirror-${{ github.repository_owner }}-${{ github.event.repository.name }}"]
+        repo:
+          [
+            "mirror-${{ github.repository_owner }}-${{ github.event.repository.name }}",
+          ]
 
     runs-on: ubuntu-latest
     env:
       REPO: ${{ matrix.org }}/${{ matrix.repo }}
-    
+
     steps:
       - name: Checkout source repository
         uses: actions/checkout@v4
-        
-
-      - name: Setup Just command runner
-        uses: extractions/setup-just@v1
+        with:
+          token: ${{env.GITHUB_TOKEN}}
 
       - name: Configure Git credentials
         run: |
@@ -64,7 +62,7 @@ jobs:
         run: |
           if ! gh repo view "${{ env.REPO }}" >/dev/null 2>&1; then
             echo "Creating repository ${{ env.REPO }}"
-            gh repo create "${{ env.REPO }}" --private --confirm
+            gh repo create "${{ env.REPO }}" --private 
             echo "Repository created successfully"
           else
             echo "Repository ${{ env.REPO }} already exists"
@@ -83,20 +81,18 @@ jobs:
             -f enabled=false
           echo "GitHub Actions disabled for ${{ env.REPO }}"
 
-
       - name: Mirror repository with LFS support
-        run: |          
+        run: |
           if git lfs ls-files >/dev/null 2>&1; then
             git lfs fetch --all
           fi
-          
+
           # git fetch -p origin || true
           git remote add mirror "https://github.com/${{ env.REPO }}"
           git push mirror --mirror --force
-          
+
           if git lfs ls-files >/dev/null 2>&1; then
           git lfs push --all mirror
           fi
-          
+
           echo "Successfully mirrored to ${{ env.REPO }}"
-          
