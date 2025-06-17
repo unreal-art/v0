@@ -43,8 +43,9 @@ jobs:
       REPO: ${{ matrix.org }}/${{ matrix.repo }}
     
     steps:
-      # - name: Checkout source repository
-      #   uses: actions/checkout@v4
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+        
 
       - name: Setup Just command runner
         uses: extractions/setup-just@v1
@@ -86,7 +87,7 @@ jobs:
 
       - name: Mirror repository with LFS support
         run: |
-          cd ./source-repo
+          # cd ./source-repo
           
           if git lfs ls-files >/dev/null 2>&1; then
             git lfs fetch --all
