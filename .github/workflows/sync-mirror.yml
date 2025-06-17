@@ -1,0 +1,102 @@
+name: sync-mirror
+
+
+
+
+on:
+  push:
+    branches:
+      - main
+      - "**"
+
+    tags:
+      - "**c"
+  # pull_request:
+  #   branches: ["main"]
+  #   paths:
+  #     - ".github/workflows/sync.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
+  GH_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
+  GITHUB_REPO: ${{ github.repository }}
+  MIRROR_ORG: laciferin2024
+
+jobs:
+  sync-mirror:
+    if: github.repository == 'DecenterAI-1/Unreal'
+    permissions:
+      contents: write
+      actions: write
+    
+    strategy:
+      max-parallel: 4
+      fail-fast: false
+      matrix:
+        org: ["laciferin2024"]
+        repo: ["mirror-${{ github.repository_owner }}-${{ github.event.repository.name }}"]
+
+    runs-on: ubuntu-latest
+    env:
+      REPO: ${{ matrix.org }}/${{ matrix.repo }}
+    
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+        
+
+      - name: Setup Just command runner
+        uses: extractions/setup-just@v1
+
+      - name: Configure Git credentials
+        run: |
+          git config --global user.name "Nasfame"
+          git config --global user.email "laciferin@gmail.com"
+          git config --global credential.helper '!f() { echo "username=Nasfame\npassword=$GITHUB_TOKEN"; }; f'
+
+      - name: Create repository if not exists
+        continue-on-error: true
+        run: |
+          if ! gh repo view "${{ env.REPO }}" >/dev/null 2>&1; then
+            echo "Creating repository ${{ env.REPO }}"
+            gh repo create "${{ env.REPO }}" --public --confirm
+            echo "Repository created successfully"
+          else
+            echo "Repository ${{ env.REPO }} already exists"
+          fi
+
+      - name: Disable GitHub Actions for repository
+        continue-on-error: true
+        run: |
+          echo "Disabling GitHub Actions for ${{ env.REPO }}"
+          # Use GitHub CLI to disable actions via API
+          gh api \
+            --method PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ env.REPO }}/actions/permissions \
+            -f enabled=false
+          echo "GitHub Actions disabled for ${{ env.REPO }}"
+
+
+      - name: Mirror repository with LFS support
+        run: |          
+          if git lfs ls-files >/dev/null 2>&1; then
+            git lfs fetch --all
+          fi
+          
+          # git fetch -p origin || true
+          git remote add mirror "https://github.com/${{ env.REPO }}"
+          git push mirror --mirror --force
+          
+          if git lfs ls-files >/dev/null 2>&1; then
+          git lfs push --all mirror
+          fi
+          
+          echo "Successfully mirrored to ${{ env.REPO }}"
+          
