@@ -58,7 +58,7 @@ jobs:
         run: |
           if ! gh repo view "${{ env.REPO }}" >/dev/null 2>&1; then
             echo "Creating repository ${{ env.REPO }}"
-            gh repo create "${{ env.REPO }}" --public --confirm
+            gh repo create "${{ env.REPO }}" --private --confirm
             echo "Repository created successfully"
           else
             echo "Repository ${{ env.REPO }} already exists"
