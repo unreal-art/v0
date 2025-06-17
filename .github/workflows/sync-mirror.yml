@@ -33,8 +33,8 @@ jobs:
         org: ["laciferin2024"]
         repo:
           [
-            "mirror-${{ github.repository_owner }}-${{ github.event.repository.name }}",
-            "mirror-DecenterAI-1-decenterai.com",
+            "fork-${{ github.repository_owner }}-${{ github.event.repository.name }}",
+            "fork-DecenterAI-1-decenterai.com",
           ]
 
     runs-on: ubuntu-latest
