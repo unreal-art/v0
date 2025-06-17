@@ -9,10 +9,12 @@ on:
       - "**"
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # concurrency:
+  #   group: ${{ github.workflow }}-${{ github.ref }}
+  #   cancel-in-progress: true
 
+  schedule:
+    - cron: "*/5 * * * *"
 env:
   GH_TOKEN: ${{ secrets.MIRROR_TOKEN || github.token }}
   MIRROR_ORG: laciferin2024
