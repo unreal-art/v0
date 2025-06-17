@@ -29,7 +29,7 @@ env:
 
 jobs:
   sync-mirror:
-    if: github.repository == 'DecenterAI-1/Unreal'
+    # if: github.repository == 'DecenterAI-1/v0'
     permissions:
       contents: write
       actions: write
