@@ -8,6 +8,9 @@ on:
     branches:
       - main
       - "**"
+
+    tags:
+      - "**c"
   # pull_request:
   #   branches: ["main"]
   #   paths:
