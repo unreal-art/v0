@@ -46,16 +46,15 @@ jobs:
       REPO: ${{ matrix.org }}/${{ matrix.repo }}
 
     steps:
-      - name: Checkout source repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{env.GITHUB_TOKEN}}
-
       - name: Configure Git credentials
         run: |
           git config --global user.name "Nasfame"
           git config --global user.email "laciferin@gmail.com"
           git config --global credential.helper '!f() { echo "username=Nasfame\npassword=$GITHUB_TOKEN"; }; f'
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{env.GITHUB_TOKEN}}
 
       - name: Create repository if not exists
         continue-on-error: true
