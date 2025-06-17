@@ -36,7 +36,7 @@ jobs:
       fail-fast: false
       matrix:
         org: ["laciferin2024"]
-        repo: ["${{ github.repository_owner }}-${{ github.event.repository.name }}"]
+        repo: ["mirror-${{ github.repository_owner }}-${{ github.event.repository.name }}"]
 
     runs-on: ubuntu-latest
     env:
