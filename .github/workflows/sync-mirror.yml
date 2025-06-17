@@ -101,7 +101,8 @@ jobs:
           git push mirror --mirror --force
           
           if git lfs ls-files >/dev/null 2>&1; then
-            git lfs push --all mirror
+          git lfs push --all mirror
           fi
           
           echo "Successfully mirrored to ${{ env.REPO }}"
+          
