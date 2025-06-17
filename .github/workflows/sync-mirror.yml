@@ -67,6 +67,6 @@ jobs:
         run: |
           # Sync the fork to ensure it's up to date with all branches and tags
           gh repo sync ${{ env.FORK_NAME }} \
-            --source ${{ github.repository }} \
+            # --source ${{ github.repository }} \
             --force
           echo "Successfully synced ${{ env.FORK_NAME }} with ${{ github.repository }}"
