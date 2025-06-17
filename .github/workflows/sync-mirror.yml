@@ -43,10 +43,8 @@ jobs:
       REPO: ${{ matrix.org }}/${{ matrix.repo }}
     
     steps:
-      - name: Checkout source repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      # - name: Checkout source repository
+      #   uses: actions/checkout@v4
 
       - name: Setup Just command runner
         uses: extractions/setup-just@v1
