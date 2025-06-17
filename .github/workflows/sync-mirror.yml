@@ -1,0 +1,72 @@
+name: sync-fork
+
+on:
+  push:
+    branches:
+      - main
+      - "**"
+    tags:
+      - "**"
+  workflow_dispatch:
+
+  # concurrency:
+  #   group: ${{ github.workflow }}-${{ github.ref }}
+  #   cancel-in-progress: true
+
+  schedule:
+    - cron: "*/5 * * * *"
+env:
+  GH_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
+  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
+  MIRROR_ORG: laciferin2024
+
+jobs:
+  sync-fork:
+    permissions:
+      contents: write
+      actions: write
+
+    strategy:
+      max-parallel: 4
+      fail-fast: false
+      matrix:
+        org: ["laciferin2024"]
+        repo:
+          [
+            "${{ github.repository_owner }}-${{ github.event.repository.name }}",
+            "DecenterAI-1-decenterai.com",
+          ]
+
+    runs-on: ubuntu-latest
+    env:
+      FORK_NAME: ${{ matrix.org }}/${{ matrix.repo }}
+
+    steps:
+      - name: Create fork with custom name
+        continue-on-error: true
+        run: |
+          # Fork the current repository to the target organization with custom name
+          gh repo fork ${{ github.repository }} \
+            --org ${{ matrix.org }} \
+            --fork-name ${{ matrix.repo }} \
+            --default-branch-only
+          echo "Fork created: ${{ env.FORK_NAME }}"
+
+      - name: Disable GitHub Actions for fork
+        continue-on-error: true
+        run: |
+          echo "Disabling GitHub Actions for ${{ env.FORK_NAME }}"
+          gh api \
+            --method PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ env.FORK_NAME }}/actions/permissions \
+            -f enabled=false
+          echo "GitHub Actions disabled for ${{ env.FORK_NAME }}"
+
+      - name: Sync fork with source
+        run: |
+          # Sync the fork to ensure it's up to date with all branches and tags
+          gh repo sync ${{ env.FORK_NAME }} \
+            # --source ${{ github.repository }} \
+          echo "Successfully synced ${{ env.FORK_NAME }} with ${{ github.repository }}"
