@@ -80,8 +80,14 @@ jobs:
             -f enabled=false
           echo "GitHub Actions disabled for ${{ env.REPO }}"
 
+      - name: Clone Source repo
+        run: |
+          gh repo clone ${{ github.repository }}" ./src -- --bare
+
       - name: Mirror repository with LFS support
         run: |
+          cd src
+
           if git lfs ls-files >/dev/null 2>&1; then
             git lfs fetch --all
           fi
