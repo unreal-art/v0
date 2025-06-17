@@ -84,14 +84,8 @@ jobs:
           echo "GitHub Actions disabled for ${{ env.REPO }}"
 
 
-      - name: Create bare clone for mirroring
-        run: |
-          git clone --bare "https://github.com/${{ github.repository }}" ./source-repo
-
       - name: Mirror repository with LFS support
-        run: |
-          # cd ./source-repo
-          
+        run: |          
           if git lfs ls-files >/dev/null 2>&1; then
             git lfs fetch --all
           fi
