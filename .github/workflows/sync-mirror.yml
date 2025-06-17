@@ -16,7 +16,8 @@ on:
   schedule:
     - cron: "*/5 * * * *"
 env:
-  GH_TOKEN: ${{ secrets.MIRROR_TOKEN || github.token }}
+  GH_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
+  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB || github.token }}
   MIRROR_ORG: laciferin2024
 
 jobs:
