@@ -24,7 +24,7 @@ function getChainInfo(chainId: number) {
   const isMainnet = chainId === torusMainnet.id
   const isTestnet = chainId === torusTestnet.id
 
-  if (!isMainnet && !isTestnet) {
+  if (!isMainnet) {
     console.warn(
       `Chain ID ${chainId} is not one of our supported chains, using testnet as fallback`
     )
