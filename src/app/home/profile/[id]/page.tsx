@@ -13,6 +13,7 @@ import { Post } from "$/types/data.types";
 import ProfileView from "../components/profileView";
 import {
   getIsDraftPostsByUser,
+  getMintedPostsByUser,
   getPinnedPostsByUser,
   getPostsByUser,
   getPrivatePostsByUser,
@@ -204,7 +205,9 @@ async function getInitialPosts(
     case "LIKED":
       return await getUserLikedPosts(supabase, pageParam, userId);
     case "PINNED":
-      return await getPinnedPostsByUser(supabase, pageParam, userId);
+      return await getPinnedPostsByUser(supabase, pageParam, userId);    
+    case "MINTED":
+      return await getMintedPostsByUser(supabase, pageParam, userId);
     case "DRAFT":
       return await getIsDraftPostsByUser(supabase, pageParam, userId);
     default:
