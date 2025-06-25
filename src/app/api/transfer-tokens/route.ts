@@ -109,13 +109,19 @@ export async function POST(
       process.env.SIMULATE_ODP_SUCCESS === "true"
     ) {
       console.log("simulating ODP success")
+      // Generate 0x + exactly 64 hex chars to match DB constraint
+      const generateValidTxHash = () => {
+        // Create array of 64 elements and map each to a random hex digit
+        const hexChars = Array(64).fill(0).map(() => {
+          const randomHex = Math.floor(Math.random() * 16).toString(16)
+          return randomHex
+        }).join('')
+        
+        return `0x${hexChars}`
+      }
+      
       const resData = {
-        transactionhash:
-          "0x" +
-          Math.floor(
-            Math.random() *
-              10000000000000000000000000000000000000000000000000000000000000000
-          ).toString(16),
+        transactionhash: generateValidTxHash()
       }
       return NextResponse.json({
         success: true,
