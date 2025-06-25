@@ -8,6 +8,8 @@ import {
   MessageIcon,
   PinIcon,
   ShareIcon,
+  MintIcon,
+  MintFillIcon,
 } from "@/app/components/icons";
 import { useComments, useRealtimeComments } from "@/hooks/useComments";
 import { useLikePost } from "@/hooks/useLikePost";
@@ -16,7 +18,13 @@ import {
   //usePinnedPosts,
   usePinPost,
   useUnpinPost,
-} from "@/hooks/usePinnedPosts";
+}
+from "@/hooks/usePinnedPosts";
+import {
+  useIsPostMinted,
+  useMintPost,
+  useUnmintPost,
+} from "@/hooks/useMintedPosts";
 import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
@@ -59,6 +67,14 @@ export default function Interactions({
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
   const { mutate: unpinPost } = useUnpinPost(userId as string);
+
+  // Mint functionality
+  const { isMinted, setMinted } = useIsPostMinted(
+    postId,
+    userId as string
+  );
+  const { mutate: mintPost } = useMintPost(userId as string);
+  const { mutate: unmintPost } = useUnmintPost(userId as string);
   const { shareCount: shareNotifications } = useCountShareNotifications(postId);
 
   const togglePostPin = () => {
@@ -96,6 +112,46 @@ export default function Interactions({
             isPinned: true,
           });
           toast.error(`Failed to unpin post: ${error.message}`);
+        },
+      });
+    }
+  };
+
+  const togglePostMint = () => {
+    if (!userId) return;
+
+    // Optimistically update the UI
+    const newMintedState = !isMinted;
+
+    // Update the isMinted state
+    setMinted(newMintedState);
+
+    // Also update the post data to reflect the mint status
+    updatePostOptimistically({
+      isMinted: newMintedState,
+    });
+
+    // Call the appropriate mutation
+    if (newMintedState) {
+      mintPost(postId, {
+        onError: (error) => {
+          // If the mutation fails, revert the optimistic updates
+          setMinted(false);
+          updatePostOptimistically({
+            isMinted: false,
+          });
+          toast.error(`Failed to mint post: ${error.message}`);
+        },
+      });
+    } else {
+      unmintPost(postId, {
+        onError: (error) => {
+          // If the mutation fails, revert the optimistic updates
+          setMinted(true);
+          updatePostOptimistically({
+            isMinted: true,
+          });
+          toast.error(`Failed to unmint post: ${error.message}`);
         },
       });
     }
@@ -140,6 +196,14 @@ export default function Interactions({
               <PinFillIcon color="#F0F0F0" />
             ) : (
               <PinIcon color="#F0F0F0" />
+            )}
+          </button>
+
+          <button onClick={() => togglePostMint()}>
+            {isMinted ? (
+              <MintFillIcon color="#F0F0F0" />
+            ) : (
+              <MintIcon color="#F0F0F0" />
             )}
           </button>
 

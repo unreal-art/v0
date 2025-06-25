@@ -245,7 +245,7 @@ export async function getMintedPostsByUser(
     .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching minted posts", error)
+    logError("Supabase error fetching pinned posts", error)
     throw new Error(error.message)
   }
 
