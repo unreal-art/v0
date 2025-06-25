@@ -219,52 +219,7 @@ export default function ProfileView() {
           </div>
         }>
           {/* If we're on the Pinned tab and have minted posts, show them above the pinned posts */}
-          {currentTab === "Pinned" && mintedPosts && mintedPosts.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center mb-4">
-                <MintIcon color="#FFFFFF" width={20} height={20} />
-                <h3 className="ml-2 text-lg font-semibold">Minted Posts</h3>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {mintedPosts.map((post) => {
-                  // Only show posts that have ipfsImages with hash and fileNames
-                  if (!post.ipfsImages?.[0]?.hash || !post.ipfsImages?.[0]?.fileNames?.[0]) {
-                    return null;
-                  }
-                  
-                  return (
-                    <div key={`mint-${post.id}`} className="relative rounded-lg overflow-hidden">
-                      <div className="relative bg-primary-13 rounded-lg overflow-hidden" style={{ height: '300px' }}>
-                        <OptimizedImage
-                          src={getImage(
-                            post.ipfsImages[0].hash,
-                            post.ipfsImages[0].fileNames[0],
-                            post.author
-                          )}
-                          alt={post.caption || post.prompt || ""}
-                          width={300}
-                          height={300}
-                          className="object-cover w-full h-full transition-opacity duration-300"
-                          imageName={`mint-${post.id}`}
-                          priority={false}
-                        />
-                        {/* Mint indicator badge */}
-                        <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
-                          <MintIcon color="#FFFFFF" width={16} height={16} />
-                        </div>
-                        {/* Caption overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
-                          <p className="text-white text-xs truncate">
-                            {post.caption || post.prompt}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* Minted posts are now in their own tab */}
           
           <PhotoGridTwo
             {...config}

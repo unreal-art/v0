@@ -112,9 +112,9 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "credit_purchases_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
+            foreignKeyName: "credit_purchases_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -240,6 +240,42 @@ export type Database = {
           },
           {
             foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_rank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_mints: {
+        Row: {
+          createdat: string | null
+          id: number
+          post_id: number | null
+          user_id: string | null
+        }
+        Insert: {
+          createdat?: string | null
+          id?: never
+          post_id?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          createdat?: string | null
+          id?: never
+          post_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_mints_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_mints_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts_with_rank"
@@ -480,27 +516,6 @@ export type Database = {
       }
     }
     Functions: {
-      decrement_credit_and_insert_post: {
-        Args: { author_id: string; post_data: Json }
-        Returns: {
-          author: string
-          caption: string | null
-          category: string | null
-          cpu: number | null
-          createdAt: string
-          device: string | null
-          id: number
-          ipfsImages: Json | null
-          isDraft: boolean | null
-          isPinned: boolean | null
-          isPrivate: boolean | null
-          like_count: number | null
-          media_type: string | null
-          n: number | null
-          prompt: string | null
-          seed: number | null
-        }[]
-      }
       delete_from_queue: {
         Args: { queue_name: string; msg_id: number }
         Returns: undefined
