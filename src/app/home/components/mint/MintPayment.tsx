@@ -27,9 +27,9 @@ interface MintPaymentProps {
 
 // ODP contract instance using the appropriate network
 const odpContract = getContractInstance(
-  appConfig.environment.isDevelopment ? torusTestnet : torusMainnet,
+  appConfig.environment.isDevelopment ? torusMainnet : torusMainnet,
   appConfig.environment.isDevelopment
-    ? appConfig.blockchain.contracts.odpTestnet
+    ? appConfig.blockchain.contracts.odpMainnet
     : appConfig.blockchain.contracts.odpMainnet
 );
 
@@ -96,10 +96,8 @@ export default function MintPayment({
         throw new Error("Treasury wallet address not configured");
       }
       
-      const chainId = walletChain?.id || (appConfig.environment.isDevelopment ? torusTestnet.id : torusMainnet.id);
-      const odpAddress = appConfig.environment.isDevelopment ? 
-        (process.env.UNREAL_CHAIN === "torusMainnet" ? appConfig.blockchain.contracts.odpMainnet : appConfig.blockchain.contracts.odpTestnet) : 
-        appConfig.blockchain.contracts.odpMainnet;
+      const chainId = walletChain?.id || torusMainnet.id;
+      const odpAddress = appConfig.blockchain.contracts.odpMainnet;
       
       // Create deadline 1 hour from now
       const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
@@ -142,8 +140,7 @@ export default function MintPayment({
           postId,
           userId: user.id,
           transactionHash: transferResult.data.transactionhash,
-          amount: MINT_PRICE,
-          chain: chainId,
+          chainId: chainId,
         });
         
         // Set success status
