@@ -1,3 +1,5 @@
+"use client";
+
 import { getInitials, log } from "@/utils";
 import Image, { ImageProps } from "next/image";
 import { useState, useCallback, memo } from "react";
