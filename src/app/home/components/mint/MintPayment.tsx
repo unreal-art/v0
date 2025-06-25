@@ -124,9 +124,7 @@ export default function MintPayment({
         throw new Error("Failed to create signature");
       }
       let txHash:string | null = null;
-      if(process.env.NODE_ENV === "development" && process.env.SIMULATE_ODP_SUCCESS === "true"){
-        txHash = "0x"+Math.floor(Math.random() * 10000000000000000000000000000000000000000000000000000000000000000).toString();
-      }
+ 
 
       if(!txHash){
         // Use token transfer API

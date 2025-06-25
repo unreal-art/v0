@@ -1,36 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "@/queries/user";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { ethers } from "ethers";
-import appConfig from "@/config";
+import { NextRequest, NextResponse } from "next/server"
+import { getUser } from "@/queries/user"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
+import { ethers } from "ethers"
+import appConfig from "@/config"
 
 // Define types for request and response
 interface TokenTransferRequest {
-  owner: string;
-  signature: string;
-  value: string;
-  deadline: number;
-  spender: string;
-  partnerwallet: string;
-  vendor: string;
+  owner: string
+  signature: string
+  value: string
+  deadline: number
+  spender: string
+  partnerwallet: string
+  vendor: string
 }
 
 interface TokenTransferResponse {
-  success: boolean;
-  data?: any;
-  error?: { message: string; details?: string; statusCode?: number };
-  warning?: string;
+  success: boolean
+  data?: any
+  error?: { message: string; details?: string; statusCode?: number }
+  warning?: string
 }
 
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<TokenTransferResponse>> {
   // Initialize required configuration
-  const supabaseUrl = appConfig.services.supabase.url;
-  const privateServiceRoleKey = appConfig.services.supabase.SRK;
-  const odpApiKey = appConfig.services.odp.apiKey;
-  const odpApiEndpoint = appConfig.services.odp.apiEndpoint;
-  const rateStr = appConfig.blockchain.rates.odp;
+  const supabaseUrl = appConfig.services.supabase.url
+  const privateServiceRoleKey = appConfig.services.supabase.SRK
+  const odpApiKey = appConfig.services.odp.apiKey
+  const odpApiEndpoint = appConfig.services.odp.apiEndpoint
+  const rateStr = appConfig.blockchain.rates.odp
 
   // Check configuration
   if (
@@ -40,39 +40,39 @@ export async function POST(
     !odpApiEndpoint ||
     !rateStr
   ) {
-    console.error("Missing server configuration");
+    console.error("Missing server configuration")
     return NextResponse.json(
       { success: false, error: { message: "Server configuration error" } },
       { status: 500 }
-    );
+    )
   }
 
   // Create Supabase client only once
   const supabase: SupabaseClient = createClient(
     supabaseUrl,
     privateServiceRoleKey
-  );
+  )
 
   try {
     // Authenticate user
-    const user = await getUser();
+    const user = await getUser()
     if (!user) {
       return NextResponse.json(
         { success: false, error: { message: "User authentication failed" } },
         { status: 401 }
-      );
+      )
     }
 
     // Parse and validate request body
-    let body: TokenTransferRequest;
+    let body: TokenTransferRequest
     try {
-      body = await request.json();
+      body = await request.json()
     } catch (parseError) {
-      console.error("Request parsing error:", parseError);
+      console.error("Request parsing error:", parseError)
       return NextResponse.json(
         { success: false, error: { message: "Invalid request format" } },
         { status: 400 }
-      );
+      )
     }
 
     // console.log(body)
@@ -86,11 +86,11 @@ export async function POST(
       "spender",
       "partnerwallet",
       "vendor",
-    ];
+    ]
 
     const missingFields = requiredFields.filter(
       (field) => !body[field as keyof TokenTransferRequest]
-    );
+    )
 
     if (missingFields.length > 0) {
       return NextResponse.json(
@@ -101,18 +101,37 @@ export async function POST(
           },
         },
         { status: 400 }
-      );
+      )
     }
 
+    if (
+      process.env.NODE_ENV === "development" &&
+      process.env.SIMULATE_ODP_SUCCESS === "true"
+    ) {
+      console.log("simulating ODP success")
+      const resData = {
+        transactionhash:
+          "0x" +
+          Math.floor(
+            Math.random() *
+              10000000000000000000000000000000000000000000000000000000000000000
+          ).toString(16),
+      }
+      return NextResponse.json({
+        success: true,
+        data: resData,
+        status: 200,
+      })
+    }
     // Make API request to ODP Partner Wallet API
-    const response = await fetchTokenService(body, odpApiEndpoint, odpApiKey);
+    const response = await fetchTokenService(body, odpApiEndpoint, odpApiKey)
     if (!response.ok) {
-      const statusCode = response.status;
+      const statusCode = response.status
       const errorData = await response
         .json()
-        .catch(() => ({ message: "Unknown error" }));
+        .catch(() => ({ message: "Unknown error" }))
 
-      console.error(`External API error (${statusCode}):`, errorData);
+      console.error(`External API error (${statusCode}):`, errorData)
       return NextResponse.json(
         {
           success: false,
@@ -123,28 +142,27 @@ export async function POST(
           },
         },
         { status: response.status === 404 ? 404 : 502 }
-      );
+      )
     }
 
     // Process successful API response
     const data = await response.json().catch((error) => {
-      console.error("Response parsing error:", error);
-      throw new Error("Invalid response from token service");
-    });
+      console.error("Response parsing error:", error)
+      throw new Error("Invalid response from token service")
+    })
 
     // Update user credit balance
     try {
-      const rate = Number(rateStr);
-      const formattedValue = ethers.formatUnits(body.value, 18);
+      const rate = Number(rateStr)
+      const formattedValue = ethers.formatUnits(body.value, 18)
       const addedBalance =
-        Number(formattedValue) /
-        Number(ethers.formatUnits(rate.toString(), 18));
-      const newBalance = (user?.creditBalance || 0) + addedBalance;
-      console.log(newBalance, user.creditBalance);
+        Number(formattedValue) / Number(ethers.formatUnits(rate.toString(), 18))
+      const newBalance = (user?.creditBalance || 0) + addedBalance
+      console.log(newBalance, user.creditBalance)
       const { error } = await supabase
         .from("profiles")
         .update({ credit_balance: newBalance })
-        .eq("id", user?.id);
+        .eq("id", user?.id)
 
       // Insert credit purchase record
       const { error: creditError } = await supabase
@@ -154,15 +172,15 @@ export async function POST(
             amount: addedBalance,
             user: user?.id,
           },
-        ]);
+        ])
 
       if (creditError) {
-        console.error("Error inserting credit purchase:", creditError);
+        console.error("Error inserting credit purchase:", creditError)
         // Don't fail the whole process if credit insertion fails
       }
 
       if (error) {
-        console.error("Supabase update error:", error);
+        console.error("Supabase update error:", error)
         return NextResponse.json(
           {
             success: true,
@@ -170,10 +188,10 @@ export async function POST(
             data,
           },
           { status: 200 }
-        );
+        )
       }
     } catch (balanceError) {
-      console.error("Balance calculation error:", balanceError);
+      console.error("Balance calculation error:", balanceError)
       return NextResponse.json(
         {
           success: true,
@@ -181,17 +199,17 @@ export async function POST(
           data,
         },
         { status: 200 }
-      );
+      )
     }
 
     // Return successful response
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data })
   } catch (error) {
-    console.error("Token transfer unexpected error:", error);
+    console.error("Token transfer unexpected error:", error)
     return NextResponse.json(
       { success: false, error: { message: "Internal server error" } },
       { status: 500 }
-    );
+    )
   }
 }
 
@@ -211,9 +229,9 @@ async function fetchTokenService(
         "x-api-key": apiKey,
       },
       body: JSON.stringify(payload),
-    });
+    })
   } catch (error) {
-    console.error("Token service fetch error:", error);
-    throw new Error("Failed to connect to token service");
+    console.error("Token service fetch error:", error)
+    throw new Error("Failed to connect to token service")
   }
 }
