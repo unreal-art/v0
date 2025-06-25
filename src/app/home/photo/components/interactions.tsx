@@ -196,7 +196,7 @@ export default function Interactions({
           >
             <MintIcon color="#FFFFFF" />
             <p className="text-xs font-medium text-white">
-              Mint{mintCount > 0 && <> <AnimatedCounter value={mintCount} className="text-yellow-300 font-bold" /></>}
+              Mint <AnimatedCounter value={mintCount} className="text-yellow-300 font-bold" />
             </p>
           </button>
 
