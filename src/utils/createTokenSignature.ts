@@ -26,7 +26,7 @@ function getChainInfo(chainId: number) {
 
   if (!isMainnet) {
     console.warn(
-      `Chain ID ${chainId} is not one of our supported chains, using testnet as fallback`
+      `Chain ID ${chainId} is not one of our supported chains, using mainnet as fallback`
     )
   }
 
