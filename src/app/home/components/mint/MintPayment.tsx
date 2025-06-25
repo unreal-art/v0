@@ -16,6 +16,8 @@ import {
 } from "thirdweb/react";
 import { toast } from "sonner";
 import { axiosInstanceLocal } from "@/lib/axiosInstance";
+import { useTokenTransfer } from "@/hooks/useTokenTransfer";
+import { createTokenSignature } from "@/utils/createTokenSignature";
 
 interface MintPaymentProps {
   postId: number;
@@ -51,6 +53,10 @@ export default function MintPayment({
   const isLoggedIn = !!account;
   const { user } = useUser();
 
+  // Token transfer hook
+  const tokenTransfer = useTokenTransfer();
+  const isTransferring = tokenTransfer.isPending;
+
   // Read ODP balance
   const { data: balance } = useReadContract({
     contract: odpContract,
@@ -61,14 +67,10 @@ export default function MintPayment({
   // Format ODP balance for display
   const odpBalance = balance ? Number(formatEther(balance)) : 0;
   
-  // Transaction mutation
-  const { mutateAsync: sendTransaction, isPending: isSending } = 
-    useSendAndConfirmTransaction();
-
   // Function to handle the mint transaction
   const handleMint = async () => {
-    if (!account || !walletChain) {
-      toast.error("Please connect your wallet first");
+    if (!account) {
+      toast.error("Please connect your wallet");
       return;
     }
     
@@ -87,32 +89,61 @@ export default function MintPayment({
     setStatus("processing");
     
     try {
-      // Contract address for the app to receive ODP
-      // Using the treasury address as the recipient wallet
-      const appWalletAddress = appConfig.blockchain.contracts.treasury;
+      // Using treasury as the recipient wallet
+      const treasuryAddress = appConfig.blockchain.contracts.treasury;
       
-      if (!appWalletAddress) {
+      if (!treasuryAddress) {
         throw new Error("Treasury wallet address not configured");
       }
       
-      // Prepare the transaction - sending ODP to app wallet
-      const transaction = prepareContractCall({
-        contract: odpContract,
-        method: "function transfer(address, uint256) returns (bool)",
-        params: [appWalletAddress, parseEther(MINT_PRICE.toString())],
+      const chainId = walletChain?.id || (appConfig.environment.isDevelopment ? torusTestnet.id : torusMainnet.id);
+      const odpAddress = appConfig.environment.isDevelopment ? 
+        (process.env.UNREAL_CHAIN === "torusMainnet" ? appConfig.blockchain.contracts.odpMainnet : appConfig.blockchain.contracts.odpTestnet) : 
+        appConfig.blockchain.contracts.odpMainnet;
+      
+      // Create deadline 1 hour from now
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+      
+      if (!account.address) {
+        throw new Error("Wallet address not available");
+      }
+
+      // Create token signature
+      const signature = await createTokenSignature(
+        account, // Pass the wallet object as first parameter
+        {
+          owner: account.address,
+          spender: appConfig.blockchain.contracts.spender,
+          value: parseEther(MINT_PRICE.toString()).toString(),
+          deadline: deadline.toString(),
+          tokenAddress: odpAddress,
+          chainId,
+        }
+      );
+      
+      if (!signature) {
+        throw new Error("Failed to create signature");
+      }
+      
+      // Use token transfer API
+      const transferResult = await tokenTransfer.mutateAsync({
+        owner: account.address,
+        signature,
+        value: parseEther(MINT_PRICE.toString()).toString(),
+        deadline,
+        spender: appConfig.blockchain.contracts.spender,
+        partnerwallet: treasuryAddress,
+        vendor: "mint",
       });
       
-      // Send the transaction with correct typing
-      const result = await sendTransaction(transaction);
-      
-      if (result?.transactionHash) {
+      if (transferResult.success && transferResult.data?.transactionhash) {
         // Send the transaction data to the API
         await axiosInstanceLocal.post("/api/mint", {
           postId,
           userId: user.id,
-          transactionHash: result.transactionHash,
+          transactionHash: transferResult.data.transactionhash,
           amount: MINT_PRICE,
-          chain: walletChain.id,
+          chain: chainId,
         });
         
         // Set success status
@@ -125,12 +156,12 @@ export default function MintPayment({
           onMintSuccess();
         }, 2000);
       } else {
-        throw new Error("Transaction failed");
+        throw new Error(transferResult.error?.message || "Token transfer failed");
       }
     } catch (error: any) {
       console.error("Mint error:", error);
       setStatus("error");
-      setErrorMessage(error.message || "Transaction failed");
+      setErrorMessage(error.message || "Failed to mint post");
       logError("Mint transaction error", error);
       toast.error("Failed to mint post");
     }
@@ -216,14 +247,14 @@ export default function MintPayment({
 
           <button
             onClick={handleMint}
-            disabled={odpBalance < MINT_PRICE || isSending}
+            disabled={odpBalance < MINT_PRICE || isTransferring}
             className={`w-full py-3 rounded-full font-medium ${
-              odpBalance < MINT_PRICE || isSending
+              odpBalance < MINT_PRICE || isTransferring
                 ? "bg-primary-8 text-primary-6 cursor-not-allowed"
                 : "bg-primary-11 text-primary-1 hover:bg-primary-10"
             }`}
           >
-            {isSending ? "Processing..." : "Mint Post"}
+            {isTransferring ? "Processing..." : "Mint Post"}
           </button>
         </div>
       )}
