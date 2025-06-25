@@ -123,24 +123,34 @@ export default function MintPayment({
       if (!signature) {
         throw new Error("Failed to create signature");
       }
+      let txHash:string | null = null;
+      if(process.env.NODE_ENV === "development" && process.env.SIMULATE_ODP_SUCCESS === "true"){
+        txHash = "0x"+Math.floor(Math.random() * 10000000000000000000000000000000000000000000000000000000000000000).toString();
+      }
+
+      if(!txHash){
+        // Use token transfer API
+        const transferResult = await tokenTransfer.mutateAsync({
+          owner: account.address,
+          signature,
+          value: parseEther(MINT_PRICE.toString()).toString(),
+          deadline,
+          spender: appConfig.blockchain.contracts.spender,
+          partnerwallet: treasuryAddress,
+          vendor: appConfig.app.name,
+        });
+        if (!transferResult.success) {
+          throw new Error("Failed to transfer ODP");
+        }
+        txHash = transferResult.data?.transactionhash ;
+      }
       
-      // Use token transfer API
-      const transferResult = await tokenTransfer.mutateAsync({
-        owner: account.address,
-        signature,
-        value: parseEther(MINT_PRICE.toString()).toString(),
-        deadline,
-        spender: appConfig.blockchain.contracts.spender,
-        partnerwallet: treasuryAddress,
-        vendor: appConfig.app.name,
-      });
-      
-      if (transferResult.success && transferResult.data?.transactionhash) {
+      if (txHash) {
         // Send the transaction data to the API
         await axiosInstanceLocal.post("/api/mint", {
           postId,
           userId: user.id,
-          transactionHash: transferResult.data.transactionhash,
+          transactionHash: txHash,
           chainId: chainId,
         });
         
@@ -153,8 +163,10 @@ export default function MintPayment({
           handleClose();
           onMintSuccess();
         }, 2000);
-      } else {
-        throw new Error(transferResult.error?.message || "Token transfer failed");
+      }else{
+        setStatus("error");
+        setErrorMessage("Failed to mint post as txHas not found");
+        toast.error("Failed to mint post");
       }
     } catch (error: any) {
       console.error("Mint error:", error);
