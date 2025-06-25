@@ -39,6 +39,7 @@ import ImageView from "../../components/imageView";
 import { IPhoto } from "@/app/libs/interfaces";
 import MintModal from "../../components/mint/MintModal";
 import { usePostMints } from "@/hooks/usePostMints";
+import AnimatedCounter from "../../components/mint/AnimatedCounter";
 
 export default function Interactions({
   postId,
@@ -194,7 +195,9 @@ export default function Interactions({
             title="Mint this post with ODP tokens"
           >
             <MintIcon color="#FFFFFF" />
-            <p className="text-xs font-medium text-white">Mint <span className="text-yellow-300 font-bold">{mintCount}</span></p>
+            <p className="text-xs font-medium text-white">
+              Mint{mintCount > 0 && <> <AnimatedCounter value={mintCount} className="text-yellow-300 font-bold" /></>}
+            </p>
           </button>
 
           <button
