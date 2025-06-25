@@ -1,32 +1,31 @@
-import { Client } from "$/supabase/client";
-import { Post, UploadResponse } from "$/types/data.types";
-import { getRange } from "@/utils";
-import { LIST_LIMIT } from "@/app/libs/constants";
-import { logError, logWarning } from "@/utils/sentryUtils";
+import { Client } from "$/supabase/client"
+import { Post, UploadResponse } from "$/types/data.types"
+import { getRange } from "@/utils"
+import { LIST_LIMIT } from "@/app/libs/constants"
+import { logError, logWarning } from "@/utils/sentryUtils"
 
 export async function getPostsByUser(
   client: Client,
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
 
-    id = userData?.user?.id;
-
+    id = userData?.user?.id
 
     // Check for both undefined and string "null"
     if (!id || id === "null" || id === "") {
       // Instead of throwing an error, return an empty array
-      console.warn("No valid user ID provided, returning empty posts array");
-      return [];
+      console.warn("No valid user ID provided, returning empty posts array")
+      return []
     }
   }
 
@@ -37,11 +36,11 @@ export async function getPostsByUser(
     .neq("isPrivate", true)
     .neq("isDraft", true)
     .order("createdAt", { ascending: false })
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching user posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching user posts", error)
+    throw new Error(error.message)
   }
 
   // console.log("Supabase raw data:", data);
@@ -53,7 +52,7 @@ export async function getPostsByUser(
       : typeof post.ipfsImages === "string"
       ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
       : null, // ❌ Set to null if neither
-  }));
+  }))
 }
 
 export async function getOtherPostsByUser(
@@ -62,18 +61,18 @@ export async function getOtherPostsByUser(
   postId: number,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for other posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for other posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
-    id = userData?.user?.id;
+    id = userData?.user?.id
     if (!id) {
-      throw new Error("User ID is undefined.");
+      throw new Error("User ID is undefined.")
     }
   }
 
@@ -85,11 +84,11 @@ export async function getOtherPostsByUser(
     .neq("isPrivate", true)
     .neq("isDraft", true)
     .order("createdAt", { ascending: false }) // Order posts by creation date, descending
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching other user posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching other user posts", error)
+    throw new Error(error.message)
   }
 
   // console.log("Supabase raw data:", data);
@@ -101,7 +100,7 @@ export async function getOtherPostsByUser(
       : typeof post.ipfsImages === "string"
       ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
       : null, // ❌ Set to null if neither
-  }));
+  }))
 }
 
 export async function getPrivatePostsByUser(
@@ -109,18 +108,18 @@ export async function getPrivatePostsByUser(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for private posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for private posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
-    id = userData?.user?.id;
+    id = userData?.user?.id
     if (!id) {
-      throw new Error("User ID is undefined.");
+      throw new Error("User ID is undefined.")
     }
   }
 
@@ -131,11 +130,11 @@ export async function getPrivatePostsByUser(
     .eq("isPrivate", true)
     // .neq("isDraft", true) for now only user sees private post so they can see it even if it is draft
     .order("createdAt", { ascending: false }) // Order posts by creation date, descending
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching private posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching private posts", error)
+    throw new Error(error.message)
   }
 
   // console.log("Supabase raw data:", data);
@@ -147,25 +146,25 @@ export async function getPrivatePostsByUser(
       : typeof post.ipfsImages === "string"
       ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
       : null, // ❌ Set to null if neither
-  }));
+  }))
 }
 export async function getPinnedPostsByUser(
   client: Client,
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for pinned posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for pinned posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
-    id = userData?.user?.id;
+    id = userData?.user?.id
     if (!id) {
-      throw new Error("User ID is undefined.");
+      throw new Error("User ID is undefined.")
     }
   }
 
@@ -183,16 +182,16 @@ export async function getPinnedPostsByUser(
     .filter("posts.isPrivate", "neq", true)
     .filter("posts.isDraft", "neq", true)
     .order("createdAt", { ascending: false }) // ✅ Sort correctly
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching pinned posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching pinned posts", error)
+    throw new Error(error.message)
   }
 
   if (!Array.isArray(data)) {
-    logError("Unexpected response from Supabase", { data });
-    throw new Error("Invalid data format received from Supabase.");
+    logError("Unexpected response from Supabase", { data })
+    throw new Error("Invalid data format received from Supabase.")
   }
 
   return (
@@ -206,7 +205,67 @@ export async function getPinnedPostsByUser(
         ? (JSON.parse(posts.ipfsImages) as UploadResponse[]) // ✅ Parse string
         : null, // ❌ Set to null if neither
     })) ?? []
-  );
+  )
+}
+
+export async function getMintedPostsByUser(
+  client: Client,
+  start = 0,
+  id?: string
+): Promise<Post[]> {
+  const range = getRange(start, LIST_LIMIT)
+
+  // If no ID is provided, retrieve the authenticated user's ID
+  if (!id) {
+    const { error: userError, data: userData } = await client.auth.getUser()
+    if (userError) {
+      logError("Error fetching user for pinned posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
+    }
+    id = userData?.user?.id
+    if (!id) {
+      throw new Error("User ID is undefined.")
+    }
+  }
+
+  const { data, error } = await client
+    .from("post_mints")
+    .select(
+      `
+    posts:posts (
+      *,
+      createdAt
+    )
+  `
+    ) // ✅ Aliases `posts` for better structure
+    .eq("user_id", id)
+    .filter("posts.isPrivate", "neq", true)
+    .filter("posts.isDraft", "neq", true)
+    .order("createdAt", { ascending: false }) // ✅ Sort correctly
+    .range(range[0], range[1])
+
+  if (error) {
+    logError("Supabase error fetching minted posts", error)
+    throw new Error(error.message)
+  }
+
+  if (!Array.isArray(data)) {
+    logError("Unexpected response from Supabase", { data })
+    throw new Error("Invalid data format received from Supabase.")
+  }
+
+  return (
+    data?.map(({ posts }) => ({
+      ...(posts as Post), // ✅ Explicitly cast `posts` as `Post`
+      author: posts?.author ?? "", // Ensure `author` is always a string
+      category: posts?.category ?? null, // Ensure `category` is `string | null`
+      ipfsImages: Array.isArray(posts?.ipfsImages)
+        ? (posts.ipfsImages as UploadResponse[]) // ✅ Already an array
+        : typeof posts?.ipfsImages === "string"
+        ? (JSON.parse(posts.ipfsImages) as UploadResponse[]) // ✅ Parse string
+        : null, // ❌ Set to null if neither
+    })) ?? []
+  )
 }
 
 export async function getIsDraftPostsByUser(
@@ -214,18 +273,18 @@ export async function getIsDraftPostsByUser(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for draft posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for draft posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
-    id = userData?.user?.id;
+    id = userData?.user?.id
     if (!id) {
-      throw new Error("User ID is undefined.");
+      throw new Error("User ID is undefined.")
     }
   }
 
@@ -235,11 +294,11 @@ export async function getIsDraftPostsByUser(
     .eq("author", id) // Filter posts by the author_id
     .eq("isDraft", true)
     .order("createdAt", { ascending: false }) // Order posts by creation date, descending
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching draft posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching draft posts", error)
+    throw new Error(error.message)
   }
 
   // console.log("Supabase raw data:", data);
@@ -251,7 +310,7 @@ export async function getIsDraftPostsByUser(
       : typeof post.ipfsImages === "string"
       ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
       : null, // ❌ Set to null if neither
-  }));
+  }))
 }
 export async function getOtherIsDraftPostsByUser(
   client: Client,
@@ -259,18 +318,18 @@ export async function getOtherIsDraftPostsByUser(
   postId: number,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for other draft posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for other draft posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
-    id = userData?.user?.id;
+    id = userData?.user?.id
     if (!id) {
-      throw new Error("User ID is undefined.");
+      throw new Error("User ID is undefined.")
     }
   }
 
@@ -281,11 +340,11 @@ export async function getOtherIsDraftPostsByUser(
     .neq("id", postId)
     .eq("isDraft", true)
     .order("createdAt", { ascending: false }) // Order posts by creation date, descending
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching other draft posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching other draft posts", error)
+    throw new Error(error.message)
   }
 
   // console.log("Supabase raw data:", data);
@@ -297,7 +356,7 @@ export async function getOtherIsDraftPostsByUser(
       : typeof post.ipfsImages === "string"
       ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
       : null, // ❌ Set to null if neither
-  }));
+  }))
 }
 
 export async function getUserLikedPosts(
@@ -305,18 +364,18 @@ export async function getUserLikedPosts(
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, LIST_LIMIT)
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
-    const { error: userError, data: userData } = await client.auth.getUser();
+    const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for liked posts", userError);
-      throw new Error("Failed to retrieve authenticated user.");
+      logError("Error fetching user for liked posts", userError)
+      throw new Error("Failed to retrieve authenticated user.")
     }
-    id = userData?.user?.id;
+    id = userData?.user?.id
     if (!id) {
-      throw new Error("User ID is undefined.");
+      throw new Error("User ID is undefined.")
     }
   }
 
@@ -327,16 +386,16 @@ export async function getUserLikedPosts(
     .neq("posts.isPrivate", true)
     .neq("posts.isDraft", true)
     .order("created_at", { ascending: false }) // Order posts by creation date, descending
-    .range(range[0], range[1]);
+    .range(range[0], range[1])
 
   if (error) {
-    logError("Supabase error fetching liked posts", error);
-    throw new Error(error.message);
+    logError("Supabase error fetching liked posts", error)
+    throw new Error(error.message)
   }
 
   // console.log("Supabase raw data:", data);
   // Extract posts, filtering out any null values
-  const posts = data?.flatMap((like) => (like.posts ? [like.posts] : [])) ?? []; // ✅ Ensure posts exist
+  const posts = data?.flatMap((like) => (like.posts ? [like.posts] : [])) ?? [] // ✅ Ensure posts exist
 
   return posts.map((post) => ({
     ...post,
@@ -346,5 +405,5 @@ export async function getUserLikedPosts(
       : typeof post.ipfsImages === "string"
       ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
       : null, // ❌ Set to null if neither
-  })) as Post[]; // ✅ Cast the final array as `Post[]`
+  })) as Post[] // ✅ Cast the final array as `Post[]`
 }

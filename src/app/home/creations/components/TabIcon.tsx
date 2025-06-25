@@ -3,6 +3,7 @@ import {
   DraftIcon,
   GlobeIcon,
   HeartIcon,
+  MintIcon,
   PhotoGridIcon,
   PinIcon,
   UserIcon,
@@ -26,6 +27,8 @@ export default function TabIcon({ text, color, height, width }: TabIconProps) {
       return <HeartIcon height={height} width={width} color={color} />;
     case "Pinned":
       return <PinIcon height={height} width={width} color={color} />;
+    case "Minted":
+      return <MintIcon height={height} width={width} color={color} />;
     case "Draft":
       return <DraftIcon height={height} width={width} color={color} />;
     case "User":

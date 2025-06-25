@@ -1,23 +1,19 @@
-import { Client } from "$/supabase/client";
+import { SupabaseClient as Client } from "@supabase/supabase-js";
 import { Post, UploadResponse } from "$/types/data.types";
-import { getRange } from "@/utils";
+import { logError } from "@/utils";
 import { LIST_LIMIT } from "@/app/libs/constants";
-import { logError } from "@/utils/sentryUtils";
 
 /**
- * Get all posts minted by a specific user
+ * Get minted posts by user ID
  * @param client Supabase client
- * @param start Starting point for pagination
- * @param id User ID to fetch minted posts for
- * @returns Array of Post objects
+ * @param start Pagination start
+ * @param id User ID
  */
 export async function getMintedPostsByUser(
   client: Client,
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
-
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser();
@@ -32,74 +28,83 @@ export async function getMintedPostsByUser(
   }
 
   try {
-    // Use raw SQL query to avoid TypeScript definition issues with post_mints table
-    const query = `
-      SELECT p.* 
-      FROM posts p
-      JOIN post_mints pm ON p.id = pm.post_id
-      WHERE pm.user_id = $1
-      AND p."isPrivate" = false
-      AND p."isDraft" = false
-      ORDER BY pm.created_at DESC
-      LIMIT $2
-      OFFSET $3
-    `;
+    // First get the minted post IDs
+    const { data: mintData, error: mintError } = await (client as any)
+      .from('post_mints')
+      .select('post_id')
+      .eq('user_id', id)
+      .order('created_at', { ascending: false })
+      .limit(LIST_LIMIT)
+      .range(start * LIST_LIMIT, (start + 1) * LIST_LIMIT - 1);
 
-    // Execute query using the PostgreSQL raw query function
-    // We use 'as any' to bypass TypeScript restrictions
-    const { data: rawData, error: rawError } = await (client as any)
-      .rpc('execute', { query, params: [id, LIST_LIMIT, start] })
-      .single();
-
-    if (rawError) {
-      logError("Supabase error fetching minted posts", rawError);
-      throw new Error(rawError.message);
+    if (mintError || !mintData) {
+      logError("Error fetching minted post IDs", mintError || new Error("No data found"));
+      throw new Error("Failed to fetch minted post IDs");
     }
 
-    // Make sure rawData exists and is an array before processing
-    if (!rawData || !rawData.result || !Array.isArray(rawData.result)) {
+    // Extract the post IDs
+    const postIds = mintData.map((item: any) => item.post_id);
+      
+    if (postIds.length === 0) {
       return [];
     }
 
-    const postsData = rawData.result as any[];
+    // Then fetch the actual posts
+    const { data, error } = await client
+      .from('posts')
+      .select('*')
+      .in('id', postIds)
+      .eq('isPrivate', false)
+      .eq('isDraft', false);
+    
+    if (error) {
+      logError("Supabase error fetching minted posts", error);
+      throw new Error(error.message);
+    }
 
-    // Process the result posts
-    return postsData.map(post => ({
+    if (!Array.isArray(data)) {
+      logError("Unexpected response from Supabase", { data });
+      return [];
+    }
+
+    // Process the posts to ensure consistent format
+    return data.map(post => ({
       ...post,
-      author: post?.author || "",
-      category: post?.category || null,
-      ipfsImages: processIpfsImages(post?.ipfsImages),
+      author: post?.author ?? "", // Ensure author is always a string
+      category: post?.category ?? null, // Ensure category is string or null
+      ipfsImages: Array.isArray(post?.ipfsImages)
+        ? (post.ipfsImages as UploadResponse[]) // Already an array
+        : typeof post?.ipfsImages === "string"
+        ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // Parse string
+        : null, // Set to null if neither
     }));
-  } catch (e) {
-    // Fallback to a direct SQL approach bypassing type systems
-    logError("Error fetching minted posts, trying direct query", e);
+  } catch (error) {
+    // Fallback to a simpler approach if there were any errors
+    logError("Error with subquery approach, using fallback", error);
     
     try {
-      // Use a simple SQL query to get post IDs first
-      const mintQuery = `
-        SELECT post_id FROM post_mints 
-        WHERE user_id = $1 
-        ORDER BY created_at DESC 
-        LIMIT $2 OFFSET $3
-      `;
-      
-      const { data: mintResult, error: mintError } = await (client as any)
-        .rpc('execute', { query: mintQuery, params: [id, LIST_LIMIT, start] })
-        .single();
+      // First get the minted post IDs
+      const { data: mintData, error: mintError } = await (client as any)
+        .from('post_mints')
+        .select('post_id')
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+        .limit(LIST_LIMIT)
+        .offset(start * LIST_LIMIT);
 
-      if (mintError || !mintResult || !mintResult.result) {
-        logError("Error fetching post_mints", mintError || new Error("No data found"));
+      if (mintError || !mintData) {
+        logError("Error fetching minted post IDs", mintError || new Error("No data found"));
         return [];
       }
 
-      // Extract post IDs
-      const postIds = (mintResult.result as any[]).map(item => item.post_id);
+      // Extract the post IDs
+      const postIds = mintData.map((item: any) => item.post_id);
       
       if (postIds.length === 0) {
         return [];
       }
 
-      // Then get the actual posts
+      // Then fetch the actual posts
       const { data: postsData, error: postsError } = await client
         .from('posts')
         .select('*')
@@ -113,11 +118,15 @@ export async function getMintedPostsByUser(
       }
 
       // Process the posts
-      return postsData.map(post => ({
+      return postsData.map((post: any) => ({
         ...post,
-        author: post?.author || "",
-        category: post?.category || null,
-        ipfsImages: processIpfsImages(post?.ipfsImages),
+        author: post?.author ?? "", // Ensure author is always a string
+        category: post?.category ?? null, // Ensure category is string or null
+        ipfsImages: Array.isArray(post?.ipfsImages)
+          ? (post.ipfsImages as UploadResponse[]) // Already an array
+          : typeof post?.ipfsImages === "string"
+          ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // Parse string
+          : null, // Set to null if neither
       }));
     } catch (finalError) {
       logError("All attempts to fetch minted posts failed", finalError);
