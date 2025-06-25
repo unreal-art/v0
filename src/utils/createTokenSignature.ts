@@ -120,8 +120,7 @@ export async function createTokenSignature(
         params.owner,
         await erc20Contract.getAddress()
       )
-      const currentNonce = await erc20Contract.nonces(params.owner)
-
+      let currentNonce = await erc20Contract.nonces(params.owner)
       console.log("currentNonce=", currentNonce)
 
       // Convert BigInt to string for MetaMask compatibility

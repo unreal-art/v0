@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import ImageView from "../../components/imageView";
 import { IPhoto } from "@/app/libs/interfaces";
 import MintModal from "../../components/mint/MintModal";
+import { usePostMints } from "@/hooks/usePostMints";
 
 export default function Interactions({
   postId,
@@ -77,6 +78,9 @@ export default function Interactions({
   );
   const { mutate: mintPost } = useMintPost(userId as string);
   const { mutate: unmintPost } = useUnmintPost(userId as string);
+  const { data: postMints } = usePostMints(Number(postId));
+  // Safely access count property with type check
+  const mintCount = postMints && 'count' in postMints ? postMints.count : 0;
   const { shareCount: shareNotifications } = useCountShareNotifications(postId);
 
   const togglePostPin = () => {
@@ -119,20 +123,11 @@ export default function Interactions({
     }
   };
 
-  const togglePostMint = async () => {
-    if (!userId) {
-      toast.error("Please login to mint/unmint posts");
-      return;
-    }
-
-    // If the post is already minted, handle unmint directly
-    if (isMinted) {
-      toast.success("Post is already minted!");
-      return;
-    }
-
+  const togglePostMint = () => {
+    if (!userId) return;
+    
+    // Open mint modal when mint button is clicked (always allow minting)
     setOpenMintModal(true);
-
   };
 
   // Handle mint success from MintModal
@@ -193,16 +188,12 @@ export default function Interactions({
             )}
           </button>
 
-
-          <button onClick={() => togglePostMint()}>
-            {isMinted ? (
-              <MintFillIcon color="#F0F0F0" />
-            ) : (
-              <Fragment>
-              <MintIcon color="#F0F0F0" />
-              <p className="text-xs text-primary-3">Mint Post</p>
-              </Fragment>
-            )}
+          <button
+            onClick={() => togglePostMint()}
+            className="flex items-center gap-[2px] justify-center"
+          >
+            <MintIcon color="#F0F0F0" />
+            <p className="text-xs text-primary-3">{mintCount}</p>
           </button>
 
           <button
