@@ -32,11 +32,12 @@ import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
 import { downloadImage } from "@/utils";
 import ShareModal from "../../components/modals/shareModal";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useCountShareNotifications } from "@/hooks/useNotifications";
 import { toast } from "sonner";
 import ImageView from "../../components/imageView";
 import { IPhoto } from "@/app/libs/interfaces";
+import MintModal from "../../components/mint/MintModal";
 
 export default function Interactions({
   postId,
@@ -48,6 +49,7 @@ export default function Interactions({
   selectedImageIndex: number;
 }) {
   const [openShare, setOpenShare] = useState(false);
+  const [openMintModal, setOpenMintModal] = useState(false);
   const [openComment, setOpenComment] = useState(false);
   const { data: likes } = usePostLikes(Number(postId), supabase);
   const { data: comments } = useComments(postId.toString());
@@ -117,44 +119,35 @@ export default function Interactions({
     }
   };
 
-  const togglePostMint = () => {
-    if (!userId) return;
-
-    // Optimistically update the UI
-    const newMintedState = !isMinted;
-
-    // Update the isMinted state
-    setMinted(newMintedState);
-
-    // Also update the post data to reflect the mint status
-    updatePostOptimistically({
-      isMinted: newMintedState,
-    });
-
-    // Call the appropriate mutation
-    if (newMintedState) {
-      mintPost(postId, {
-        onError: (error) => {
-          // If the mutation fails, revert the optimistic updates
-          setMinted(false);
-          updatePostOptimistically({
-            isMinted: false,
-          });
-          toast.error(`Failed to mint post: ${error.message}`);
-        },
-      });
-    } else {
-      unmintPost(postId, {
-        onError: (error) => {
-          // If the mutation fails, revert the optimistic updates
-          setMinted(true);
-          updatePostOptimistically({
-            isMinted: true,
-          });
-          toast.error(`Failed to unmint post: ${error.message}`);
-        },
-      });
+  const togglePostMint = async () => {
+    if (!userId) {
+      toast.error("Please login to mint/unmint posts");
+      return;
     }
+
+    // If the post is already minted, handle unmint directly
+    if (isMinted) {
+      toast.success("Post is already minted!");
+      return;
+    }
+
+    setOpenMintModal(true);
+
+  };
+
+  // Handle mint success from MintModal
+  const handleMintSuccess = () => {
+    // Update local state and UI
+    setMinted(true);
+    
+    // Call mintPost to update cache and queries
+    mintPost(postId, {
+      onError: (error) => {
+        // If the mutation fails, revert the optimistic updates
+        setMinted(false);
+        toast.error(`Failed to update minted status: ${error.message}`);
+      },
+    });
   };
 
   return (
@@ -194,16 +187,21 @@ export default function Interactions({
           <button onClick={() => togglePostPin()}>
             {isPinned ? (
               <PinFillIcon color="#F0F0F0" />
+          
             ) : (
               <PinIcon color="#F0F0F0" />
             )}
           </button>
 
+
           <button onClick={() => togglePostMint()}>
             {isMinted ? (
               <MintFillIcon color="#F0F0F0" />
             ) : (
+              <Fragment>
               <MintIcon color="#F0F0F0" />
+              <p className="text-xs text-primary-3">Mint Post</p>
+              </Fragment>
             )}
           </button>
 
@@ -238,6 +236,14 @@ export default function Interactions({
           photo={openComment && postDetails}
           setImageIndex={() => setOpenComment(false)}
         />
+        {post && userId && (
+          <MintModal
+            open={openMintModal}
+            setOpen={setOpenMintModal}
+            postId={postId}
+            onMintSuccess={handleMintSuccess}
+          />
+        )}
       </div>
     </>
   );
