@@ -29,10 +29,15 @@ export async function GET(req: Request, segmentData: { params: Params }) {
     }
 
     // Count posts by author
+    // const { count, error: countError } = await supabase
+    //   .from("posts")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("author", profile.id)
+
     const { count, error: countError } = await supabase
-      .from("posts")
+      .from("post_mints")
       .select("*", { count: "exact", head: true })
-      .eq("author", profile.id)
+      .eq("user_id", profile.id)
 
     // TODO: count
 
