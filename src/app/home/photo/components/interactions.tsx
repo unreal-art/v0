@@ -191,11 +191,11 @@ export default function Interactions({
 
           <button
             onClick={() => togglePostMint()}
-            className="flex items-center gap-[3px] justify-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-2 py-1 rounded-md transition-all duration-300"
+            className="flex items-center gap-2 justify-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-4 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             title="Mint this post with ODP tokens"
           >
-            <MintIcon color="#FFFFFF" />
-            <p className="text-xs font-medium text-white">
+            <MintIcon color="#FFFFFF" width={20} height={20} />
+            <p className="text-sm font-semibold text-white tracking-wide">
               Mint <AnimatedCounter value={mintCount} className="text-yellow-300 font-bold" />
             </p>
           </button>
