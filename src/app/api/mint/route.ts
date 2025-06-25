@@ -22,8 +22,10 @@ export async function POST(request: NextRequest) {
     const { data: existingMint, error: checkError } = await supabase
       .from("post_mints")
       .select()
-      .eq("post_id", postId)
-      .eq("user_id", userId)
+      .eq("transaction_hash", transactionHash)
+      // .select()
+      // .eq("post_id", postId)
+      // .eq("user_id", userId)
       .single()
 
     if (checkError && checkError.code !== "PGRST116") {
