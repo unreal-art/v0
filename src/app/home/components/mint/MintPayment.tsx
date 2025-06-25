@@ -131,7 +131,7 @@ export default function MintPayment({
         deadline,
         spender: appConfig.blockchain.contracts.spender,
         partnerwallet: treasuryAddress,
-        vendor: "mint",
+        vendor: appConfig.app.name,
       });
       
       if (transferResult.success && transferResult.data?.transactionhash) {
