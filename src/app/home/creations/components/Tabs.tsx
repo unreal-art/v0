@@ -22,7 +22,8 @@ const TAB_CONFIG = [
   { text: "Private", index: 1 },
   { text: "Liked", index: 2 },
   { text: "Pinned", index: 3 },
-  { text: "Draft", index: 4 },
+  { text: "Minted", index: 4 },
+  { text: "Draft", index: 5 },
 ] as const;
 
 export default function Tabs({
