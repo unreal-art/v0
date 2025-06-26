@@ -15,12 +15,10 @@ import { useComments, useRealtimeComments } from "@/hooks/useComments";
 import { useLikePost } from "@/hooks/useLikePost";
 import {
   useIsPostPinned,
-  //usePinnedPosts,
   usePinPost,
   useUnpinPost,
 }
 from "@/hooks/usePinnedPosts";
-import { useIsPostMinted } from "@/hooks/useMintedPosts";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
@@ -29,7 +27,7 @@ import { getImage } from "../../formattedPhotos";
 import { Post, UploadResponse } from "$/types/data.types";
 import { downloadImage } from "@/utils";
 import ShareModal from "../../components/modals/shareModal";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useCountShareNotifications } from "@/hooks/useNotifications";
 import { toast } from "sonner";
 import ImageView from "../../components/imageView";
@@ -68,13 +66,6 @@ export default function Interactions({
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
   const { mutate: unpinPost } = useUnpinPost(userId as string);
-
-  // Mint functionality
-  const { isMinted, setMinted } = useIsPostMinted(
-    postId,
-    userId as string
-  );
-  
   
   const { data: postMints } = usePostMints(Number(postId));
   // Safely access count property with type check
@@ -132,10 +123,7 @@ export default function Interactions({
   const queryClient = useQueryClient();
 
   const handleMintSuccess = () => {
-    // Update local state and UI
-    setMinted(true);
 
-    // Invalidate queries to refresh mint counts / lists
     queryClient.invalidateQueries({ queryKey: ["post-mints", Number(postId)] });
     queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
   };
