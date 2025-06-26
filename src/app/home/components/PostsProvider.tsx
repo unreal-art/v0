@@ -38,7 +38,7 @@ export default function PostsProvider({
 
   // Normalize searchType for consistency
   const normalizedSearchType =
-    (searchType?.toUpperCase() as SearchType) || "EXPLORE";
+    (searchType?.toUpperCase() as SearchType) || "TOP";
 
   useEffect(() => {
     // Set up mounted ref for cleanup
@@ -70,14 +70,14 @@ export default function PostsProvider({
                   result = await getTopPosts(supabase, pageParam);
                   break;
                 default:
-                  result = await getPosts(supabase, pageParam);
+                  result = await getTopPosts(supabase, pageParam);
               }
 
               // Ensure result is an array to prevent runtime errors
               if (!Array.isArray(result)) {
                 console.warn(
                   "Expected array result from API but got:",
-                  typeof result
+                  typeof result,
                 );
                 result = [];
               }

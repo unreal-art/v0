@@ -150,9 +150,7 @@ function NavLink({ href, text, icon }: NavLinkProps) {
       onMouseLeave={() => setHover(false)}
       href={href}
       prefetch={
-        href === "/home" ||
-        href === "/home?s=explore" ||
-        href === "/home/creations"
+        href === "/home" || href === "/home?s=top" || href === "/home/creations"
       }
     >
       <div className="h-8 flex items-center justify-center">{iconSvg}</div>

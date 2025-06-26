@@ -197,6 +197,13 @@ export type Database = {
             foreignKeyName: "likes_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "posts_with_mint_count"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "posts_with_rank"
             referencedColumns: ["id"]
           },
@@ -236,6 +243,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_mint_count"
             referencedColumns: ["id"]
           },
           {
@@ -284,7 +298,21 @@ export type Database = {
             foreignKeyName: "post_mints_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "posts_with_mint_count"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_mints_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "posts_with_rank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_mints_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -317,6 +345,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_pins_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_with_mint_count"
             referencedColumns: ["id"]
           },
           {
@@ -455,6 +490,36 @@ export type Database = {
       }
     }
     Views: {
+      posts_with_mint_count: {
+        Row: {
+          author: string | null
+          caption: string | null
+          category: string | null
+          cpu: number | null
+          createdAt: string | null
+          device: string | null
+          id: number | null
+          ipfsImages: Json | null
+          isDraft: boolean | null
+          isPinned: boolean | null
+          isPrivate: boolean | null
+          like_count: number | null
+          media_type: string | null
+          mint_count: number | null
+          n: number | null
+          prompt: string | null
+          seed: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Posts_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts_with_rank: {
         Row: {
           author: string | null
