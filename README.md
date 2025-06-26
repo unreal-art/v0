@@ -1,51 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Unreal.art – The AI Studio & Launchpad
 
-## Getting Started
+Welcome to the future of AI creation, collaboration, and innovation.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 The Story So Far
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Unreal.art began as an ambitious AI content generation platform, powered by proprietary decentralized compute (dePin). In just a few months, we:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Attracted 3,500+ users
+- Forged partnerships and won prizes
+- Gained VC attention and joined Soonami Cohort 7
+- Burned through $45K of credits to learn, iterate, and grow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+But we faced a choice: chase quick revenue, or build something bigger. We chose the latter.
 
-## Deploy on Cloudflare
+## 🔥 The Pivot: From Platform to AI Launchpad
 
-To deploy this application to Cloudflare Workers:
+The world is drowning in fragmented AI tools. Startups struggle with billing, churn, user acquisition, and the ever-rising cost of compute. Users are lost in a maze of disconnected apps.
 
-```bash
-# Install dependencies with Bun
-bun install
+**Unreal is the answer.**
 
-# Build the application
-bun run cloudflare:build
+We’re evolving into an AI Launchpad and Studio—a unified space for:
 
-# Deploy to Cloudflare
-bun run cloudflare:deploy
-```
+- **AI startups**: Join the Unreal economy, powered by the $UNREAL token. Forget billing, churn, and infrastructure headaches. Focus on building, and let us handle the rest.
+- **Users & creators**: Access a growing suite of AI tools, agents, and creative power—all in one place, with a single account and treasury-backed free generation (for now!).
 
-## Learn More
+## 💎 Why Unreal?
 
-To learn more about Next.js, take a look at the following resources:
+- **Tokenized Compute**: $UNREAL token powers all inference, making compute transparent, fair, and community-driven.
+- **Open Ecosystem**: Any AI startup can plug in, reach users, and monetize instantly.
+- **Unified Experience**: No more juggling logins or subscriptions. One studio, infinite possibilities.
+- **Sponsored Inference**: While the $UNREAL treasury lasts, all generations are free for users.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🗓️ What’s Next?
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **July**: Pre-launch of the $UNREAL-powered OpenAI wrapper
+- **Mid Next Month**: Launch of the full Unreal AI Studio
+- **3,000+ new users**: Coming via Neoma Ventures, our marketing partner
 
-## Deploy on Vercel
+## 🤝 Join the Movement
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Whether you’re a founder, creator, or just AI-curious—Unreal is your home. Help us shape the future of decentralized, democratized AI.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Try it now: [v0.unreal.art](https://v0.unreal.art)
+- Learn more: [unreal.art](https://unreal.art)
+- Twitter: [@ideomind](https://twitter.com/ideomind)
+
+---
+
+_Built by founders, for founders. Powered by community. No more barriers—just pure AI innovation._
