@@ -40,7 +40,7 @@ export function usePostMints(postId: number) {
             // Get all mints for this post with user information
             const { data, error, count } = await supabase
               .from('post_mints')
-              .select('*, profiles:user_id(username, avatar_url)', { count: 'exact' })
+              .select('*, profiles:user_id(full_name, avatar_url, display_name)', { count: 'exact' })
               .eq('post_id', postId)
               .order('created_at', { ascending: false });
             
@@ -50,10 +50,16 @@ export function usePostMints(postId: number) {
             }
             
             // Format the mint data with user profiles
-            const formattedMints = (data || []).map((mint: any) => ({
+            const formattedMints = (data || []).map((mint: any) => {
+              
+              const user_profile = mint.profiles || {};
+
+              user_profile.username = user_profile.display_name || user_profile.full_name;
+              
+              return {
               ...mint,
-              user_profile: mint.profiles || {},
-            }));
+              user_profile,
+            }});
             
             // Calculate unique users who minted this post
             const uniqueUsers = new Set(formattedMints.map((mint: MintInfo) => mint.user_id));
