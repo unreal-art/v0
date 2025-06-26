@@ -19,6 +19,7 @@ import Skeleton from "react-loading-skeleton";
 import { supabase } from "$/supabase/client";
 import { Post } from "$/types/data.types";
 import { ErrorBoundary } from "@/app/components/errorBoundary";
+import OptimizedImage from "@/app/components/OptimizedImage";
 import {
   getIsDraftPostsByUser,
   getPinnedPostsByUser,
@@ -26,7 +27,11 @@ import {
   getPrivatePostsByUser,
   getUserLikedPosts,
 } from "@/queries/post/getPostsByUser";
+import { getMintedPostsByUser } from "@/queries/post/getMintedPostsByUser";
 import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
+import { useMintPosts, MintListMode } from "@/hooks/useMintPosts";
+import { MintIcon } from "@/app/components/icons";
+import { getImage } from "../../formattedPhotos";
 
 export default function ProfileView() {
   const searchParams = useSearchParams();
@@ -35,6 +40,9 @@ export default function ProfileView() {
   const { userId } = useUser();
   const { profileTab, initFromUrl, setProfileTab } =
     useCreationAndProfileStore();
+    
+  // Fetch minted posts for this user - in profile view, we want to see the user's posts that have been minted by others
+  const { data: mintedPosts, isLoading: mintedLoading } = useMintPosts(id as string, "minted_posts");
 
   // Add isPending state with useTransition for smooth tab transitions
   const [isPending, startTransition] = useTransition();
@@ -115,6 +123,8 @@ export default function ProfileView() {
         result = await getUserLikedPosts(supabase, pageParam, id as string);
       } else if (searchType === "PINNED") {
         result = await getPinnedPostsByUser(supabase, pageParam, id as string);
+      } else if (searchType === "MINTED") {
+        result = await getMintedPostsByUser(supabase, pageParam, id as string);
       } else if (searchType === "DRAFT") {
         result = await getIsDraftPostsByUser(supabase, pageParam, id as string);
       } else {
@@ -159,6 +169,11 @@ export default function ProfileView() {
         content: "You haven't pinned anything yet.",
         subContent: "Find something you love and pin it!",
       },
+      Minted: {
+        title: "Minted" as TabText,
+        content: "You haven't minted anything yet.",
+        subContent: "Find something you love and mint it!",
+      },
       Draft: {
         title: "Draft" as TabText,
         content: "You haven't saved anything yet.",
@@ -169,11 +184,14 @@ export default function ProfileView() {
   );
 
   const renderContent = useCallback(() => {
-    const configs = ["Public", "Private", "Liked", "Pinned", "Draft"];
+    const configs = ["Public", "Private", "Liked", "Pinned", "Minted", "Draft"];
     const config =
       contentConfig[configs[currentIndex] as keyof typeof contentConfig];
     if (!config) return null;
 
+    // Current tab name for reference
+    const currentTab = configs[currentIndex];
+    
     return (
       <ErrorBoundary
         componentName={`ProfileTab-${configs[currentIndex]}`}
@@ -200,6 +218,9 @@ export default function ProfileView() {
             </div>
           </div>
         }>
+          {/* If we're on the Pinned tab and have minted posts, show them above the pinned posts */}
+          {/* Minted posts are now in their own tab */}
+          
           <PhotoGridTwo
             {...config}
             data={data}

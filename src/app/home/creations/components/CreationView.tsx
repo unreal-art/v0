@@ -20,6 +20,7 @@ import {
   getPostsByUser,
   getPrivatePostsByUser,
   getUserLikedPosts,
+  getMintedPostsByUser,
 } from "@/queries/post/getPostsByUser";
 import { useUser } from "@/hooks/useUser";
 import { Post } from "$/types/data.types";
@@ -27,6 +28,10 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
 import { ErrorBoundary } from "@/app/components/errorBoundary";
+import { useMintPosts, MintListMode } from "@/hooks/useMintPosts";
+import { MintIcon } from "@/app/components/icons";
+import OptimizedImage from "@/app/components/OptimizedImage";
+import { getImage } from "../../formattedPhotos";
 
 // Memoize tab configurations to prevent recreating on each render
 const TAB_CONFIGS = {
@@ -49,6 +54,11 @@ const TAB_CONFIGS = {
     title: "Pinned" as const,
     content: "You haven't pinned anything yet.",
     subContent: "Find something you love and pin it!",
+  },
+  Minted: {
+    title: "Minted" as const,
+    content: "You haven't minted anything yet.",
+    subContent: "Find something you love and mint it!",
   },
   Draft: {
     title: "Draft" as const,
@@ -80,6 +90,9 @@ const createQueryFn =
         break;
       case "PINNED":
         result = await getPinnedPostsByUser(supabase, page, userId || "");
+        break;   
+     case "MINTED":
+        result = await getMintedPostsByUser(supabase, page, userId || "");
         break;
       case "DRAFT":
         result = await getIsDraftPostsByUser(supabase, page, userId || "");
@@ -153,6 +166,11 @@ export default function CreationView() {
       }
     }
   }, [creationTab, currentIndex]);
+
+  // Fetch minted posts for this user using the custom hook
+  // In creation view, we want to see posts that the user has minted (not their posts that were minted)
+  const mintedPostsQuery = useMintPosts(userId || "", "minted_by");
+  const mintedPosts = mintedPostsQuery.data || [];
 
   // Memoize the query function
   const queryFn = useCallback(
@@ -249,15 +267,16 @@ export default function CreationView() {
     isFetchingNextPage,
   ]);
 
+
   return (
     <div className="w-full ">
-        <div className="w-full mb-4">
-      <Tabs
-        currentIndex={currentIndex}
-        setCurrentIndex={handleTabChange}
-        section="creation"
-        hideDraft={false}
-      />
+      <div className="w-full mb-4">
+        <Tabs
+          currentIndex={currentIndex}
+          setCurrentIndex={handleTabChange}
+          section="creation"
+          hideDraft={false}
+        />
       </div>
       {renderTabContent()}
     </div>

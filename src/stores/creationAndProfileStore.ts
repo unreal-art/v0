@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from "zustand"
 
 // Use the existing TabText type from the Tabs component
 export type TabText =
@@ -6,33 +6,34 @@ export type TabText =
   | "Private"
   | "Liked"
   | "Pinned"
+  | "Minted"
   | "Draft"
   | "User"
-  | "Image";
+  | "Image"
 
 // Add type for navigation type
-export type NavigationType = "page" | "tab" | "none";
+export type NavigationType = "page" | "tab" | "none"
 
 interface CreationAndProfileState {
   // Tab states
-  creationTab: TabText;
-  profileTab: TabText;
+  creationTab: TabText
+  profileTab: TabText
 
   // Navigation state
-  lastNavigationType: NavigationType;
-  isTransitioning: boolean;
+  lastNavigationType: NavigationType
+  isTransitioning: boolean
 
   // Setters
-  setCreationTab: (tab: TabText) => void;
-  setProfileTab: (tab: TabText) => void;
-  setNavigationType: (type: NavigationType) => void;
-  setIsTransitioning: (isTransitioning: boolean) => void;
+  setCreationTab: (tab: TabText) => void
+  setProfileTab: (tab: TabText) => void
+  setNavigationType: (type: NavigationType) => void
+  setIsTransitioning: (isTransitioning: boolean) => void
 
   // Initializers from URL
   initFromUrl: (
     section: "creation" | "profile",
     urlParam: string | null
-  ) => void;
+  ) => void
 }
 
 // Create the store with default values
@@ -71,11 +72,11 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
 
     // Initialize from URL parameter
     initFromUrl: (section, urlParam) => {
-      if (!urlParam) return;
+      if (!urlParam) return
 
       // Format the parameter to match the TabText type (capital first letter)
       const formattedTab = (urlParam.charAt(0).toUpperCase() +
-        urlParam.slice(1).toLowerCase()) as TabText;
+        urlParam.slice(1).toLowerCase()) as TabText
 
       // Make sure it's a valid tab
       const validTabs: TabText[] = [
@@ -84,8 +85,8 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
         "Liked",
         "Pinned",
         "Draft",
-      ];
-      if (!validTabs.includes(formattedTab)) return;
+      ]
+      if (!validTabs.includes(formattedTab)) return
 
       // Update the correct section and set navigation type to "tab"
       if (section === "creation") {
@@ -95,7 +96,7 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
             state.creationTab !== formattedTab
               ? "tab"
               : state.lastNavigationType,
-        }));
+        }))
       } else if (section === "profile") {
         set((state) => ({
           profileTab: formattedTab,
@@ -103,8 +104,8 @@ export const useCreationAndProfileStore = create<CreationAndProfileState>(
             state.profileTab !== formattedTab
               ? "tab"
               : state.lastNavigationType,
-        }));
+        }))
       }
     },
   })
-);
+)

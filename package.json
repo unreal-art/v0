@@ -28,7 +28,8 @@
     "mobile:dev:ios": "bunx cap run ios",
     "mobile:dev:android": "bunx cap run android",
     "mobile:dev:all": "bun run mobile:dev:ios & bun run mobile:dev:android",
-    "update-wallets": "bun run update-missing-wallets.js"
+    "update-wallets": "bun run update-missing-wallets.js",
+    "types:gen": "supabase gen types typescript --project-id ayghfeluaxotpfyuezlw --schema public > types/database.types.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",

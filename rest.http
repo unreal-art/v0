@@ -1,6 +1,8 @@
 ### Options
 OPTIONS {{u}}/darts
 ###
+{{u}}/api/images
+###
 GET https://api.near.ai/openapi.json
 ###
 

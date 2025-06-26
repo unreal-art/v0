@@ -38,8 +38,8 @@ const fetchUser = async (): Promise<{
         full_name: profileData[0].full_name as string,
         username: profileData[0].display_name || profileData[0].full_name,
         avatar_url: profileData[0].avatar_url as string,
+        torus_id: profileData[0].torus_id as string,
       };
-
       // Store in normalized cache for reuse across components
       normalizeEntity("users", {
         ...user,
@@ -111,5 +111,6 @@ export const useUser = () => {
     user: data?.user || null,
     refetchUser,
     prefetchUserProfile, // Expose prefetch capability
+    torusId: data?.user?.torus_id,
   };
 };

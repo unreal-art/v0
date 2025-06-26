@@ -10,6 +10,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { createClient } from "$/supabase/server";
 import {
   getIsDraftPostsByUser,
+  getMintedPostsByUser,
   getPinnedPostsByUser,
   getPostsByUser,
   getPrivatePostsByUser,
@@ -41,6 +42,8 @@ export default async function Creation({
         result = await getUserLikedPosts(supabaseSSR, pageParam);
       } else if (params.s?.toUpperCase() === "PINNED") {
         result = await getPinnedPostsByUser(supabaseSSR, pageParam);
+      } else if (params.s?.toUpperCase() === "MINTED") {
+        result = await getMintedPostsByUser(supabaseSSR, pageParam);
       } else if (params.s?.toUpperCase() === "DRAFT") {
         result = await getIsDraftPostsByUser(supabaseSSR, pageParam);
       } else {

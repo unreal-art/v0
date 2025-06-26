@@ -62,7 +62,9 @@ export const appConfig = {
   blockchain: {
     supportedChains: ["torusTestnet", "torusMainnet"],
     defaultChain:
-      process.env.NODE_ENV === "development" ? "torusTestnet" : "torusMainnet",
+      process.env.NODE_ENV === "development"
+        ? process.env.UNREAL_CHAIN ?? "torusTestnet"
+        : "torusMainnet",
     rpcUrls: {
       torusTestnet:
         process.env.TORUS_TESTNET_RPC_URL ||
@@ -144,6 +146,6 @@ export const appConfig = {
     enableProfileEditing: true,
     enableGallerySharing: true,
   },
-};
+}
 
-export default appConfig;
+export default appConfig

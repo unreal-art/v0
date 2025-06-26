@@ -41,10 +41,8 @@ interface OdpPayProps {
   refetch: () => void;
 }
 const defaultOdpContract = getContractInstance(
-  appConfig.environment.isDevelopment ? torusTestnet : torusMainnet,
-  appConfig.environment.isDevelopment
-    ? appConfig.blockchain.contracts.odpTestnet
-    : appConfig.blockchain.contracts.odpMainnet
+  torusMainnet,
+  appConfig.blockchain.contracts.odpMainnet,
 );
 
 // const exchangeContract = getContractInstance(

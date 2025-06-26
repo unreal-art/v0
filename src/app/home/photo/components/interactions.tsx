@@ -8,15 +8,18 @@ import {
   MessageIcon,
   PinIcon,
   ShareIcon,
+  MintIcon,
+  MintFillIcon,
 } from "@/app/components/icons";
 import { useComments, useRealtimeComments } from "@/hooks/useComments";
 import { useLikePost } from "@/hooks/useLikePost";
 import {
   useIsPostPinned,
-  //usePinnedPosts,
   usePinPost,
   useUnpinPost,
-} from "@/hooks/usePinnedPosts";
+}
+from "@/hooks/usePinnedPosts";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
@@ -29,6 +32,9 @@ import { useCountShareNotifications } from "@/hooks/useNotifications";
 import { toast } from "sonner";
 import ImageView from "../../components/imageView";
 import { IPhoto } from "@/app/libs/interfaces";
+import MintModal from "../../components/mint/MintModal";
+import { usePostMints } from "@/hooks/usePostMints";
+import AnimatedCounter from "../../components/mint/AnimatedCounter";
 
 export default function Interactions({
   postId,
@@ -40,6 +46,7 @@ export default function Interactions({
   selectedImageIndex: number;
 }) {
   const [openShare, setOpenShare] = useState(false);
+  const [openMintModal, setOpenMintModal] = useState(false);
   const [openComment, setOpenComment] = useState(false);
   const { data: likes } = usePostLikes(Number(postId), supabase);
   const { data: comments } = useComments(postId.toString());
@@ -59,6 +66,10 @@ export default function Interactions({
   // const { data: pinnedPosts } = usePinnedPosts(userId as string);
   const { mutate: pinPost } = usePinPost(userId as string);
   const { mutate: unpinPost } = useUnpinPost(userId as string);
+  
+  const { data: postMints } = usePostMints(Number(postId));
+  // Safely access count property with type check
+  const mintCount = postMints && 'count' in postMints ? postMints.count : 0;
   const { shareCount: shareNotifications } = useCountShareNotifications(postId);
 
   const togglePostPin = () => {
@@ -101,6 +112,22 @@ export default function Interactions({
     }
   };
 
+  const togglePostMint = () => {
+    if (!userId) return;
+    
+    // Open mint modal when mint button is clicked (always allow minting)
+    setOpenMintModal(true);
+  };
+
+  // Handle mint success from MintModal
+  const queryClient = useQueryClient();
+
+  const handleMintSuccess = () => {
+
+    queryClient.invalidateQueries({ queryKey: ["post-mints", Number(postId)] });
+    queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -138,9 +165,21 @@ export default function Interactions({
           <button onClick={() => togglePostPin()}>
             {isPinned ? (
               <PinFillIcon color="#F0F0F0" />
+          
             ) : (
               <PinIcon color="#F0F0F0" />
             )}
+          </button>
+
+          <button
+            onClick={() => togglePostMint()}
+            className="flex items-center gap-2 justify-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-4 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            title="Mint this post with ODP tokens"
+          >
+            <MintIcon color="#FFFFFF" width={20} height={20} />
+            <p className="text-sm font-semibold text-white tracking-wide">
+              Mint <AnimatedCounter value={mintCount} className="text-yellow-300 font-bold" />
+            </p>
           </button>
 
           <button
@@ -174,6 +213,14 @@ export default function Interactions({
           photo={openComment && postDetails}
           setImageIndex={() => setOpenComment(false)}
         />
+        {post && userId && (
+          <MintModal
+            open={openMintModal}
+            setOpen={setOpenMintModal}
+            postId={postId}
+            onMintSuccess={handleMintSuccess}
+          />
+        )}
       </div>
     </>
   );
