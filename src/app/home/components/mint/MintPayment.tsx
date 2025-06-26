@@ -75,7 +75,8 @@ export default function MintPayment({
         throw new Error("Treasury wallet address not configured");
       }
       
-      const chainId = walletChain?.id || 1; // Default to Ethereum mainnet (1) if chainId is undefined
+      const chainId = torusMainnet.id; // Default to Ethereum mainnet (1) if chainId is undefined //FIXME: walletChain?.id 
+      // FIXME: but remind users to manually switch to the network
       const odpAddress = appConfig.blockchain.contracts.odpMainnet;
       
       // Create deadline 1 hour from now
