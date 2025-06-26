@@ -33,14 +33,14 @@ export async function getPosts(client: Client, start = 0): Promise<Post[]> {
 }
 
 export async function getTopPosts(client: Client, start = 0): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   const { data, error } = await client
-    .from("posts")
+    .from("posts_with_mint_count") // Use the view instead
     .select("*")
-    .eq("isPrivate", false) // Filter where isPrivate is false
-    .eq("isDraft", false) // Filter where isDraft is false
-    .gt("like_count", 0)
+    .eq("isPrivate", false)
+    .eq("isDraft", false)
+    .order("mint_count", { ascending: false })
     .order("like_count", { ascending: false })
     .range(range[0], range[1]);
 
@@ -49,24 +49,24 @@ export async function getTopPosts(client: Client, start = 0): Promise<Post[]> {
     throw new Error(error.message);
   }
 
-  // console.log("Supabase raw data:", data);
-
   return data.map((post) => ({
     ...post,
+    author: post.author || "", // Ensure author is always a string
+    createdAt: post.createdAt || "", // Ensure createdAt is always a string
+    id: post.id ?? 0, // Ensure id is always a number
     ipfsImages: Array.isArray(post.ipfsImages)
-      ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
+      ? (post.ipfsImages as UploadResponse[])
       : typeof post.ipfsImages === "string"
-      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
-      : null, // ❌ Set to null if neither
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[])
+      : null,
   }));
 }
-
 export async function getFollowingPosts(
   client: Client,
   start = 0,
   id?: string
 ): Promise<Post[]> {
-  const range = getRange(start, 20);
+  const range = getRange(start, LIST_LIMIT);
 
   // If no ID is provided, retrieve the authenticated user's ID
   if (!id) {

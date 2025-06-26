@@ -22,7 +22,7 @@ interface GalleryState {
 
 export const useGalleryStore = create<GalleryState>((set) => ({
   // Default tab
-  activeTab: "EXPLORE",
+  activeTab: "TOP",
 
   // Default transition state
   isTabTransitioning: false,

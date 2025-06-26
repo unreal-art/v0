@@ -75,7 +75,7 @@ const LazyImage = React.memo(
           {
             rootMargin: "200px", // Load images 200px before they enter viewport
             threshold: 0.01, // Trigger when just 1% is visible
-          }
+          },
         );
 
         if (imageRef.current) {
@@ -98,7 +98,7 @@ const LazyImage = React.memo(
     const imageName = useMemo(() => {
       return typeof photo === "object" && photo !== null && "src" in photo
         ? String(photo.src).split("/").pop()?.split("?")[0] ||
-          `gallery-img-${index}`
+            `gallery-img-${index}`
         : `gallery-img-${index}`;
     }, [photo, index]);
 
@@ -142,24 +142,24 @@ const LazyImage = React.memo(
   (prevProps, nextProps) => {
     // If the photo ID is the same, don't re-render
     if (
-      prevProps.photo && 
-      nextProps.photo && 
-      'id' in prevProps.photo && 
-      'id' in nextProps.photo && 
+      prevProps.photo &&
+      nextProps.photo &&
+      "id" in prevProps.photo &&
+      "id" in nextProps.photo &&
       prevProps.photo.id === nextProps.photo.id
     ) {
       return true; // props are equal, don't re-render
     }
-    
+
     // Default comparison for other cases
     return false;
-  }
+  },
 );
 
 // Enhanced image renderer with Intersection Observer for more efficient loading
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
-  { photo, width, height, index = 0 }: RenderImageContext
+  { photo, width, height, index = 0 }: RenderImageContext,
 ) {
   // Use priority loading for the first 4 images (eagerly loaded)
   // Reduced from 8 to 4 to improve initial load time
@@ -178,7 +178,7 @@ function renderNextImage(
       }}
     />
   ) : (
-    <LazyImage 
+    <LazyImage
       photo={photo}
       width={width}
       height={height}
@@ -199,7 +199,9 @@ export default function PhotoGallary() {
   // Keep a reference to the previous photos to prevent layout jumping during tab changes
   const [prevPhotos, setPrevPhotos] = useState<any[]>([]);
   // Create a dictionary to track already processed photos by their ID
-  const [processedPhotoDict, setProcessedPhotoDict] = useState<Record<string, any>>({});
+  const [processedPhotoDict, setProcessedPhotoDict] = useState<
+    Record<string, any>
+  >({});
 
   // Use Zustand store for tab state
   const { activeTab, initFromUrl } = useGalleryStore();
@@ -231,18 +233,18 @@ export default function PhotoGallary() {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", activeTab?.toLowerCase() || "explore"],
+    queryKey: ["posts", activeTab?.toLowerCase() || "top"],
     queryFn: async ({ pageParam = 0 }) => {
       try {
         let result: Post[] = [];
         // Use activeTab from Zustand instead of URL param
         if (activeTab === "FOLLOWING") {
           result = await getFollowingPosts(supabase, pageParam);
-        } else if (activeTab === "TOP") {
-          result = await getTopPosts(supabase, pageParam);
-        } else {
-          // Default to explore
+        } else if (activeTab === "EXPLORE") {
           result = await getPosts(supabase, pageParam);
+        } else {
+          // Default to top posts
+          result = await getTopPosts(supabase, pageParam);
         }
 
         return {
@@ -340,13 +342,13 @@ export default function PhotoGallary() {
   // Use memo to format photos only when necessary
   const currentPhotos = useMemo(() => {
     if (!data) return [];
-    
+
     // Format only new photos and reuse already processed ones
-    const newPhotos = formattedPhotosForGallery(data.pages).map(photo => {
+    const newPhotos = formattedPhotosForGallery(data.pages).map((photo) => {
       // If we already processed this photo before, reuse the existing reference
       return processedPhotoDict[photo.id] || photo;
     });
-    
+
     return newPhotos;
   }, [data, processedPhotoDict]);
 
@@ -357,20 +359,20 @@ export default function PhotoGallary() {
       // Build new dictionary of processed photos
       const newDict = { ...processedPhotoDict };
       let dictChanged = false;
-      
+
       // Add any new photos to our dictionary
-      currentPhotos.forEach(photo => {
+      currentPhotos.forEach((photo) => {
         if (!newDict[photo.id]) {
           newDict[photo.id] = photo;
           dictChanged = true;
         }
       });
-      
+
       // Update the dictionary if changed
       if (dictChanged) {
         setProcessedPhotoDict(newDict);
       }
-      
+
       // Compare to avoid unnecessary state updates for previous photos
       if (prevPhotos.length !== currentPhotos.length) {
         setPrevPhotos(currentPhotos);
