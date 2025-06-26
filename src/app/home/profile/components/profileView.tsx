@@ -29,7 +29,7 @@ import {
 } from "@/queries/post/getPostsByUser";
 import { getMintedPostsByUser } from "@/queries/post/getMintedPostsByUser";
 import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
-import { useMintPosts } from "@/hooks/useMintPosts";
+import { useMintPosts, MintListMode } from "@/hooks/useMintPosts";
 import { MintIcon } from "@/app/components/icons";
 import { getImage } from "../../formattedPhotos";
 
@@ -41,8 +41,8 @@ export default function ProfileView() {
   const { profileTab, initFromUrl, setProfileTab } =
     useCreationAndProfileStore();
     
-  // Fetch minted posts for this user (will use React Query caching)
-  const { data: mintedPosts, isLoading: mintedLoading } = useMintPosts(id as string);
+  // Fetch minted posts for this user - in profile view, we want to see the user's posts that have been minted by others
+  const { data: mintedPosts, isLoading: mintedLoading } = useMintPosts(id as string, "minted_posts");
 
   // Add isPending state with useTransition for smooth tab transitions
   const [isPending, startTransition] = useTransition();

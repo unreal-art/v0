@@ -228,20 +228,19 @@ export async function getMintedPostsByUser(
     }
   }
 
+  // TODO: order should be based on number of mints not createdAt
   const { data, error } = await client
     .from("post_mints")
     .select(
       `
-    posts:posts (
+    *,
+    posts (
       *,
       createdAt
     )
   `
-    ) // ✅ Aliases `posts` for better structure
+    )
     .eq("user_id", id)
-    .filter("posts.isPrivate", "neq", true)
-    .filter("posts.isDraft", "neq", true)
-    .order("createdAt", { ascending: false }) // ✅ Sort correctly
     .range(range[0], range[1])
 
   if (error) {
@@ -254,8 +253,16 @@ export async function getMintedPostsByUser(
     throw new Error("Invalid data format received from Supabase.")
   }
 
+  const uniquePosts = new Map()
+
+  data.forEach((item) => {
+    uniquePosts.set(item.post_id, item)
+  })
+
+  let uniquePostItems = Array.from(uniquePosts.values())
+
   return (
-    data?.map(({ posts }) => ({
+    uniquePostItems?.map(({ posts }) => ({
       ...(posts as Post), // ✅ Explicitly cast `posts` as `Post`
       author: posts?.author ?? "", // Ensure `author` is always a string
       category: posts?.category ?? null, // Ensure `category` is `string | null`

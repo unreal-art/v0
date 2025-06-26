@@ -249,21 +249,27 @@ export type Database = {
       }
       post_mints: {
         Row: {
-          createdat: string | null
+          chain_id: number
+          created_at: string | null
           id: number
           post_id: number | null
+          transaction_hash: string
           user_id: string | null
         }
         Insert: {
-          createdat?: string | null
+          chain_id: number
+          created_at?: string | null
           id?: never
           post_id?: number | null
+          transaction_hash: string
           user_id?: string | null
         }
         Update: {
-          createdat?: string | null
+          chain_id?: number
+          created_at?: string | null
           id?: never
           post_id?: number | null
+          transaction_hash?: string
           user_id?: string | null
         }
         Relationships: [

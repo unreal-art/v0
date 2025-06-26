@@ -1,7 +1,9 @@
 "use client";
 
 import { supabase } from "$/supabase/client";
+import { axiosInstanceLocal } from "@/lib/axiosInstance";
 import { getMintedPostsByUser } from "@/queries/post/getMintedPostsByUser";
+import { MintListMode } from "./useMintPosts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   dedupedRequest,
@@ -105,28 +107,14 @@ export function useMintPost(userId: string) {
 
   const mutation = useMutation({
     mutationFn: async (postId: number) => {
-      if (!postId || !userId)
-        throw new Error("Post ID and User ID are required");
+      if (!postId || !userId) throw new Error("Post ID and User ID are required");
 
-      // First, check if post is already minted
-      const { data: existingMint } = await supabase
-        .from("post_mints")
-        .select("id")
-        .eq("post_id", postId)
-        .eq("user_id", userId)
-        .single();
-
-      if (existingMint) return { alreadyMinted: true };
-
-      // Insert new mint
-      const { data, error } = await supabase
-        .from("post_mints")
-        .insert({ post_id: postId, user_id: userId })
-        .select("id")
-        .single();
-
-      if (error) throw error;
-      return { id: data.id, success: true };
+      // Call the backend mint API (handles wallet tx + DB write)
+      const { data } = await axiosInstanceLocal.post("/api/mint", {
+        postId,
+        userId,
+      });
+      return data; // expected { success: boolean, id?: number }
     },
 
     onMutate: async (postId) => {
@@ -138,49 +126,16 @@ export function useMintPost(userId: string) {
         queryClient.cancelQueries({ queryKey: ["minted-posts", userId] }),
       ]);
 
-      // Snapshot the previous values
-      const previousMinted = queryClient.getQueryData([
-        "post_minted",
-        postId,
-        userId,
-      ]);
-      const previousPosts = queryClient.getQueryData(["minted-posts", userId]);
+      // Simply invalidate affected queries so fresh data is fetched
+      queryClient.invalidateQueries({ queryKey: ["post-mints", postId] });
+      queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
 
-      // Update is minted status
-      queryClient.setQueryData(["post_minted", postId, userId], true);
-
-      // Update post's is_minted property
-      updatePostInQueries(queryClient, postId, { is_minted: true });
-
-      // Try to get the post to add to minted list
-      const post = queryClient.getQueryData(["post", postId]);
-      if (post) {
-        queryClient.setQueryData(["minted-posts", userId], (old: any) =>
-          Array.isArray(old) ? [post, ...old] : [post]
-        );
-      }
-
-      return { previousMinted, previousPosts };
+      return {};
     },
 
-    onError: (err, postId, context) => {
-      // Revert optimistic updates
-      if (context?.previousMinted !== undefined) {
-        queryClient.setQueryData(
-          ["post_minted", postId, userId],
-          context.previousMinted
-        );
-      }
-
-      if (context?.previousPosts !== undefined) {
-        queryClient.setQueryData(
-          ["minted-posts", userId],
-          context.previousPosts
-        );
-      }
-
-      // Revert post update
-      updatePostInQueries(queryClient, postId, { is_minted: false });
+    onError: () => {
+      // Nothing to rollback – just notify queries to refetch
+      queryClient.invalidateQueries({ queryKey: ["post-mints"] });
     },
 
     onSuccess: () => {

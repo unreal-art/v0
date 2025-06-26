@@ -5,35 +5,67 @@ import { useQuery } from "@tanstack/react-query";
 import { dedupedRequest } from "@/utils/queryOptimizer";
 import { logError } from "@/utils";
 
-// Hook to get the count of mints for a specific post
+// Type for mint information with user details
+export interface MintInfo {
+  id: string;
+  user_id: string;
+  post_id: number;
+  created_at: string;
+  transaction_hash?: string;
+  user_profile?: {
+    username?: string;
+    avatar_url?: string;
+  };
+}
+
+// Interface for the mints query result
+export interface PostMintsResult {
+  mints: MintInfo[];
+  count: number;
+  uniqueUserCount: number;
+}
+
+// Hook to get the count and details of mints for a specific post
 export function usePostMints(postId: number) {
   return useQuery({
     queryKey: ["post-mints", postId],
     queryFn: async () => {
-      if (!postId) return [];
+      if (!postId) return { mints: [], count: 0, uniqueUserCount: 0 };
       
       // Use deduped request to avoid duplicate calls
       return dedupedRequest(
         `post-mints-${postId}`,
         async () => {
           try {
+            // Get all mints for this post with user information
             const { data, error, count } = await supabase
               .from('post_mints')
-              .select('*', { count: 'exact' })
-              .eq('post_id', postId);
+              .select('*, profiles:user_id(username, avatar_url)', { count: 'exact' })
+              .eq('post_id', postId)
+              .order('created_at', { ascending: false });
             
             if (error) {
               logError("Error fetching post mints", error);
               throw new Error("Failed to fetch post mints");
             }
             
+            // Format the mint data with user profiles
+            const formattedMints = (data || []).map((mint: any) => ({
+              ...mint,
+              user_profile: mint.profiles || {},
+            }));
+            
+            // Calculate unique users who minted this post
+            const uniqueUsers = new Set(formattedMints.map((mint: MintInfo) => mint.user_id));
+            
             return { 
-              mints: data || [], 
-              count: count || 0 
+              mints: formattedMints, 
+              count: count || 0,
+              uniqueUserCount: uniqueUsers.size
             };
           } catch (error) {
             logError("Error in usePostMints", error);
-            return { mints: [], count: 0 };
+            return { mints: [], count: 0, uniqueUserCount: 0 };
           }
         }
       );

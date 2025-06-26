@@ -28,7 +28,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useCreationAndProfileStore } from "@/stores/creationAndProfileStore";
 import { ErrorBoundary } from "@/app/components/errorBoundary";
-import { useMintPosts } from "@/hooks/useMintPosts";
+import { useMintPosts, MintListMode } from "@/hooks/useMintPosts";
 import { MintIcon } from "@/app/components/icons";
 import OptimizedImage from "@/app/components/OptimizedImage";
 import { getImage } from "../../formattedPhotos";
@@ -168,7 +168,8 @@ export default function CreationView() {
   }, [creationTab, currentIndex]);
 
   // Fetch minted posts for this user using the custom hook
-  const mintedPostsQuery = useMintPosts(userId || "");
+  // In creation view, we want to see posts that the user has minted (not their posts that were minted)
+  const mintedPostsQuery = useMintPosts(userId || "", "minted_by");
   const mintedPosts = mintedPostsQuery.data || [];
 
   // Memoize the query function
