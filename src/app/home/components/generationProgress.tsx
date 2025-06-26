@@ -13,7 +13,7 @@ export default function GenerationProgress() {
       ? 16
       : 24,
   );
-  const [timeLeft, setTimeLeft] = useState(30); // 30 secs countdown
+  const [timeLeft, setTimeLeft] = useState(35); // 30 secs countdown
   const [isFinishing, setIsFinishing] = useState(false);
 
   useEffect(() => {
