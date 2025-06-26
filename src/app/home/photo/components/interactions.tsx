@@ -20,11 +20,8 @@ import {
   useUnpinPost,
 }
 from "@/hooks/usePinnedPosts";
-import {
-  useIsPostMinted,
-  useMintPost,
-  useUnmintPost,
-} from "@/hooks/useMintedPosts";
+import { useIsPostMinted } from "@/hooks/useMintedPosts";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePost } from "@/hooks/usePost";
 import { usePostLikes } from "@/hooks/usePostLikes";
 import { useUser } from "@/hooks/useUser";
@@ -77,8 +74,8 @@ export default function Interactions({
     postId,
     userId as string
   );
-  const { mutate: mintPost } = useMintPost(userId as string);
-  const { mutate: unmintPost } = useUnmintPost(userId as string);
+  
+  
   const { data: postMints } = usePostMints(Number(postId));
   // Safely access count property with type check
   const mintCount = postMints && 'count' in postMints ? postMints.count : 0;
@@ -132,18 +129,15 @@ export default function Interactions({
   };
 
   // Handle mint success from MintModal
+  const queryClient = useQueryClient();
+
   const handleMintSuccess = () => {
     // Update local state and UI
     setMinted(true);
-    
-    // Call mintPost to update cache and queries
-    mintPost(postId, {
-      onError: (error) => {
-        // If the mutation fails, revert the optimistic updates
-        setMinted(false);
-        toast.error(`Failed to update minted status: ${error.message}`);
-      },
-    });
+
+    // Invalidate queries to refresh mint counts / lists
+    queryClient.invalidateQueries({ queryKey: ["post-mints", Number(postId)] });
+    queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { usePostMints, MintInfo } from '@/hooks/usePostMints';
 import MintCard from './MintCard';
 import { MintFillIcon } from '@/app/components/icons';
@@ -10,14 +10,10 @@ interface MintListProps {
   maxInitialDisplay?: number;
 }
 
-/**
- * Component to display a list of mints for a post
- */
 export default function MintList({ postId, maxInitialDisplay = 3 }: MintListProps) {
   const [showAll, setShowAll] = useState(false);
   const { data, isLoading, isError } = usePostMints(postId);
-  
-  // Handle loading and error states
+
   if (isLoading) {
     return (
       <div className="py-3 px-4">
@@ -31,7 +27,7 @@ export default function MintList({ postId, maxInitialDisplay = 3 }: MintListProp
       </div>
     );
   }
-  
+
   if (isError || !data || !data.mints || data.mints.length === 0) {
     return (
       <div className="text-center py-3 text-gray-500">
@@ -40,14 +36,12 @@ export default function MintList({ postId, maxInitialDisplay = 3 }: MintListProp
       </div>
     );
   }
-  
-  // Determine how many mints to show
+
   const mintsToShow = showAll ? data.mints : data.mints.slice(0, maxInitialDisplay);
   const hasMore = data.mints.length > maxInitialDisplay;
-  
+
   return (
     <div className="w-full">
-      {/* Stats summary */}
       <div className="flex justify-between items-center mb-3 px-2">
         <h3 className="text-white font-semibold">Mints</h3>
         <div className="text-sm text-gray-400">
@@ -57,17 +51,13 @@ export default function MintList({ postId, maxInitialDisplay = 3 }: MintListProp
           )}
         </div>
       </div>
-      
-      {/* List of mints */}
       <div className="space-y-2">
         {mintsToShow.map((mint: MintInfo) => (
           <MintCard key={mint.id} mint={mint} isExpanded={showAll} />
         ))}
       </div>
-      
-      {/* Show more/less button */}
       {hasMore && (
-        <button 
+        <button
           onClick={() => setShowAll(!showAll)}
           className="mt-3 w-full py-2 text-sm text-center text-blue-400 hover:text-blue-300 transition-colors"
         >

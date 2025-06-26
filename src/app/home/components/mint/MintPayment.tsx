@@ -1,24 +1,18 @@
 "use client";
-import { torusMainnet, torusTestnet } from "$/constants/chains";
+
+import { useState } from "react";
 import { getContractInstance, logError } from "@/utils";
 import appConfig from "@/config";
-import WalletButton from "@/app/components/walletButton";
 import { useUser } from "@/hooks/useUser";
-import { BigNumberish, formatEther, parseEther, parseUnits } from "ethers";
-import { useEffect, useState } from "react";
-import { prepareContractCall } from "thirdweb";
-import {
-  useActiveAccount,
-  useReadContract,
-  useSendAndConfirmTransaction,
-  useWalletInfo,
-  useActiveWalletChain,
-} from "thirdweb/react";
+import { formatEther, parseEther } from "ethers";
+import { useActiveAccount, useReadContract, useActiveWalletChain } from "thirdweb/react";
 import { toast } from "sonner";
-import { axiosInstanceLocal } from "@/lib/axiosInstance";
 import { useTokenTransfer } from "@/hooks/useTokenTransfer";
-import { createTokenSignature } from "@/utils/createTokenSignature";
 import { MintIcon } from "@/app/components/icons";
+import WalletButton from "@/app/components/walletButton";
+import { axiosInstance as axiosInstanceLocal } from "@/lib/axiosInstance";
+import { createTokenSignature } from "@/utils/createTokenSignature";
+import { Chain } from "thirdweb/chains";
 
 interface MintPaymentProps {
   postId: number;
@@ -26,15 +20,10 @@ interface MintPaymentProps {
   onMintSuccess: () => void;
 }
 
-// ODP contract instance using the appropriate network
 const odpContract = getContractInstance(
-  appConfig.environment.isDevelopment ? torusMainnet : torusMainnet,
-  appConfig.environment.isDevelopment
-    ? appConfig.blockchain.contracts.odpMainnet
-    : appConfig.blockchain.contracts.odpMainnet
+  appConfig.blockchain.contracts.odpMainnet
 );
 
-// Mint price constant in ODP
 const MINT_PRICE = 500;
 
 export default function MintPayment({
@@ -42,39 +31,27 @@ export default function MintPayment({
   handleClose,
   onMintSuccess,
 }: MintPaymentProps) {
-  const [status, setStatus] = useState<
-    "ready" | "processing" | "success" | "error"
-  >("ready");
+  const [status, setStatus] = useState<"ready" | "processing" | "success" | "error">("ready");
   const [errorMessage, setErrorMessage] = useState("");
-  
-  // Get the active wallet account and wallet chain
   const account = useActiveAccount();
   const walletChain = useActiveWalletChain();
-  // Simply check if account exists to determine if user is logged in
   const isLoggedIn = !!account;
   const { user } = useUser();
-
-  // Token transfer hook
   const tokenTransfer = useTokenTransfer();
   const isTransferring = tokenTransfer.isPending;
-
-  // Read ODP balance
   const { data: balance } = useReadContract({
     contract: odpContract,
     method: "function balanceOf(address) returns (uint256)",
     params: [account?.address || '0x0000000000000000000000000000000000000000'] as const,
   });
-
-  // Format ODP balance for display
   const odpBalance = balance ? Number(formatEther(balance)) : 0;
-  
+
   // Function to handle the mint transaction
   const handleMint = async () => {
     if (!account) {
       toast.error("Please connect your wallet");
       return;
     }
-    
     if (!user?.id) {
       toast.error("User not authenticated");
       return;
@@ -97,7 +74,7 @@ export default function MintPayment({
         throw new Error("Treasury wallet address not configured");
       }
       
-      const chainId = walletChain?.id || torusMainnet.id;
+      const chainId = walletChain?.id || 1; // Default to Ethereum mainnet (1) if chainId is undefined
       const odpAddress = appConfig.blockchain.contracts.odpMainnet;
       
       // Create deadline 1 hour from now
@@ -123,7 +100,7 @@ export default function MintPayment({
       if (!signature) {
         throw new Error("Failed to create signature");
       }
-      let txHash:string | null = null;
+      let txHash: string | null = null;
  
 
       if(!txHash){
@@ -140,7 +117,7 @@ export default function MintPayment({
         if (!transferResult.success) {
           throw new Error("Failed to transfer ODP");
         }
-        txHash = transferResult.data?.transactionhash ;
+        txHash = transferResult.data?.transactionhash || null;
       }
       
       if (txHash) {

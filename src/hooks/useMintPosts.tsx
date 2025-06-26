@@ -1,17 +1,15 @@
-import { supabase } from "$/supabase/client";
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
-import { logError } from "@/utils/sentryUtils";
+import { supabase } from "$/supabase/client";
 import { getMintedPostsByUser } from "@/queries/post/getMintedPostsByUser";
+import { logError } from "@/utils/sentryUtils";
 
-// Type for the listing mode
 export type MintListMode = "minted_by" | "minted_posts";
 
-// Fetch minted posts for a user from Supabase using the internal function
+// Fetch minted posts for a user with support for different listing modes
 async function getMintPostsByUser(userId: string, mode: MintListMode = "minted_by") {
   if (!userId) return [];
   try {
-    // Use the enhanced query function that supports both modes
     const posts = await getMintedPostsByUser(supabase, 0, userId, mode);
     return posts;
   } catch (error) {
@@ -20,11 +18,10 @@ async function getMintPostsByUser(userId: string, mode: MintListMode = "minted_b
   }
 }
 
-// Enhanced hook for fetching minted posts with optimized caching
+// Hook to fetch minted posts for a user, with localStorage cache
 export function useMintPosts(userId: string, mode: MintListMode = "minted_by") {
   const queryClient = useQueryClient();
 
-  // Check if we have minted posts in localStorage for immediate display
   useEffect(() => {
     if (!userId) return;
     try {
@@ -34,7 +31,6 @@ export function useMintPosts(userId: string, mode: MintListMode = "minted_by") {
         const parsedData = JSON.parse(cachedData);
         const timestamp = parsedData.timestamp || 0;
         const posts = parsedData.posts || [];
-        // Only use cache if it's less than 1 hour old
         if (Date.now() - timestamp < 1000 * 60 * 60) {
           queryClient.setQueryData(["minted-posts", userId, mode], posts);
         }
@@ -44,11 +40,10 @@ export function useMintPosts(userId: string, mode: MintListMode = "minted_by") {
     }
   }, [userId, mode, queryClient]);
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ["minted-posts", userId, mode],
     queryFn: async () => {
       const posts = await getMintPostsByUser(userId, mode);
-      // Cache in localStorage for fast reloads
       try {
         localStorage.setItem(
           `minted-posts-${userId}-${mode}`,
@@ -60,9 +55,7 @@ export function useMintPosts(userId: string, mode: MintListMode = "minted_by") {
       return posts;
     },
     enabled: !!userId,
-    staleTime: 1000 * 60 * 3, // 3 minutes
-    gcTime: 1000 * 60 * 15, // 15 minutes
+    staleTime: 1000 * 60 * 3,
+    gcTime: 1000 * 60 * 15,
   });
-
-  return query;
 }

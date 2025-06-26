@@ -1,28 +1,22 @@
 "use client";
 
-import { supabase } from "$/supabase/client";
-import { axiosInstanceLocal } from "@/lib/axiosInstance";
-import { getMintedPostsByUser } from "@/queries/post/getMintedPostsByUser";
-import { MintListMode } from "./useMintPosts";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  dedupedRequest,
-  updatePostInQueries,
-} from "@/utils/queryOptimizer";
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "$/supabase/client";
+import { getMintedPostsByUser } from "@/queries/post/getMintedPostsByUser";
+import { dedupedRequest } from "@/utils/queryOptimizer";
 
-// Hook for fetching minted posts
+
+// Hook for fetching minted posts list for a user
 export function useMintedPosts(userId: string) {
-  const queryClient = useQueryClient();
   const [cachedPosts, setCachedPosts] = useState<any[]>([]);
 
-  // Fetch cached posts from localStorage on mount
+  // Load cache from localStorage on mount
   useEffect(() => {
-    const cachedData = localStorage.getItem(`minted-posts-${userId}`);
-    if (cachedData) {
+    const cached = localStorage.getItem(`minted-posts-${userId}`);
+    if (cached) {
       try {
-        const parsed = JSON.parse(cachedData);
+        const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setCachedPosts(parsed);
         }
@@ -34,24 +28,20 @@ export function useMintedPosts(userId: string) {
 
   const query = useQuery({
     queryKey: ["minted-posts", userId],
-    queryFn: async ({ signal }) => {
+    queryFn: async () => {
       if (!userId) return [];
-      
-      // Use deduped request to avoid duplicate calls
-      return dedupedRequest(
-        `minted-posts-${userId}`,
-        async () => {
-          const posts = await getMintedPostsByUser(supabase, 0, userId);
-          // Update cache in localStorage
-          try {
-            localStorage.setItem(`minted-posts-${userId}`, JSON.stringify(posts));
-          } catch (e) {
-            console.error("Error caching minted posts", e);
-          }
-          return posts;
-        },
-        { priority: "normal" }
-      );
+      return dedupedRequest(`minted-posts-${userId}`, async () => {
+        const posts = await getMintedPostsByUser(supabase, 0, userId);
+        try {
+          localStorage.setItem(
+            `minted-posts-${userId}`,
+            JSON.stringify(posts)
+          );
+        } catch (e) {
+          console.error("Error caching minted posts", e);
+        }
+        return posts;
+      });
     },
     initialData: cachedPosts.length > 0 ? cachedPosts : undefined,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -60,171 +50,3 @@ export function useMintedPosts(userId: string) {
   return query;
 }
 
-// Hook to check if a post is minted
-export function useIsPostMinted(postId: number, userId: string) {
-  const queryClient = useQueryClient();
-  const [isMinted, setIsMinted] = useState<boolean | undefined>(undefined);
-
-  const query = useQuery({
-    queryKey: ["post_minted", postId, userId],
-    queryFn: async () => {
-      if (!postId || !userId) return false;
-
-      const { data, error } = await supabase
-        .from("post_mints")
-        .select("id")
-        .eq("post_id", postId)
-        .eq("user_id", userId)
-        .single();
-
-      if (error && error.code !== "PGRST116") {
-        console.error("Error checking if post is minted:", error);
-      }
-
-      return !!data;
-    },
-    enabled: !!postId && !!userId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  // Set local state when query data changes
-  useEffect(() => {
-    if (query.data !== undefined) {
-      setIsMinted(query.data);
-    }
-  }, [query.data]);
-
-  return {
-    ...query,
-    isMinted: query.data || false,
-    setMinted: setIsMinted,
-  };
-}
-
-// Mutation hook for minting posts
-export function useMintPost(userId: string) {
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: async (postId: number) => {
-      if (!postId || !userId) throw new Error("Post ID and User ID are required");
-
-      // Call the backend mint API (handles wallet tx + DB write)
-      const { data } = await axiosInstanceLocal.post("/api/mint", {
-        postId,
-        userId,
-      });
-      return data; // expected { success: boolean, id?: number }
-    },
-
-    onMutate: async (postId) => {
-      // Cancel any outgoing refetches
-      await Promise.all([
-        queryClient.cancelQueries({
-          queryKey: ["post_minted", postId, userId],
-        }),
-        queryClient.cancelQueries({ queryKey: ["minted-posts", userId] }),
-      ]);
-
-      // Simply invalidate affected queries so fresh data is fetched
-      queryClient.invalidateQueries({ queryKey: ["post-mints", postId] });
-      queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
-
-      return {};
-    },
-
-    onError: () => {
-      // Nothing to rollback – just notify queries to refetch
-      queryClient.invalidateQueries({ queryKey: ["post-mints"] });
-    },
-
-    onSuccess: () => {
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
-      toast.success("Post minted successfully!");
-    },
-  });
-
-  return mutation;
-}
-
-// Mutation hook for unminting posts
-export function useUnmintPost(userId: string) {
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: async (postId: number) => {
-      if (!postId || !userId)
-        throw new Error("Post ID and User ID are required");
-
-      const { error } = await supabase
-        .from("post_mints")
-        .delete()
-        .eq("post_id", postId)
-        .eq("user_id", userId);
-
-      if (error) throw error;
-      return { success: true };
-    },
-
-    onMutate: async (postId) => {
-      // Cancel any outgoing refetches
-      await Promise.all([
-        queryClient.cancelQueries({
-          queryKey: ["post_minted", postId, userId],
-        }),
-        queryClient.cancelQueries({ queryKey: ["minted-posts", userId] }),
-      ]);
-
-      // Snapshot the previous values
-      const previousMinted = queryClient.getQueryData([
-        "post_minted",
-        postId,
-        userId,
-      ]);
-      const previousPosts = queryClient.getQueryData(["minted-posts", userId]);
-
-      // Update is minted status
-      queryClient.setQueryData(["post_minted", postId, userId], false);
-
-      // Update post's is_minted property
-      updatePostInQueries(queryClient, postId, { is_minted: false });
-
-      // Remove from minted posts list
-      queryClient.setQueryData(["minted-posts", userId], (old: any[]) => {
-        if (!Array.isArray(old)) return [];
-        return old.filter((p: any) => p.id !== postId);
-      });
-
-      return { previousMinted, previousPosts };
-    },
-
-    onError: (err, postId, context) => {
-      // Revert optimistic updates
-      if (context?.previousMinted !== undefined) {
-        queryClient.setQueryData(
-          ["post_minted", postId, userId],
-          context.previousMinted
-        );
-      }
-
-      if (context?.previousPosts !== undefined) {
-        queryClient.setQueryData(
-          ["minted-posts", userId],
-          context.previousPosts
-        );
-      }
-
-      // Revert post update
-      updatePostInQueries(queryClient, postId, { is_minted: true });
-    },
-
-    onSuccess: () => {
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ["minted-posts", userId] });
-      toast.success("Post unminted successfully!");
-    },
-  });
-
-  return mutation;
-}

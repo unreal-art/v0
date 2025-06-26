@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { postId, userId, transactionHash, chainId } = await request.json()
 
     // Validate required data
-    if (!postId || !userId || !transactionHash) {
+    if (!postId || !userId || !transactionHash || !chainId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
