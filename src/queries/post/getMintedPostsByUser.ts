@@ -38,7 +38,6 @@ export async function getMintedPostsByUser(
       mintQuery = mintQuery
         .select("post_id")
         .eq("user_id", user_id)
-        .order("created_at", { ascending: false, foreignTable: "post_mints" })
         .limit(LIST_LIMIT)
         .range(start * LIST_LIMIT, (start + 1) * LIST_LIMIT - 1)
     } else {

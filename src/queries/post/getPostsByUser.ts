@@ -219,7 +219,7 @@ export async function getMintedPostsByUser(
   if (!id) {
     const { error: userError, data: userData } = await client.auth.getUser()
     if (userError) {
-      logError("Error fetching user for pinned posts", userError)
+      logError("Error fetching user for minted posts", userError)
       throw new Error("Failed to retrieve authenticated user.")
     }
     id = userData?.user?.id

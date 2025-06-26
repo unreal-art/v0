@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Check if the post is already minted by this user
     const { data: existingMint, error: checkError } = await supabase
       .from("post_mints")
-      .select()
+      .select("id")
       .eq("transaction_hash", transactionHash)
       // .select()
       // .eq("post_id", postId)
