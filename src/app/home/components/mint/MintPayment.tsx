@@ -13,6 +13,7 @@ import WalletButton from "@/app/components/walletButton";
 import { axiosInstance as axiosInstanceLocal } from "@/lib/axiosInstance";
 import { createTokenSignature } from "@/utils/createTokenSignature";
 import { Chain } from "thirdweb/chains";
+import { torusMainnet } from "$/constants/chains";
 
 interface MintPaymentProps {
   postId: number;
@@ -21,6 +22,7 @@ interface MintPaymentProps {
 }
 
 const odpContract = getContractInstance(
+  torusMainnet,
   appConfig.blockchain.contracts.odpMainnet
 );
 
