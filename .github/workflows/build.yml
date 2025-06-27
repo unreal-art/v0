@@ -16,8 +16,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  envfile: ${{secrets.ENV}}
 
 jobs:
   build:
@@ -51,9 +49,7 @@ jobs:
 
       - name: Write environment
         run: |
-          echo "\n$envfile" >> .env
-          sed -i 's/ /\n/g' .env
-          source .env
+          echo "${{ secrets.ENV }}" | tr ' ' '\n' >> .env
 
       - name: Build
         run: |
