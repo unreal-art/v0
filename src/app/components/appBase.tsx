@@ -30,7 +30,11 @@ function AppBase({ children }: { children: React.ReactNode }) {
 
         <div className="flex md:flex-col flex-grow justify-between gap-3 will-change-contents">
           <div className="flex flex-grow justify-evenly md:flex-col md:justify-start">
-            <NavLink href={"/home?s=top"} text="Home" icon="dashboard" />
+            <NavLink
+              href={"/home?s=featured_mints"}
+              text="Home"
+              icon="dashboard"
+            />
             <NavLink
               href={"/home/creations"}
               text="Creations"

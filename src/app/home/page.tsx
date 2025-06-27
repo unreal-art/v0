@@ -65,26 +65,56 @@ export default function HomePage() {
         <div className="hidden md:flex flex-col justify-center items-center pt-5 w-full">
           <GenerateInput />
         </div>
-        <div className="flex gap-x-2 items-center w-full h-10 mt-3 md:mt-0 mb-2 relative">
+        <div className="flex gap-x-2 items-center w-full h-10 mt-3 md:mt-0 mb-2 relative overflow-x-auto">
           <Search />
-          <Suspense fallback={<div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">Explore</div>}>
+          <Suspense
+            fallback={
+              <div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">
+                Explore
+              </div>
+            }
+          >
             <TabBtn text="Explore" />
           </Suspense>
-          <Suspense fallback={<div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">Following</div>}>
+          <Suspense
+            fallback={
+              <div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0 whitespace-nowrap">
+                Featured Mints
+              </div>
+            }
+          >
+            <TabBtn text="Featured Mints" />
+          </Suspense>
+          <Suspense
+            fallback={
+              <div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">
+                Following
+              </div>
+            }
+          >
             <TabBtn text="Following" />
           </Suspense>
-          <Suspense fallback={<div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">Top</div>}>
-            <TabBtn text="Top" />
+
+          <Suspense
+            fallback={
+              <div className="rounded-full px-4 py-2 text-sm md:text-base font-medium text-primary-6 bg-opacity-0">
+                Feed
+              </div>
+            }
+          >
+            <TabBtn text="Feed" />
           </Suspense>
         </div>
         <div className="overflow-y-auto w-full">
           {isClient && (
-            <ErrorBoundary 
+            <ErrorBoundary
               componentName="Photo Gallery"
               fallback={
                 <div className="flex flex-col items-center justify-center w-full py-8">
-                  <p className="text-center text-lg text-primary-6 mb-4">Unable to load gallery</p>
-                  <button 
+                  <p className="text-center text-lg text-primary-6 mb-4">
+                    Unable to load gallery
+                  </p>
+                  <button
                     onClick={() => window.location.reload()}
                     className="px-4 py-2 bg-primary-8 hover:bg-primary-7 text-white rounded-md transition-colors"
                   >
@@ -93,19 +123,23 @@ export default function HomePage() {
                 </div>
               }
             >
-              <Suspense fallback={
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
-                  {Array(15).fill(null).map((_, index) => (
-                    <Skeleton
-                      key={index}
-                      height={200}
-                      baseColor="#1a1a1a"
-                      highlightColor="#333"
-                      className="rounded-lg animate-pulse"
-                    />
-                  ))}
-                </div>
-              }>
+              <Suspense
+                fallback={
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2 w-full">
+                    {Array(15)
+                      .fill(null)
+                      .map((_, index) => (
+                        <Skeleton
+                          key={index}
+                          height={200}
+                          baseColor="#1a1a1a"
+                          highlightColor="#333"
+                          className="rounded-lg animate-pulse"
+                        />
+                      ))}
+                  </div>
+                }
+              >
                 <PhotoGallary />
               </Suspense>
             </ErrorBoundary>

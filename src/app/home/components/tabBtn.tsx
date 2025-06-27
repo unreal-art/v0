@@ -18,10 +18,11 @@ import {
   UserIcon,
   FlashIcon,
   SearchIcon,
+  NoteIcon,
 } from "@/app/components/icons";
 
 interface NavBtnProps {
-  text: "Explore" | "Following" | "Top" | "Search";
+  text: "Explore" | "Following" | "Feed" | "Search" | "Featured Mints";
 }
 
 function TabBtn({ text }: NavBtnProps) {
@@ -59,20 +60,22 @@ function TabBtn({ text }: NavBtnProps) {
         return <GlobeIcon color={iconColor} width={16} height={16} />;
       case "Following":
         return <UserIcon color={iconColor} width={16} height={16} />;
-      case "Top":
-        return <FlashIcon color={iconColor} width={16} height={16} />;
+      case "Feed":
+        return <NoteIcon color={iconColor} width={16} height={16} />;
       case "Search":
         return <SearchIcon color={iconColor} width={16} height={16} />;
+      case "Featured Mints":
+        return <FlashIcon color={iconColor} width={16} height={16} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="relative rounded-full cursor-pointer overflow-hidden">
+    <div className="relative rounded-full cursor-pointer ">
       <button
         onClick={handleClick}
-        className={`rounded-full px-4 py-2 text-sm md:text-base font-medium ${
+        className={`rounded-full px-4 py-2 text-sm md:text-base font-medium whitespace-nowrap ${
           isActive ? "bg-primary-10" : "text-primary-6 bg-opacity-0"
         } flex items-center gap-2`}
       >

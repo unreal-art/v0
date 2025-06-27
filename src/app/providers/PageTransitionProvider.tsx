@@ -101,17 +101,17 @@ export default function PageTransitionProvider({
       // for better performance and smoother animations
       const animationDuration = 300; // Match this to your animation duration
       const startTime = performance.now();
-      
+
       const resetTransition = (timestamp: number) => {
         const elapsed = timestamp - startTime;
-        
+
         if (elapsed >= animationDuration) {
           setIsPageTransitioning(false);
         } else {
           requestAnimationFrame(resetTransition);
         }
       };
-      
+
       requestAnimationFrame(resetTransition);
     } else if (tabChange) {
       // Tab change - lighter transition
@@ -122,17 +122,17 @@ export default function PageTransitionProvider({
       // for better performance and smoother animations
       const tabAnimationDuration = 150; // Shorter duration for tab changes
       const tabStartTime = performance.now();
-      
+
       const resetTabTransition = (timestamp: number) => {
         const elapsed = timestamp - tabStartTime;
-        
+
         if (elapsed >= tabAnimationDuration) {
           setIsTransitioning(false);
         } else {
           requestAnimationFrame(resetTabTransition);
         }
       };
-      
+
       requestAnimationFrame(resetTabTransition);
     }
 
@@ -170,7 +170,13 @@ export default function PageTransitionProvider({
 
         if (pathname.includes("/home")) {
           // Update with the actual Home tab param names
-          const tabs = ["explore", "following", "top", "search"];
+          const tabs = [
+            "explore",
+            "following",
+            "feed",
+            "featured_mints",
+            "search",
+          ];
           tabs.forEach((tab) => {
             const url = `${pathname}?s=${tab}`;
             if (!existingPreloads.includes(url)) pathsToPreload.push(url);

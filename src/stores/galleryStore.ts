@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export type GalleryTab = "EXPLORE" | "FOLLOWING" | "TOP" | "SEARCH";
+export type GalleryTab =
+  | "EXPLORE"
+  | "FOLLOWING"
+  | "FEED"
+  | "SEARCH"
+  | "FEATURED MINTS";
 
 interface GalleryState {
   // Active tab in the gallery
@@ -22,7 +27,7 @@ interface GalleryState {
 
 export const useGalleryStore = create<GalleryState>((set) => ({
   // Default tab
-  activeTab: "TOP",
+  activeTab: "FEATURED MINTS",
 
   // Default transition state
   isTabTransitioning: false,
@@ -55,7 +60,13 @@ export const useGalleryStore = create<GalleryState>((set) => ({
     const paramUppercase = urlParam.toUpperCase() as GalleryTab;
 
     // Only set if it's a valid tab
-    const validTabs: GalleryTab[] = ["EXPLORE", "FOLLOWING", "TOP", "SEARCH"];
+    const validTabs: GalleryTab[] = [
+      "EXPLORE",
+      "FOLLOWING",
+      "FEED",
+      "SEARCH",
+      "FEATURED MINTS",
+    ];
     if (validTabs.includes(paramUppercase)) {
       set((state) => ({
         previousTab:
