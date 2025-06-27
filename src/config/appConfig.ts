@@ -60,11 +60,8 @@ export const appConfig = {
 
   // Blockchain configuration
   blockchain: {
-    supportedChains: ["torusTestnet", "torusMainnet"],
-    defaultChain:
-      process.env.NODE_ENV === "development"
-        ? process.env.UNREAL_CHAIN ?? "torusTestnet"
-        : "torusMainnet",
+    supportedChains: ["torusMainnet", "torusTestnet"],
+    defaultChain: "torusMainnet",
     rpcUrls: {
       torusTestnet:
         process.env.TORUS_TESTNET_RPC_URL ||
