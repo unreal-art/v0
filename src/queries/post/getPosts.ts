@@ -33,15 +33,46 @@ export async function getPosts(client: Client, start = 0): Promise<Post[]> {
 }
 
 export async function getTopPosts(client: Client, start = 0): Promise<Post[]> {
-  const range = getRange(start, LIST_LIMIT);
+  const range = getRange(start, 20);
 
+  const { data, error } = await client
+    .from("posts")
+    .select("*")
+    .eq("isPrivate", false) // Filter where isPrivate is false
+    .eq("isDraft", false) // Filter where isDraft is false
+    .gt("like_count", 0)
+    .order("like_count", { ascending: false })
+    .range(range[0], range[1]);
+
+  if (error) {
+    console.error("Supabase error:", error.message);
+    throw new Error(error.message);
+  }
+
+  // console.log("Supabase raw data:", data);
+
+  return data.map((post) => ({
+    ...post,
+    ipfsImages: Array.isArray(post.ipfsImages)
+      ? (post.ipfsImages as UploadResponse[]) // ✅ If already an array, cast it
+      : typeof post.ipfsImages === "string"
+      ? (JSON.parse(post.ipfsImages) as UploadResponse[]) // ✅ Parse string to UploadResponse[]
+      : null, // ❌ Set to null if neither
+  }));
+}
+export async function getTopMintedPosts(
+  client: Client,
+  start = 0
+): Promise<Post[]> {
+  const range = getRange(start, LIST_LIMIT);
+  console.log("here called");
   const { data, error } = await client
     .from("posts_with_mint_count") // Use the view instead
     .select("*")
     .eq("isPrivate", false)
     .eq("isDraft", false)
     .order("mint_count", { ascending: false })
-    .order("like_count", { ascending: false })
+    // .order("like_count", { ascending: false })
     .range(range[0], range[1]);
 
   if (error) {
@@ -61,6 +92,7 @@ export async function getTopPosts(client: Client, start = 0): Promise<Post[]> {
       : null,
   }));
 }
+
 export async function getFollowingPosts(
   client: Client,
   start = 0,

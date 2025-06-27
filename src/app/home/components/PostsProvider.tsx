@@ -12,11 +12,18 @@ import {
   getFollowingPosts,
   getPosts,
   getTopPosts,
+  getTopMintedPosts,
 } from "@/queries/post/getPosts";
 import Loading from "../loading";
 
 // Define a type for the search type to improve type safety
-type SearchType = "EXPLORE" | "FOLLOWING" | "TOP" | string | undefined;
+type SearchType =
+  | "EXPLORE"
+  | "FOLLOWING"
+  | "FEED"
+  | "FEATURED_MINTS"
+  | string
+  | undefined;
 
 // Define response type to ensure proper typing
 interface QueryResponse {
@@ -38,7 +45,7 @@ export default function PostsProvider({
 
   // Normalize searchType for consistency
   const normalizedSearchType =
-    (searchType?.toUpperCase() as SearchType) || "TOP";
+    (searchType?.toUpperCase() as SearchType) || "FEATURED_MINTS";
 
   useEffect(() => {
     // Set up mounted ref for cleanup
@@ -66,18 +73,18 @@ export default function PostsProvider({
                 case "FOLLOWING":
                   result = await getFollowingPosts(supabase, pageParam);
                   break;
-                case "TOP":
+                case "FEED":
                   result = await getTopPosts(supabase, pageParam);
                   break;
                 default:
-                  result = await getTopPosts(supabase, pageParam);
+                  result = await getTopMintedPosts(supabase, pageParam);
               }
 
               // Ensure result is an array to prevent runtime errors
               if (!Array.isArray(result)) {
                 console.warn(
                   "Expected array result from API but got:",
-                  typeof result,
+                  typeof result
                 );
                 result = [];
               }

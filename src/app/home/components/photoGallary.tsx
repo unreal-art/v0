@@ -17,6 +17,7 @@ import { supabase } from "$/supabase/client";
 import {
   getFollowingPosts,
   getPosts,
+  getTopMintedPosts,
   getTopPosts,
 } from "@/queries/post/getPosts";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -233,7 +234,7 @@ export default function PhotoGallary() {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", activeTab?.toLowerCase() || "top"],
+    queryKey: ["posts", activeTab?.toLowerCase() || "featured_mints"],
     queryFn: async ({ pageParam = 0 }) => {
       try {
         let result: Post[] = [];
@@ -242,9 +243,11 @@ export default function PhotoGallary() {
           result = await getFollowingPosts(supabase, pageParam);
         } else if (activeTab === "EXPLORE") {
           result = await getPosts(supabase, pageParam);
+        } else if (activeTab === "FEED") {
+          result = await getTopPosts(supabase, pageParam);
         } else {
           // Default to top posts
-          result = await getTopPosts(supabase, pageParam);
+          result = await getTopMintedPosts(supabase, pageParam);
         }
 
         return {
