@@ -84,6 +84,9 @@ export const appConfig = {
       odpMainnet: "0xFF47178dAE98Cb1D61c0e46f38EB68bEa5BDE284",
       exchange: "0x5b807e61094c6c59321E11b3EcFD727D8f587eeE",
       treasury: "0x823531B7c7843D8c3821B19D70cbFb6173b9Cb02",
+      odpPartner:
+        process.env.NEXT_PUBLIC_ODP_PARTNER ||
+        "0x7ba9154300176fdd65c88db9fedfdb7e8fdcb0c1", //FIXME: its DecenterAI : on 15th July 2025 revert
       spender: "0xa6095e20d2A2a79e36322aaC39339eECb9e6C861",
     },
     tokens: {

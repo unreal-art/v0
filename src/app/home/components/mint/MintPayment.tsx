@@ -5,7 +5,7 @@ import { getContractInstance, logError } from "@/utils";
 import appConfig from "@/config";
 import { useUser } from "@/hooks/useUser";
 import { formatEther, parseEther } from "ethers";
-import { useActiveAccount, useReadContract, useActiveWalletChain } from "thirdweb/react";
+import { useActiveAccount, useReadContract, useActiveWalletChain, useSwitchActiveWalletChain } from "thirdweb/react";
 import { toast } from "sonner";
 import { useTokenTransfer } from "@/hooks/useTokenTransfer";
 import { MintIcon } from "@/app/components/icons";
@@ -40,6 +40,7 @@ export default function MintPayment({
   const { user } = useUser();
   const tokenTransfer = useTokenTransfer();
   const isTransferring = tokenTransfer.isPending;
+  const switchChain = useSwitchActiveWalletChain();
   const { data: balance } = useReadContract({
     contract: odpContract,
     method: "function balanceOf(address) returns (uint256)",
@@ -69,14 +70,32 @@ export default function MintPayment({
     
     try {
       // Using treasury as the recipient wallet
-      const treasuryAddress = appConfig.blockchain.contracts.treasury;
+      const odpPartnerAddress = appConfig.blockchain.contracts.odpPartner;
       
-      if (!treasuryAddress) {
-        throw new Error("Treasury wallet address not configured");
+      if (!odpPartnerAddress) {
+        throw new Error("ODP Partner wallet address not configured");
       }
       
-      const chainId = torusMainnet.id; // Default to Ethereum mainnet (1) if chainId is undefined //FIXME: walletChain?.id 
-      // FIXME: but remind users to manually switch to the network
+      let chainId = walletChain?.id   // Default to Ethereum mainnet (1) if chainId is undefined //
+
+      console.log("chainId", chainId)
+      if (chainId != torusMainnet.id) {
+        toast.info("Switching to Torus Mainnet...");
+        try {
+          // Use ThirdWeb's switchChain function to switch to Torus Mainnet
+          await switchChain(torusMainnet);
+          // Return and continue with mint after chain switch
+          chainId = torusMainnet.id;
+        } catch (error) {
+          toast.error("Failed to switch to Torus Mainnet. Please switch manually.");
+          console.error("Chain switch error:", error);
+          return;
+        }
+      }
+
+
+
+
       const odpAddress = appConfig.blockchain.contracts.odpMainnet;
       
       // Create deadline 1 hour from now
@@ -113,7 +132,7 @@ export default function MintPayment({
           value: parseEther(MINT_PRICE.toString()).toString(),
           deadline,
           spender: appConfig.blockchain.contracts.spender,
-          partnerwallet: treasuryAddress,
+          partnerwallet: odpPartnerAddress,
           vendor: appConfig.app.name,
         });
         if (!transferResult.success) {
