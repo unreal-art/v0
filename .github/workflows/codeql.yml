@@ -64,8 +64,7 @@ jobs:
         if: ${{ matrix.language }} == "javascript"
         uses: actions/setup-node@v3
         with:
-          node-version: 22
-          cache: "npm"
+          node-version: 23
           check-latest: true
 
       #      - name: Set up Node
