@@ -39,16 +39,6 @@ export const getUser = async (client?: Client) => {
       return null;
     }
 
-    // Refetch the profile data to get the updated wallet
-    const { data: updatedProfileData, error: refetchError } = await authClient
-      .from("profiles")
-      .select("*")
-      .eq("id", profileData[0].id);
-
-    if (refetchError) {
-      return null;
-    }
-
     return getUser()
   }
 
