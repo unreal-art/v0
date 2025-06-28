@@ -36,6 +36,7 @@ export const getUser = async (client?: Client) => {
       .single(); // Ensures only one row is returned
 
     if (walletError) {
+      console.error(walletError)
       return null;
     }
 
