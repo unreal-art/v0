@@ -32,9 +32,9 @@ import appConfig from "@/config";
 
 type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
 
-const dartContract = getContractInstance(
+const unrealTokenContract = getContractInstance(
   torusTestnet,
-  appConfig.blockchain.contracts.dart
+  appConfig.blockchain.tokens.mainnet.torus.unreal
 );
 
 // Add this placeholder function at the top of the file, outside the component
@@ -83,8 +83,8 @@ export default function UserData() {
   const { data: likeCount } = useLikeStat(profileId);
 
   // credit
-  const { data: dartBalance, refetch } = useReadContract({
-    contract: dartContract,
+  const { data: unrealBalance, refetch } = useReadContract({
+    contract: unrealTokenContract,
     method: "function balanceOf(address account) returns (uint256)",
     params: [authUser?.wallet?.address || ""],
   });
@@ -239,19 +239,12 @@ export default function UserData() {
               onClick={() => setTopup(true)}
               className="flex gap-2 whitespace-nowrap text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11"
             >
-              <div>
-                <FlashIcon width={16} height={16} color="#DADADA" />
-              </div>
+            
               <p>
                 {(() => {
-                  const profileBalance = authUser?.creditBalance ?? 0;
-                  const dartConvertedBalance = dartBalance
-                    ? Number(formatEther(dartBalance)) / 3 // divide by 3 cos 1 credit == 3 darts
-                    : 0;
-                  const totalBalance = profileBalance;
-                  return `${totalBalance.toFixed(2)} Credit${
-                    totalBalance !== 1 ? "s" : ""
-                  }`;
+                  return `${Number(
+                    formatEther(unrealBalance ?? BigInt(0))
+                  ).toFixed(2)} $UNREAL`;
                 })()}
               </p>
             </button>

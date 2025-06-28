@@ -113,6 +113,9 @@ export const appConfig = {
           usdc: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
           usdt: "0x55d398326f99059ff775485246999027b3197955",
         },
+        torus: {
+          unreal: "0xA409B5E5D34928a0F1165c7a73c8aC572D1aBCDB",
+        },
       },
     },
     rates: {
@@ -146,6 +149,6 @@ export const appConfig = {
     enableProfileEditing: true,
     enableGallerySharing: true,
   },
-}
+};
 
-export default appConfig
+export default appConfig;
