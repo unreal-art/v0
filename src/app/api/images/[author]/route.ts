@@ -18,8 +18,8 @@ export async function GET(req: Request, segmentData: { params: Params }) {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id")
-      // .eq("torus_id", author)
-      .single()
+      .eq("torus_id", author)
+      .single();
 
     if (profileError) {
       return NextResponse.json(
