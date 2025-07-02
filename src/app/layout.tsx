@@ -1,20 +1,20 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
-import ServiceWorker from "./components/serviceWorker";
-import ProgressBar from "./components/progressBar";
-import { Suspense } from "react";
-import appConfig from "@/config";
+import type { Metadata } from "next"
+import localFont from "next/font/local"
+import "./globals.css"
+import ServiceWorker from "./components/serviceWorker"
+import ProgressBar from "./components/progressBar"
+import { Suspense } from "react"
+import appConfig from "@/config"
 
-import { HighlightInit } from "@highlight-run/next/client";
-import PageTransitionProvider from "./providers/PageTransitionProvider";
+import { HighlightInit } from "@highlight-run/next/client"
+import PageTransitionProvider from "./providers/PageTransitionProvider"
 
 const nasalization = localFont({
   src: "./fonts/nasalization/Nasalization Rg.otf",
   preload: true,
   display: "swap",
   variable: "--font-nasalization",
-});
+})
 
 const archivo = localFont({
   src: [
@@ -42,7 +42,7 @@ const archivo = localFont({
   preload: true,
   display: "swap",
   variable: "--font-archivo",
-});
+})
 
 export const metadata: Metadata = {
   title: "Unreal Art",
@@ -55,13 +55,13 @@ export const metadata: Metadata = {
   // ],
   openGraph: {
     type: "website",
-    url: "https://unreal.art",
+    url: "https://art.unreal.art",
     title: "Unreal Art",
     description: "A place to let your unreal imagination come alive.",
     siteName: "Unreal",
     images: [
       {
-        url: "https://unreal.art/unreal_wordmark.png",
+        url: "https://art.unreal.art/unreal_wordmark.png",
         width: 1200,
         height: 630,
         alt: "unreal art",
@@ -75,17 +75,17 @@ export const metadata: Metadata = {
     // creator: "@YourTwitterHandle",
     title: "Unreal Art",
     description: "A place to let your unreal imagination come alive.",
-    images: ["https://unreal.art/unreal_wordmark.png"],
+    images: ["https://art.unreal.art/unreal_wordmark.png"],
   },
   other: {
     "theme-color": "#191919", // Discord embed color
   },
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en" className={`${archivo.variable} ${nasalization.variable}`}>
@@ -144,5 +144,5 @@ export default function RootLayout({
         <ServiceWorker />
       </body>
     </html>
-  );
+  )
 }

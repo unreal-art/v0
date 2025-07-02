@@ -1,32 +1,32 @@
-"use client";
-import { ReactNode, useState } from "react";
+"use client"
+import { ReactNode, useState } from "react"
 import {
   DownloadIcon,
   PinFillIcon,
   PinIcon,
   ShareIcon,
   UserIcon,
-} from "../../components/icons";
-import { useUser } from "@/hooks/useUser";
-import { IPhoto } from "@/app/libs/interfaces";
-import { useRouter } from "next/navigation";
+} from "../../components/icons"
+import { useUser } from "@/hooks/useUser"
+import { IPhoto } from "@/app/libs/interfaces"
+import { useRouter } from "next/navigation"
 import {
   useIsPostPinned,
   usePinPost,
   useUnpinPost,
-} from "@/hooks/usePinnedPosts";
-import { downloadImage } from "@/utils";
-import { Post } from "$/types/data.types";
-import Link from "next/link";
-import { usePost } from "@/hooks/usePost";
-import ShareModal from "./modals/shareModal";
-import { toast } from "sonner";
-import { Following } from "./followingBtn";
+} from "@/hooks/usePinnedPosts"
+import { downloadImage } from "@/utils"
+import { Post } from "$/types/data.types"
+import Link from "next/link"
+import { usePost } from "@/hooks/usePost"
+import ShareModal from "./modals/shareModal"
+import { toast } from "sonner"
+import { Following } from "./followingBtn"
 
 interface ImageOptionMenuProps {
-  children: ReactNode;
-  image: IPhoto;
-  postId?: string;
+  children: ReactNode
+  image: IPhoto
+  postId?: string
 }
 
 export default function ImageOptionMenu({
@@ -34,55 +34,55 @@ export default function ImageOptionMenu({
   image,
   postId,
 }: ImageOptionMenuProps) {
-  const { userId } = useUser();
-  const [open, setOpen] = useState(false);
-  const [openShare, setOpenShare] = useState(false);
+  const { userId } = useUser()
+  const [open, setOpen] = useState(false)
+  const [openShare, setOpenShare] = useState(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
   const { isPinned, setPinned } = useIsPostPinned(
     Number(postId),
-    userId as string,
-  );
-  const { data: post } = usePost(Number(postId));
-  const pinPostMutation = usePinPost(userId as string);
-  const unpinPostMutation = useUnpinPost(userId as string);
+    userId as string
+  )
+  const { data: post } = usePost(Number(postId))
+  const pinPostMutation = usePinPost(userId as string)
+  const unpinPostMutation = useUnpinPost(userId as string)
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   const handlePrompt = () => {
-    router.push("/home/photo/" + image.id);
-    handleClose();
-  };
+    router.push("/home/photo/" + image.id)
+    handleClose()
+  }
 
   const handleCreator = () => {
-    router.push("/home/profile/" + image.author);
-    handleClose();
-  };
+    router.push("/home/profile/" + image.author)
+    handleClose()
+  }
 
   const togglePostPin = () => {
-    if (!userId || !postId) return;
+    if (!userId || !postId) return
 
-    setPinned(!isPinned);
+    setPinned(!isPinned)
 
     if (!isPinned) {
       pinPostMutation.mutate(Number(postId), {
         onError: (error) => {
-          setPinned(false);
-          toast.error(`Failed to pin post: ${error.message}`);
+          setPinned(false)
+          toast.error(`Failed to pin post: ${error.message}`)
         },
-      });
+      })
     } else {
       unpinPostMutation.mutate(Number(postId), {
         onError: (error) => {
-          setPinned(true);
-          toast.error(`Failed to unpin post: ${error.message}`);
+          setPinned(true)
+          toast.error(`Failed to unpin post: ${error.message}`)
         },
-      });
+      })
     }
-  };
+  }
   return (
     <div className="relative">
       <button className="" onClick={() => setOpen(true)}>
@@ -117,11 +117,11 @@ export default function ImageOptionMenu({
             <MenuItem
               onClick={() => {
                 if (!image.src) {
-                  handleClose();
-                  return;
+                  handleClose()
+                  return
                 }
-                downloadImage(image.src);
-                handleClose();
+                downloadImage(image.src)
+                handleClose()
               }}
               icon={<DownloadIcon width={16} height={16} color="#8F8F8F" />}
               text="Download JPEG"
@@ -131,8 +131,8 @@ export default function ImageOptionMenu({
             {post && userId && (
               <MenuItem
                 onClick={() => {
-                  setOpenShare(true);
-                  handleClose();
+                  setOpenShare(true)
+                  handleClose()
                 }}
                 icon={<ShareIcon width={16} height={16} color="#8F8F8F" />}
                 text="Share"
@@ -169,12 +169,12 @@ export default function ImageOptionMenu({
             post={post as Post}
             userId={userId as string}
             setOpen={setOpenShare}
-            link={"https://unreal.art/home/photo/" + postId}
+            link={"https://art.unreal.art/home/photo/" + postId}
           />
         </div>
       )}
     </div>
-  );
+  )
 }
 
 // export function MenuItem({ icon, text, underlineOff, action, color, onClick } : { icon: ReactNode, text: string, color?: string, onClick?: () => void,  underlineOff?: boolean, action?: ReactNode }) {
@@ -257,12 +257,12 @@ export function MenuItem({
   color,
   onClick,
 }: {
-  icon: ReactNode;
-  text: string;
-  color?: string;
-  onClick?: () => void;
-  underlineOff?: boolean;
-  action?: ReactNode;
+  icon: ReactNode
+  text: string
+  color?: string
+  onClick?: () => void
+  underlineOff?: boolean
+  action?: ReactNode
 }) {
   return (
     <div
@@ -278,7 +278,7 @@ export function MenuItem({
       </div>
       {action}
     </div>
-  );
+  )
 }
 
 //#FDA29B

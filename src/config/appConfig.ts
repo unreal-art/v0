@@ -24,7 +24,7 @@ export const appConfig = {
     baseUrl:
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
-        : "https://unreal.art",
+        : "https://art.unreal.art",
   },
 
   // External services
@@ -149,6 +149,6 @@ export const appConfig = {
     enableProfileEditing: true,
     enableGallerySharing: true,
   },
-};
+}
 
-export default appConfig;
+export default appConfig

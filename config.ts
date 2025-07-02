@@ -4,7 +4,7 @@ const config = {
   domainName:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://unreal.art",
-};
+      : "https://art.unreal.art",
+}
 
-export default config;
+export default config
