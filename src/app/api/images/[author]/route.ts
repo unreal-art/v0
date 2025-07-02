@@ -19,11 +19,15 @@ export async function GET(req: Request, segmentData: { params: Params }) {
       .from("profiles")
       .select("id")
       .eq("torus_id", author)
-      .single();
+      .single()
 
     if (profileError) {
       return NextResponse.json(
-        { success: false, error: profileError.message },
+        {
+          success: false,
+          error: profileError.message,
+          message: "failed to get the torus user",
+        },
         { status: profileError.code === "PGRST116" ? 404 : 500 }
       )
     }
