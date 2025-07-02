@@ -1,60 +1,60 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image"
+import { useState, useEffect } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 
-import { FlashIcon, ShareModernIcon } from "@/app/components/icons";
-import ProfileInfo from "./profileInfo";
-import { useFollowStats } from "@/hooks/useFollowStats";
-import { useLikeStat } from "@/hooks/useLikeStat";
-import { useParams } from "next/navigation";
+import { FlashIcon, ShareModernIcon } from "@/app/components/icons"
+import ProfileInfo from "./profileInfo"
+import { useFollowStats } from "@/hooks/useFollowStats"
+import { useLikeStat } from "@/hooks/useLikeStat"
+import { useParams } from "next/navigation"
 // import { useUser } from "@/hooks/useUser";
-import useUserData, { prefetchUserData } from "@/hooks/useUserData";
-import ProfileSkeleton from "./profileSkeleton";
-import ModalWrapper from "../../components/modals/modalWrapper";
-import EditModal from "./modals/editModal";
-import DeleteModal from "./modals/deleteModal";
-import EditProfileModal from "./modals/editProfileModal";
-import ShareModal from "../../components/modals/shareModal";
-import { useUser } from "@/hooks/useUser";
-import Topup from "@/app/menu/topup";
-import { useReadContract } from "thirdweb/react";
-import { getContractInstance } from "@/utils";
-import { torusTestnet } from "$/constants/chains";
-import { formatEther } from "ethers";
-import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails";
-import { log, logError } from "@/utils/sentryUtils";
-import OptimizedImage from "@/app/components/OptimizedImage";
-import profileImage from "@/assets/images/profile.jpg";
-import appConfig from "@/config";
+import useUserData, { prefetchUserData } from "@/hooks/useUserData"
+import ProfileSkeleton from "./profileSkeleton"
+import ModalWrapper from "../../components/modals/modalWrapper"
+import EditModal from "./modals/editModal"
+import DeleteModal from "./modals/deleteModal"
+import EditProfileModal from "./modals/editProfileModal"
+import ShareModal from "../../components/modals/shareModal"
+import { useUser } from "@/hooks/useUser"
+import Topup from "@/app/menu/topup"
+import { useReadContract } from "thirdweb/react"
+import { getContractInstance } from "@/utils"
+import { torusTestnet } from "$/constants/chains"
+import { formatEther } from "ethers"
+import { useUpdateUserDetails } from "@/hooks/useUpdateUserDetails"
+import { log, logError } from "@/utils/sentryUtils"
+import OptimizedImage from "@/app/components/OptimizedImage"
+import profileImage from "@/assets/images/profile.jpg"
+import appConfig from "@/config"
 // import { getUser } from "$/queries/user/getUser";
 
-type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | "";
+type TitleType = "Edit Account" | "Edit Profile" | "Delete Account" | ""
 
 const unrealTokenContract = getContractInstance(
   torusTestnet,
   appConfig.blockchain.tokens.mainnet.torus.unreal
-);
+)
 
 // Add this placeholder function at the top of the file, outside the component
 // This is a placeholder - you would need to implement the actual function
 const getFollowerIds = async (userId: string): Promise<string[]> => {
   // In a real implementation, you would fetch follower IDs from your API
-  log(`Fetching followers for user ${userId}`);
-  return []; // Return empty array for now
-};
+  log(`Fetching followers for user ${userId}`)
+  return [] // Return empty array for now
+}
 
 export default function UserData() {
-  const [open, setOpen] = useState(false);
-  const [topup, setTopup] = useState(false);
-  const [openShare, setOpenShare] = useState(false);
-  const [title, setTitle] = useState<TitleType>("");
+  const [open, setOpen] = useState(false)
+  const [topup, setTopup] = useState(false)
+  const [openShare, setOpenShare] = useState(false)
+  const [title, setTitle] = useState<TitleType>("")
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  const params = useParams();
-  const profileId = params.id as string;
+  const params = useParams()
+  const profileId = params.id as string
 
   // Fetch data about the profile being viewed
   const {
@@ -63,7 +63,7 @@ export default function UserData() {
     error: profileError,
     isOwnProfile,
     updateUserDataOptimistically,
-  } = useUserData(profileId);
+  } = useUserData(profileId)
 
   // Get the current authenticated user's information
   const {
@@ -71,23 +71,23 @@ export default function UserData() {
     user: authUser,
     loading: authUserLoading,
     refetchUser,
-  } = useUser();
+  } = useUser()
 
   // Get the update function for profile data
   //const { updateViewedProfile } = useUpdateUserDetails();
 
   //fetch follow stats
-  const { followeeCount, followerCount } = useFollowStats(profileId);
+  const { followeeCount, followerCount } = useFollowStats(profileId)
 
   //fetch like stat
-  const { data: likeCount } = useLikeStat(profileId);
+  const { data: likeCount } = useLikeStat(profileId)
 
   // credit
   const { data: unrealBalance, refetch } = useReadContract({
     contract: unrealTokenContract,
     method: "function balanceOf(address account) returns (uint256)",
     params: [authUser?.wallet?.address || ""],
-  });
+  })
 
   // Prefetch related users when this profile is viewed
   useEffect(() => {
@@ -96,19 +96,19 @@ export default function UserData() {
       const prefetchFollowers = async () => {
         try {
           // Get follower IDs
-          const followerIds = await getFollowerIds(profileId);
+          const followerIds = await getFollowerIds(profileId)
           // Prefetch the first 3-5 followers for better UX
           followerIds.slice(0, 5).forEach((followerId: string) => {
-            prefetchUserData(queryClient, followerId);
-          });
+            prefetchUserData(queryClient, followerId)
+          })
         } catch (error) {
-          logError("Error prefetching followers", error);
+          logError("Error prefetching followers", error)
         }
-      };
+      }
 
-      prefetchFollowers();
+      prefetchFollowers()
     }
-  }, [profileId, followeeCount, queryClient, profileData]);
+  }, [profileId, followeeCount, queryClient, profileData])
 
   // Example of how to use profile updates when it's the user's own profile
   // const updateProfileBio = async (newBio: string) => {
@@ -129,23 +129,22 @@ export default function UserData() {
   //   }
   // };
 
-  if (profileLoading || authUserLoading || !authUser)
-    return <ProfileSkeleton />;
+  if (profileLoading || authUserLoading || !authUser) return <ProfileSkeleton />
   if (profileError)
-    return <p>Error loading profile data: {profileError.message}</p>;
+    return <p>Error loading profile data: {profileError.message}</p>
 
   const showEditAccount = () => {
     // Only allow editing if it's the user's own profile
-    if (!isOwnProfile) return;
+    if (!isOwnProfile) return
 
-    setOpen(true);
-    setTitle("Edit Account");
-  };
+    setOpen(true)
+    setTitle("Edit Account")
+  }
 
   const handleClose = () => {
-    setOpen(false);
-    setTitle("");
-  };
+    setOpen(false)
+    setTitle("")
+  }
 
   return (
     <>
@@ -239,12 +238,11 @@ export default function UserData() {
               onClick={() => setTopup(true)}
               className="flex gap-2 whitespace-nowrap text-primary-4 font-medium text-sm topup-btn-gradient p-3 rounded-md bg-primary-11"
             >
-            
               <p>
                 {(() => {
                   return `${Number(
                     formatEther(unrealBalance ?? BigInt(0))
-                  ).toFixed(2)} $UNREAL`;
+                  ).toFixed(2)} $UNREAL`
                 })()}
               </p>
             </button>
@@ -256,8 +254,8 @@ export default function UserData() {
         setOpen={setOpenShare}
         link={
           profileId
-            ? "https://unreal.art/home/profile/" + profileId
-            : "https://unreal.art/home"
+            ? "https://art.unreal.art/home/profile/" + profileId
+            : "https://art.unreal.art/home"
         }
         isProfile={true}
       />
@@ -281,5 +279,5 @@ export default function UserData() {
         )}
       </ModalWrapper>
     </>
-  );
+  )
 }

@@ -1,45 +1,45 @@
-"use client";
-import { supabase } from "$/supabase/client";
-import { downloadImage, formatNumber } from "@/utils";
+"use client"
+import { supabase } from "$/supabase/client"
+import { downloadImage, formatNumber } from "@/utils"
 import {
   DownloadIcon,
   HeartFillIcon,
   HeartIcon,
   MessageIcon,
   ShareIcon,
-} from "@/app/components/icons";
-import { useLikePost } from "@/hooks/useLikePost";
-import { usePost } from "@/hooks/usePost";
-import { usePostLikes } from "@/hooks/usePostLikes";
-import { useUser } from "@/hooks/useUser";
-import React, { useState } from "react";
-import { getImage } from "../formattedPhotos";
-import { Post, UploadResponse } from "$/types/data.types";
-import ShareModal from "./modals/shareModal";
-import { useCountShareNotifications } from "@/hooks/useNotifications";
+} from "@/app/components/icons"
+import { useLikePost } from "@/hooks/useLikePost"
+import { usePost } from "@/hooks/usePost"
+import { usePostLikes } from "@/hooks/usePostLikes"
+import { useUser } from "@/hooks/useUser"
+import React, { useState } from "react"
+import { getImage } from "../formattedPhotos"
+import { Post, UploadResponse } from "$/types/data.types"
+import ShareModal from "./modals/shareModal"
+import { useCountShareNotifications } from "@/hooks/useNotifications"
 
 interface IInteractions {
-  commentCount: number;
-  postId: string;
+  commentCount: number
+  postId: string
 }
 export default function ImageViewInteractions({
   commentCount,
   postId,
 }: IInteractions) {
-  const { data: likes } = usePostLikes(Number(postId), supabase);
-  const { userId } = useUser();
-  const { data: post } = usePost(Number(postId));
+  const { data: likes } = usePostLikes(Number(postId), supabase)
+  const { userId } = useUser()
+  const { data: post } = usePost(Number(postId))
 
-  const [openShare, setOpenShare] = useState(false);
+  const [openShare, setOpenShare] = useState(false)
   const { mutate: toggleLike } = useLikePost(
     Number(postId),
     userId,
-    post?.author as string,
-  );
+    post?.author as string
+  )
   const { shareCount: shareNotifications } = useCountShareNotifications(
-    Number(postId),
-  );
-  const userHasLiked = likes?.some((like) => like.author === userId);
+    Number(postId)
+  )
+  const userHasLiked = likes?.some((like) => like.author === userId)
 
   return (
     <div className="flex justify-between w-full relative h-8">
@@ -78,7 +78,7 @@ export default function ImageViewInteractions({
             post={post as Post}
             userId={userId as string}
             setOpen={setOpenShare}
-            link={"https://unreal.art/home/photo/" + postId}
+            link={"https://art.unreal.art/home/photo/" + postId}
           />
         </div>
       )}
@@ -89,14 +89,14 @@ export default function ImageViewInteractions({
             getImage(
               (post?.ipfsImages as UploadResponse[])?.[0]?.hash,
               (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
-              post?.author as string,
+              post?.author as string
             ),
-            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0],
+            (post?.ipfsImages as UploadResponse[])?.[0]?.fileNames[0]
           )
         }
       >
         <DownloadIcon color="#F0F0F0" />
       </button>
     </div>
-  );
+  )
 }
