@@ -112,16 +112,19 @@ export async function POST(
       // Generate 0x + exactly 64 hex chars to match DB constraint
       const generateValidTxHash = () => {
         // Create array of 64 elements and map each to a random hex digit
-        const hexChars = Array(64).fill(0).map(() => {
-          const randomHex = Math.floor(Math.random() * 16).toString(16)
-          return randomHex
-        }).join('')
-        
+        const hexChars = Array(64)
+          .fill(0)
+          .map(() => {
+            const randomHex = Math.floor(Math.random() * 16).toString(16)
+            return randomHex
+          })
+          .join("")
+
         return `0x${hexChars}`
       }
-      
+
       const resData = {
-        transactionhash: generateValidTxHash()
+        transactionhash: generateValidTxHash(),
       }
       return NextResponse.json({
         success: true,
@@ -156,57 +159,6 @@ export async function POST(
       console.error("Response parsing error:", error)
       throw new Error("Invalid response from token service")
     })
-
-    // Update user credit balance
-    try {
-      const rate = Number(rateStr)
-      const formattedValue = ethers.formatUnits(body.value, 18)
-      const addedBalance =
-        Number(formattedValue) / Number(ethers.formatUnits(rate.toString(), 18))
-      const newBalance = (user?.creditBalance || 0) + addedBalance
-      console.log(newBalance, user.creditBalance)
-      const { error } = await supabase
-        .from("profiles")
-        .update({ credit_balance: newBalance })
-        .eq("id", user?.id)
-
-      // Insert credit purchase record
-      const { error: creditError } = await supabase
-        .from("credit_purchases")
-        .insert([
-          {
-            amount: addedBalance,
-            user: user?.id,
-          },
-        ])
-
-      if (creditError) {
-        console.error("Error inserting credit purchase:", creditError)
-        // Don't fail the whole process if credit insertion fails
-      }
-
-      if (error) {
-        console.error("Supabase update error:", error)
-        return NextResponse.json(
-          {
-            success: true,
-            warning: "Token transfer successful but balance update failed",
-            data,
-          },
-          { status: 200 }
-        )
-      }
-    } catch (balanceError) {
-      console.error("Balance calculation error:", balanceError)
-      return NextResponse.json(
-        {
-          success: true,
-          warning: "Token transfer successful but balance update failed",
-          data,
-        },
-        { status: 200 }
-      )
-    }
 
     // Return successful response
     return NextResponse.json({ success: true, data })
