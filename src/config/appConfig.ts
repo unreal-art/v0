@@ -83,7 +83,7 @@ export const appConfig = {
       treasury: "0x823531B7c7843D8c3821B19D70cbFb6173b9Cb02",
       odpPartner:
         process.env.NEXT_PUBLIC_ODP_PARTNER ||
-        "0x823531B7c7843D8c3821B19D70cbFb6173b9Cb02", //FIXME: its DecenterAI : on 15th July 2025 revert
+        "0x0e4cC613300F22Cf86CC018397Dd57956e65a0e5", //FIXME: its DecenterAI : on 15th July 2025 revert
       spender: "0xa6095e20d2A2a79e36322aaC39339eECb9e6C861",
     },
     tokens: {
