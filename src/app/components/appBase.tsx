@@ -15,8 +15,13 @@ import WalletButton from "./walletButton";
 function AppBase({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
   const pathname = usePathname();
-  const isProfilePage = pathname.startsWith("/home/profile");
+  const isProfilePage = pathname?.startsWith("/home/profile") ?? false;
 
+  console.log("Production Debug:", {
+    pathname,
+    isProfilePage,
+    shouldShowWallet: !isProfilePage,
+  });
   return (
     <main className="fixed z-10 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen will-change-transform">
       <Toaster />
