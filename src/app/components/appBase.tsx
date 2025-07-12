@@ -67,19 +67,14 @@ function AppBase({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-      <div className=" flex-col w-full h-full hidden md:flex">
+
+      <div className="flex flex-col basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto overscroll-none">
         {!isProfilePage && (
-          <div className="hidden md:flex items-center  justify-end pr-10 py-2">
+          <div className="hidden md:flex items-center justify-end pr-10 py-2">
             <WalletButton />
           </div>
         )}
-        <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto overscroll-none">
-          {children}
-        </div>
-      </div>
-
-      <div className="flex md:hidden justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto overscroll-none">
-        {children}
+        <div className="flex justify-center flex-1">{children}</div>
       </div>
     </main>
   );
