@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { createWallet, inAppWallet } from "thirdweb/wallets"
-import { torusMainnet, torusTestnet } from "$/constants/chains"
-import { createThirdwebClient } from "thirdweb"
-import { ConnectButton } from "thirdweb/react"
-import appConfig from "@/config"
+import { createWallet, inAppWallet } from "thirdweb/wallets";
+import { torusMainnet, torusTestnet } from "$/constants/chains";
+import { createThirdwebClient } from "thirdweb";
+import { ConnectButton } from "thirdweb/react";
+import appConfig from "@/config";
 import {
   bsc,
   bscTestnet,
@@ -12,11 +12,11 @@ import {
   polygon,
   polygonAmoy,
   sepolia,
-} from "thirdweb/chains"
+} from "thirdweb/chains";
 
 export const client = createThirdwebClient({
   clientId: appConfig.services.thirdweb.clientId,
-})
+});
 
 const chains = appConfig.environment.isDevelopment
   ? [
@@ -29,13 +29,13 @@ const chains = appConfig.environment.isDevelopment
       polygonAmoy,
       sepolia,
     ]
-  : [torusMainnet, mainnet, bsc, polygon]
+  : [torusMainnet, mainnet, bsc, polygon];
 
 const metadata = {
   name: "unreal",
   url: "https://art.unreal.art",
   description: "An ai media agent",
-}
+};
 
 const wallets = [
   inAppWallet({
@@ -47,7 +47,7 @@ const wallets = [
   createWallet("io.metamask"),
   createWallet("com.coinbase.wallet"),
   createWallet("me.rainbow"),
-]
+];
 
 const WalletButton: React.FC = () => {
   return (
@@ -58,7 +58,7 @@ const WalletButton: React.FC = () => {
       wallets={wallets}
       chains={chains}
     />
-  )
-}
+  );
+};
 
-export default WalletButton
+export default WalletButton;
