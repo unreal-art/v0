@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import NavLink from "../home/components/navLink";
@@ -9,9 +10,12 @@ import { useUser } from "@/hooks/useUser";
 import { Toaster } from "sonner";
 import { useUnreadNotificationsCount } from "@/hooks/useNotifications";
 import { memo } from "react";
+import WalletButton from "./walletButton";
 
 function AppBase({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
+  const pathname = usePathname();
+  const isProfilePage = pathname === "/home/profile";
 
   return (
     <main className="fixed z-10 flex flex-col-reverse md:flex-row bg-color-primary-1 text-primary-11 h-[100dvh] w-screen will-change-transform">
@@ -63,9 +67,15 @@ function AppBase({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-
-      <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto overscroll-none">
-        {children}
+      <div className="flex flex-col w-full py-2 ">
+        {!isProfilePage && (
+          <div className="hidden md:flex items-center  justify-end pr-10">
+            <WalletButton />
+          </div>
+        )}
+        <div className="flex justify-center basis-11/12 bg-[#080808] text-primary-8 h-full overflow-y-auto overscroll-none">
+          {children}
+        </div>
       </div>
     </main>
   );

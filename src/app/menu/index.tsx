@@ -20,6 +20,7 @@ import { formatEther } from "ethers";
 import { log, logError } from "@/utils/sentryUtils";
 import OptimizedImage from "../components/OptimizedImage";
 import appConfig from "@/config";
+import WalletButton from "../components/walletButton";
 
 // Full-screen loading overlay component
 function LogoutOverlay() {
@@ -36,13 +37,13 @@ function LogoutOverlay() {
             priority
           />
         </div>
-        
+
         {/* Logout text */}
         <p className="text-white text-sm mt-2">Logging out...</p>
       </div>
     </div>
   );
-};
+}
 
 interface INotificationProps {
   children: ReactNode;
@@ -54,7 +55,13 @@ const dartContract = getContractInstance(
 );
 
 // Separate client component for the button
-function MenuButton({ onClick, children }: { onClick: () => void; children: ReactNode }) {
+function MenuButton({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return <button onClick={onClick}>{children}</button>;
 }
 
@@ -86,10 +93,10 @@ export default function Menu({ children }: INotificationProps) {
       handleClose();
       // Then show the loading overlay
       setIsLoggingOut(true);
-      
+
       // Small delay to ensure the overlay is visible
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const { error } = await supabase.auth.signOut();
       if (error) {
         logError("Error logging out", error);
@@ -116,7 +123,7 @@ export default function Menu({ children }: INotificationProps) {
             className="fixed z-50  top-0 left-0 h-screen w-full"
           ></div>
 
-          <div className="absolute w-full max-w-[240px] h-[240px] z-50 bottom-20 md:bottom-[5vh] right-4 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
+          <div className="absolute w-full max-w-[240px] h-[300px] z-50 bottom-20 md:bottom-[5vh] right-4 md:left-44 border-primary-8 border-[1px] bg-[#191919] rounded-lg">
             <Link
               onClick={handleClose}
               href={userId ? `/home/profile/${userId}` : "/home"}
@@ -165,25 +172,10 @@ export default function Menu({ children }: INotificationProps) {
               </div>
             </Link>
 
-            {/* <MenuItem
-              onClick={handleClose}
-              icon={<FlashIcon width={16} height={16} color="#C1C1C1" />}
-              text={(() => {
-                const userBalance = user?.creditBalance ?? 0;
-                const dartConvertedBalance = dartBalance
-                  ? Number(formatEther(dartBalance)) / 3 // divide by 3 cos 1 credit == 3 darts
-                  : 0;
-                const totalBalance = userBalance;
-                return `${totalBalance.toFixed(2)} Credit${
-                  totalBalance !== 1 ? "s" : ""
-                }`;
-              })()}
-              action={
-                <button onClick={handleTopup} className="underline">
-                  Top Up
-                </button>
-              }
-            /> */}
+            {/* Wallet Connection */}
+            <div className="border-primary-8 border-b-[1px] py-2 flex justify-center items-center">
+              <WalletButton />
+            </div>
 
             <Link
               href={"https://www.linkedin.com/company/decenter-ai/"}
@@ -252,7 +244,7 @@ export default function Menu({ children }: INotificationProps) {
       )}
 
       <Topup open={topup} setOpen={setTopup} refetch={refetchUser} />
-      
+
       {/* Show full-screen loading overlay when logging out */}
       {isLoggingOut && <LogoutOverlay />}
     </>
@@ -277,9 +269,9 @@ export function MenuItem({
   return (
     <div
       onClick={disabled ? undefined : onClick}
-      className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 ${disabled ? 'opacity-60' : 'cursor-pointer'} ${
-        !underlineOff ? "border-b-[1px]" : ""
-      }`}
+      className={`flex justify-between py-2 px-4 border-primary-8 text-primary-6 h-10 ${
+        disabled ? "opacity-60" : "cursor-pointer"
+      } ${!underlineOff ? "border-b-[1px]" : ""}`}
     >
       <div className="flex gap-2 items-center justify-center ">
         <div>{icon}</div>
